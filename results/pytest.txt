@@ -1,0 +1,35 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/user/riemann-lab
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 25 items
+
+tests/test_explicit_rmt_toy.py::test_explicit_formula_holds[20-1.0] PASSED [  4%]
+tests/test_explicit_rmt_toy.py::test_explicit_formula_holds[30-0.5] PASSED [  8%]
+tests/test_explicit_rmt_toy.py::test_explicit_formula_holds[0-0.3] PASSED [ 12%]
+tests/test_explicit_rmt_toy.py::test_off_line_zero_is_detected PASSED    [ 16%]
+tests/test_explicit_rmt_toy.py::test_missing_zero_is_detected PASSED     [ 20%]
+tests/test_explicit_rmt_toy.py::test_toy_trace PASSED                    [ 24%]
+tests/test_explicit_rmt_toy.py::test_gue_beats_goe_and_poisson PASSED    [ 28%]
+tests/test_primes_criteria.py::test_prime_pi PASSED                      [ 32%]
+tests/test_primes_criteria.py::test_explicit_formula_for_pi PASSED       [ 36%]
+tests/test_primes_criteria.py::test_schoenfeld PASSED                    [ 40%]
+tests/test_primes_criteria.py::test_robin_bruteforce PASSED              [ 44%]
+tests/test_primes_criteria.py::test_robin_ca PASSED                      [ 48%]
+tests/test_primes_criteria.py::test_lagarias PASSED                      [ 52%]
+tests/test_primes_criteria.py::test_mertens_known_values PASSED          [ 56%]
+tests/test_primes_criteria.py::test_li_coefficients PASSED               [ 60%]
+tests/test_zeta_zeros.py::test_first_zero PASSED                         [ 64%]
+tests/test_zeta_zeros.py::test_numpy_Z_matches_mpmath[50.0] PASSED       [ 68%]
+tests/test_zeta_zeros.py::test_numpy_Z_matches_mpmath[1000.5] PASSED     [ 72%]
+tests/test_zeta_zeros.py::test_numpy_Z_matches_mpmath[12345.6] PASSED    [ 76%]
+tests/test_zeta_zeros.py::test_numpy_Z_matches_mpmath[100000.3] PASSED   [ 80%]
+tests/test_zeta_zeros.py::test_gram_points PASSED                        [ 84%]
+tests/test_zeta_zeros.py::test_N_exact[100-29] PASSED                    [ 88%]
+tests/test_zeta_zeros.py::test_N_exact[1000-649] PASSED                  [ 92%]
+tests/test_zeta_zeros.py::test_find_zeros_matches_mpmath PASSED          [ 96%]
+tests/test_zeta_zeros.py::test_verify_window PASSED                      [100%]
+
+============================= 25 passed in 15.49s ==============================
