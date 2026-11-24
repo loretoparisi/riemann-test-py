@@ -1,0 +1,2 @@
+window (100000, 103000]: N(T2)-N(T1) = 142695-138069 = 4626, sign changes of Z = 4626 (grid oversample 10) -> ALL ZEROS ON THE CRITICAL LINE
+window (1e+06, 1.002e+06]: N(T2)-N(T1) = 1750958-1747146 = 3812, sign changes of Z = 3812 (grid oversample 40) -> ALL ZEROS ON THE CRITICAL LINE
