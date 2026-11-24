@@ -1,0 +1,64 @@
+== riemann-lab extended report: more RH criteria, with convergence verdicts ==
+   (numerical evidence, not proof; 'CONSISTENT' = converged and in line with known theory)
+
+[turing] CONSISTENT  (13.1s)
+    Turing window [g_647, g_812] = [999.236, 1200.018]: N = 648 .. 813 (E bounds left [-0.045, +0.052], right [-0.046, +0.044]), sign changes 165 vs expected 165 (grid oversample 16); argument-principle N = (648, 813) (agrees) -> ALL ZEROS ON THE CRITICAL LINE
+    Turing window [g_138067, g_139609] = [99999.637, 101000.530]: N = 138068 .. 139610 (E bounds left [-0.097, +0.124], right [-0.121, +0.100]), sign changes 1542 vs expected 1542 (grid oversample 16); argument-principle N = (138068, 139610) (agrees) -> ALL ZEROS ON THE CRITICAL LINE
+    Turing window [g_1747144, g_1748098] = [999999.733, 1000500.169]: N = 1747145 .. 1748099 (E bounds left [-0.140, +0.118], right [-0.183, +0.183]), sign changes 954 vs expected 954 (grid oversample 16); argument-principle N = (1747145, 1748099) (agrees) -> ALL ZEROS ON THE CRITICAL LINE
+    Turing window [g_21136124, g_21138397] = [9999999.909, 10001000.008]: N = 21136125 .. 21138398 (E bounds left [-0.182, +0.184], right [-0.184, +0.160]), sign changes 2273 vs expected 2273 (grid oversample 64) -> ALL ZEROS ON THE CRITICAL LINE
+    anchor g_70000 with Turing's 1953 constants: E in [-0.121, +0.115] -> N = 70001
+    wrong guess N(g_70000) = 70002: E in [-1.090, -0.916] -> rejected: True 
+
+[de-bruijn-newman] CONSISTENT  (352.9s)
+    H_t by Gauss-Hermite heat flow vs defining integral: max rel. error 2.0e-16
+    zeros in (14, 1000]: latest backward collision t_c = -4.933e-02 at the pair 750.6560, 750.9664 (gap 0.3104)
+    zeros in (10000, 11000]: latest backward collision t_c = -2.947e-03 at the pair 10898.8746, 10898.9512 (gap 0.0766)
+    zeros in (6900, 7100]: latest backward collision t_c = -7.112e-04 at the pair 7005.0629, 7005.1006 (gap 0.0377)
+    zeros in (100000, 102000]: latest backward collision t_c = -1.015e-03 at the pair 101445.4720, 101445.5169 (gap 0.0450)
+    zeros in (1e+06, 1.002e+06]: latest backward collision t_c = -3.403e-04 at the pair 1000203.5492, 1000203.5753 (gap 0.0261)
+    trend with height ['-4.93e-02', '-2.95e-03', '-1.01e-03', '-3.40e-04']: increasing towards 0: True
+    Lehmer's pair t = 7005.06: estimate -7.11e-04 vs the rigorous bound Lambda > -0.0991 (Csordas-Ruttan-Varga 1991) from that pair: consistent True
+    pair 220.715, 221.430: first-order t_c = -0.28094, exact from H_t = -0.28210 (rel. diff 4.1e-03)
+    H_0.2 has no zero in [0, 400] x [0.2, 0.82] (winding -3.2e-14, 3335 samples) -> finite-range part of Lambda <= 0.2200
+    H_0 has no zero in [0, 400] x [0.05, 1.05] (winding -9.0e-15, 3536 samples) -> finite-range part of Lambda <= 0.0013
+    known: 0 <= Lambda <= 0.2 (Rodgers-Tao 2018; Polymath 15 2019). The finite-range checks above do not
+    bound Lambda by themselves: the range beyond X needs Polymath's asymptotic analysis. 
+
+[nyman-beurling] CONSISTENT  (19.1s)
+    d_N^2 at dps 60 and 100 agree to 0.0e+00
+    d_N^2 log N: N=10: 0.05474, N=25: 0.04996, N=50: 0.04643, N=100: 0.04692, N=150: 0.04703, N=200: 0.04726
+    Burnol's lower bound C0 = 2 + gamma - log 4pi = 0.04619; d_N^2 at N=200: 0.008921
+    monotone: True; above C0 at N=200: True
+    for 50 <= N <= 200, d_N^2 log N stays within 4.5% of C0 (conjecture: -> C0). Its approach is slow and
+    irregular, as Landreau-Richard (Exp. Math. 2002) found to N = 20000 (fit d_N ~ 0.21377/sqrt(log N), i.e. 0.0457) 
+
+[weil-positivity] CONSISTENT  (7.9s)
+    s=0.1, m=12, du=0.35: lambda_min(primes) = 1.123e-08, lambda_min(zeros) = 1.123e-08, max |M_primes - M_zeros| = 4.0e-15
+    s=0.07, m=16, du=0.3: lambda_min(primes) = 1.033e-04, lambda_min(zeros) = 1.033e-04, max |M_primes - M_zeros| = 5.2e-15
+    s=0.05, m=24, du=0.25: lambda_min(primes) = 1.955e-03, lambda_min(zeros) = 1.955e-03, max |M_primes - M_zeros| = 1.4e-14
+    adding a hypothetical off-line zero (0.6+20i or 0.55+30i) to the zero side gives lambda_min = -4.31e-04, -2.07e-02, -2.04e-01  (negative = the family would detect it)
+    scalar Gaussian family: 93 test functions, min W = -4.09e-16 at (r0, sigma) = (4.0, 1.0); W >= -1e-12: True 
+
+[li-rigorous] CONSISTENT  (247.2s)
+    backend arb (certified=True), 11128 bits: lambda_1..lambda_10000 all > 0: True
+    lambda_1 = 0.023095708966121, lambda_10000 = 34736.579732, max relative ball radius 9.7e-304
+    independent run to N/2 at its own precision agrees to 0.0e+00 (relative)
+    lambda_N / ((N/2)(log N - 1 + gamma - log 2pi)) = 0.99966
+    max |lambda_n - asymptotic| / (sqrt(n) log n) on n in (N/8, N/4], (N/4, N/2], (N/2, 3N/4], (3N/4, N]: 0.0343, 0.0275, 0.0311, 0.0209  (RH predicts bounded; an off-line zero would make it grow exponentially) 
+
+[riesz] CONSISTENT  (14.7s)
+    x up to 1e+10: max |R(x)|/x^(1/4) = 0.4390 (at x = 10, where the trivial-zero term -16.4/x dominates); for x > 1e4 it is 1.94e-04 (RH: bounded)
+    R(x) vs the zero expansion with 30 zeros + 3 trivial terms, x > 1e4: max error = 3.7e-06 of that amplitude
+    two truncation points (c = 4, 6) agree to 5.8e-17 x^(1/4); rigorous tail bound 1.5e-06 x^(1/4)
+    largest log|R(x)|/log x for x > 1e4: -0.165 (RH <=> eventually <= 1/4 + eps) 
+
+[redheffer] CONSISTENT  (11.6s)
+    det A_n = M(n) exactly (integer Bareiss) for every n <= 200
+    n = 200: det (LU) = -8.000000, M(n) = -8, top eigenvalue / sqrt(n) = 1.1837
+    n = 500: det (LU) = -6.000000, M(n) = -6, top eigenvalue / sqrt(n) = 1.1365
+    n = 1000: det (LU) = +2.000000, M(n) = +2, top eigenvalue / sqrt(n) = 1.1077
+    n = 2000: det (LU) = +5.000000, M(n) = +5, top eigenvalue / sqrt(n) = 1.0842
+    n = 3000: det (LU) = -6.000000, M(n) = -6, top eigenvalue / sqrt(n) = 1.0726
+    top eigenvalue / sqrt(n) decreasing towards 1 (Vaughan: lambda_max = sqrt(n) + O(log n)): True 
+
+7/7 checks consistent; done in 666.5s
