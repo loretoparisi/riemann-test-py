@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 import mpmath as mp
 import numpy as np
 
-from . import criteria, explicit_formula, primes, rmt, toy_trace, zeros
+from . import (criteria, dbn, explicit_formula, li_rigorous, nyman_beurling, primes, riesz_redheffer, rmt,
+               toy_trace, turing, weil, zeros, zeta)
 
 # Fixed categorical order (validated palette); text stays in neutral ink.
 C = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
@@ -157,8 +158,144 @@ def plot_toy(out, gamma=7.0, width=0.5):
     return _save(fig, out, "08_toy_trace.png")
 
 
-ALL = [plot_Z, plot_pi, plot_robin, plot_mertens, plot_li, plot_gue, plot_explicit, plot_toy]
+def plot_turing(out, n=138067, h_gram=40):
+    """Running integral of S~(t) from the Gram point g_n, against Turing's bound."""
+    an = turing.turing_anchor(n, h_gram)
+    g, h = an.g, an.h
+    zs, _ = turing.certified_sign_changes(g - h - 1, g + h + 1)
+    ts = np.linspace(g - h, g + h, 1201)
+    S = np.array([np.sum((zs > g) & (zs <= t)) - np.sum((zs > t) & (zs <= g)) for t in ts]) + n + 1 \
+        - (zeta.theta(ts) / np.pi + 1)
+    dt = ts[1] - ts[0]
+    I = np.concatenate(([0], np.cumsum(0.5 * (S[1:] + S[:-1]) * dt)))
+    I -= I[600]                                         # integral from g_n
+    a, b = turing.TRUDGIAN
+    B = a + b * np.log(ts / (2 * np.pi))
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.8))
+    a1.plot(ts - g, S, color=C[0], lw=1, label="S~(t) = N~(t) − θ(t)/π − 1")
+    a1.axhline(0, color=INK2, lw=0.8)
+    a1.set(title=f"Believed S(t) around g_{n} ≈ {g:.1f}", xlabel="t − g_n", ylabel="S~(t)")
+    a1.legend(loc="upper left")
+    a2.plot(ts - g, I, color=C[0], label="∫ from g_n of S~")
+    a2.fill_between(ts - g, -B, B, color=C[2], alpha=0.15, label="Trudgian bound ±(2.067 + 0.059 log(t/2π))")
+    a2.plot(ts - g, (ts - g) * 1.0 + 0 * ts, color=C[7], lw=1, ls="--", label="what one missing zero would add")
+    a2.set(title=f"E ∈ [{an.E_lower:+.2f}, {an.E_upper:+.2f}] ⇒ N(g_n) = {an.N} exactly",
+           xlabel="t − g_n", ylabel="∫ S~ dt", ylim=(-3.5, 3.5))
+    a2.legend(loc="lower right", fontsize=8)
+    fig.suptitle("Turing's method: an exact zero count from an integral bound", fontweight="bold")
+    return _save(fig, out, "09_turing.png")
 
 
-def make_all(out="plots"):
-    return [f(out) for f in ALL]
+def plot_dbn(out):
+    wins = [(14, 1000), (1e4, 1.1e4), (1e5, 1.02e5), (1e6, 1.002e6)]
+    est = [dbn.window_estimate(*w) for w in wins]
+    # heat flow of Lehmer's pair
+    g1, g2 = 7005.062866174921, 7005.100564672647
+    p = dbn.window_estimate(6900, 7100, edge=0.0)
+    tc = p["max_t_c"]
+    x = np.linspace(2 * g1 - 0.12, 2 * g2 + 0.12, 161)
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.8))
+    for t, col in ((0.0, C[0]), (tc / 2, C[2]), (tc, C[3]), (2 * tc, C[7])):
+        v = np.array([float(mp.re(dbn.H(t, xx, nodes=30)) * mp.exp(mp.pi * xx / 8)) for xx in x])
+        a1.plot(x / 2, v / np.abs(v).max(), color=col, lw=1.5, label=f"t = {t:+.1e}")
+    a1.axhline(0, color=INK2, lw=0.8)
+    a1.set(title="Backward heat flow merges Lehmer's pair (γ ≈ 7005.06)", xlabel="γ = x/2",
+           ylabel="H_t(x) (rescaled)")
+    a1.legend(loc="lower left", fontsize=8)
+    heights = [np.sqrt(w[0] * w[1]) if w[0] > 14 else 300 for w in wins]
+    a2.semilogx(heights, [-e["max_t_c"] for e in est], "o-", color=C[0], mec=SURF, mew=2,
+                label="−(latest collision time) in the window")
+    a2.set_yscale("log")
+    a2.set(title="Finite-window estimates creep up to Λ ≥ 0", xlabel="height t", ylabel="−t_c")
+    a2.legend(loc="upper right")
+    fig.suptitle("de Bruijn–Newman constant: RH ⇔ Λ = 0 (Λ ≥ 0 by Rodgers–Tao)", fontweight="bold")
+    return _save(fig, out, "10_de_bruijn_newman.png")
+
+
+def plot_nyman_beurling(out, N=200):
+    d2 = nyman_beurling.distances(N, 60)
+    n = np.arange(1, N + 1)
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.8))
+    a1.loglog(n, d2, color=C[0], label="d_N²")
+    a1.loglog(n[1:], nyman_beurling.C0 / np.log(n[1:]), color=C[1], lw=1.5, ls="--", label="C0 / log N (conjectured)")
+    a1.set(title="Báez-Duarte distances d_N² → 0", xlabel="N", ylabel="d_N²")
+    a1.legend()
+    a2.semilogx(n[1:], d2[1:] * np.log(n[1:]), color=C[0], label="d_N² log N")
+    a2.axhline(nyman_beurling.C0, color=C[7], lw=1.5, ls="--", label="Burnol: liminf ≥ 2 + γ − log 4π")
+    a2.set(title="Approaching Burnol's constant from above", xlabel="N", ylim=(0.04, 0.1))
+    a2.legend()
+    fig.suptitle("Nyman–Beurling criterion: RH ⇔ d_N → 0", fontweight="bold")
+    return _save(fig, out, "11_nyman_beurling.png")
+
+
+def plot_weil(out):
+    z = zeros.first_zeros(120)
+    s_, m, du = 0.07, 16, 0.3
+    u = du * np.arange(m)
+    Mg = weil.weil_matrix(s_, u)
+    Ms = weil.weil_matrix(s_, u, z, side="spectral")
+    Mf = weil.weil_matrix(s_, u, z, extra_zeros=[(0.6, 20.0)], side="spectral")
+    k = np.arange(1, m + 1)
+    fig, ax = plt.subplots(figsize=(9, 3.8))
+    ax.semilogy(k, np.linalg.eigvalsh(Mg), "o", color=C[0], ms=7, mec=SURF, mew=2, label="from primes (geometric side)")
+    ax.semilogy(k, np.linalg.eigvalsh(Ms), "x", color=C[1], ms=6, label="from zeros (spectral side)")
+    ef = np.linalg.eigvalsh(Mf)
+    ax.semilogy(k, np.abs(ef), "s", color=C[7], ms=4, mfc="none", label="zeros + one off-line zero 0.6+20i (|λ|)")
+    neg = ef < 0
+    ax.semilogy(k[neg], np.abs(ef[neg]), "s", color=C[7], ms=8, label="… negative eigenvalue")
+    ax.set(title="Weil positivity: the 16×16 Weil matrix built from primes is positive definite",
+           xlabel="eigenvalue index", ylabel="eigenvalue")
+    ax.legend(loc="lower right", fontsize=8)
+    return _save(fig, out, "12_weil.png")
+
+
+def plot_li_rigorous(out, N=5000):
+    r = li_rigorous.li_coefficients_rigorous(N)
+    n = r.n.astype(float)
+    dev = (r.mid - li_rigorous.asymptotic(n)) / (np.sqrt(n) * np.log(n + 1))
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.8))
+    a1.loglog(n, r.mid, color=C[0], label="λ_n (Arb enclosure midpoints)")
+    a1.loglog(n, li_rigorous.asymptotic(n).clip(1e-3), color=C[1], lw=1.2, ls="--", label="(n/2)(log n − 1 + γ − log 2π)")
+    a1.set(title=f"λ_1 … λ_{N} certified positive", xlabel="n", ylabel="λ_n")
+    a1.legend(loc="upper left")
+    a2.plot(n, dev, color=C[0], lw=0.8)
+    a2.set(title="(λ_n − asymptotic) / (√n log n): bounded, as RH predicts", xlabel="n")
+    fig.suptitle("Li's criterion with ball arithmetic", fontweight="bold")
+    return _save(fig, out, "13_li_rigorous.png")
+
+
+def plot_riesz_redheffer(out):
+    s = riesz_redheffer.riesz_summary(1e10, 300)
+    x, R, Rz = s["x"], s["R"], s["R_zeros"]
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.8))
+    a1.semilogx(x, R / x**0.25, color=C[0], label="R(x)/x^{1/4} (Möbius form)")
+    a1.semilogx(x, Rz / x**0.25, color=C[1], lw=1.2, ls="--", label="zero expansion, 30 zeros")
+    a1.set(title="Riesz: RH ⇔ R(x) = O(x^{1/4+ε})", xlabel="x", ylim=(-3e-4, 3e-4))
+    a1.legend(loc="lower left", fontsize=8)
+    ns = np.array([50, 100, 200, 400, 800, 1600, 3000])
+    M = criteria.mertens(int(ns.max()))
+    top, dets = [], []
+    for n in ns:
+        A = riesz_redheffer.redheffer_matrix(int(n)).astype(float)
+        ev = np.linalg.eigvals(A)
+        top.append(np.abs(ev).max())
+        sg, ld = np.linalg.slogdet(A)
+        dets.append(sg * math.exp(ld))
+    a2.plot(ns, np.array(top) / np.sqrt(ns), "o-", color=C[0], mec=SURF, mew=2, label="largest eigenvalue / √n")
+    a2b = a2.twinx()
+    a2b.plot(ns, dets, "s", color=C[1], ms=5, label="det A_n")
+    a2b.plot(ns, M[ns], "x", color=INK, ms=7, label="M(n)")
+    a2b.set_ylabel("det A_n = M(n)")
+    a2.set(title="Redheffer matrices", xlabel="n")
+    a2.legend(loc="upper right", fontsize=8)
+    a2b.legend(loc="lower right", fontsize=8)
+    return _save(fig, out, "14_riesz_redheffer.png")
+
+
+ALL = [plot_Z, plot_pi, plot_robin, plot_mertens, plot_li, plot_gue, plot_explicit, plot_toy,
+       plot_turing, plot_dbn, plot_nyman_beurling, plot_weil, plot_li_rigorous, plot_riesz_redheffer]
+NEW = ALL[8:]
+
+
+def make_all(out="plots", only_new: bool = False):
+    return [f(out) for f in (NEW if only_new else ALL)]
