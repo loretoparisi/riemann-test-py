@@ -1,4 +1,4 @@
-"""Command line: python -m riemann_lab {report,plots,verify} ..."""
+"""Command line: python -m riemann_lab {report,extended,plots,verify,turing} ..."""
 from __future__ import annotations
 
 import argparse
@@ -42,12 +42,24 @@ def main(argv=None):
     r.add_argument("--quick", action="store_true")
     pl = sub.add_parser("plots", help="write the example figures")
     pl.add_argument("--out", default="plots")
+    e = sub.add_parser("extended", help="Turing, de Bruijn-Newman, Nyman-Beurling, Weil, rigorous Li, Riesz, Redheffer")
+    e.add_argument("--quick", action="store_true")
+    e.add_argument("--only", nargs="*", help="subset, e.g. turing de_bruijn_newman nyman_beurling weil li_rigorous riesz redheffer")
     v = sub.add_parser("verify", help="Turing-style check that all zeros in (T1,T2] are on the line")
     v.add_argument("T1", type=float)
     v.add_argument("T2", type=float)
+    tu = sub.add_parser("turing", help="Turing's method: N(T) at both ends from the S(t) integral bound, no argument principle")
+    tu.add_argument("T1", type=float)
+    tu.add_argument("T2", type=float)
     a = p.parse_args(argv)
     if a.cmd == "report":
         report(a.quick)
+    elif a.cmd == "extended":
+        from . import extended
+        extended.run(a.quick, a.only)
+    elif a.cmd == "turing":
+        from . import turing
+        print(turing.turing_verify(a.T1, a.T2))
     elif a.cmd == "plots":
         from . import plots
         for path in plots.make_all(a.out):
