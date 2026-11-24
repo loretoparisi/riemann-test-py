@@ -1,0 +1,70 @@
+== riemann-lab: Ramanujan x Masullo checks (done criteria in docs/ramanujan_done_criteria.md) ==
+   (numerical evidence, not proof; 'CONSISTENT' = every criterion met, two computations agree)
+
+[rmt-mellin] CONSISTENT  (82.7s)
+    (1+x)^-1.5               max rel. err vs Gamma(s) lambda(-s) 5.8e-25 at 6 points; dps 20 vs 30 6.5e-15; Taylor 2.4e-16; Hardy A = 0.017 (< pi)
+    zeta: 1/(e^x-1) - 1/x    max rel. err vs Gamma(s) lambda(-s) 2.9e-20 at 6 points; dps 20 vs 30 8.1e-22; Taylor 1.3e-15; Hardy A = 1.572 (< pi)
+    L(s, chi4)               max rel. err vs Gamma(s) lambda(-s) 7.5e-32 at 6 points; dps 20 vs 30 2.2e-21; Taylor 1.1e-16; Hardy A = 1.524 (< pi)
+    L(s, chi5_1)             max rel. err vs Gamma(s) lambda(-s) 5.2e-32 at 6 points; dps 20 vs 30 1.2e-21; Taylor 3.5e-16; Hardy A = 1.588 (< pi)
+    L(s, chi5_2)             max rel. err vs Gamma(s) lambda(-s) 2.3e-31 at 6 points; dps 20 vs 30 3.1e-21; Taylor 8.0e-15; Hardy A = 1.583 (< pi)
+    L(s, chi7_3)             max rel. err vs Gamma(s) lambda(-s) 1.7e-31 at 6 points; dps 20 vs 30 4.4e-21; Taylor 1.2e-15; Hardy A = 1.534 (< pi)
+    Hardy-Sobolev norms of (1+x)^-1.5, I = [0.3, 1.1], s = 0 and s = 2: x side = Mellin side (via RMT) to 3.3e-15; ||f||^2 = 1.363640 <= edge sum 1.566290 <= 2||f||^2: True
+    Hardy's hypothesis holds with A = pi/2 for zeta and L(s, chi): by Carlson's theorem the values at the
+    negative integers (Bernoulli numbers) determine L(s, chi) inside the critical strip. 
+
+[hardy-littlewood-ramanujan] CONSISTENT  (427.4s)
+    zeta    series vs zero expansion 4.4e-13, Moebius sum (N=1e+07) vs zero expansion 1.3e-11 (units of x^-1/4); 1e2 <= x <= 1e+08: max x^1/4 |M| = 4.346e-02, without the trivial-zero terms 2.918e-05 <= sum_rho |Gamma((1-rho)/2)/(2L'(rho))| = 2.934e-05
+    chi3_1  series vs zero expansion 4.4e-16, Moebius sum (N=1e+07) vs zero expansion 1.3e-11 (units of x^-1/4); 1e2 <= x <= 1e+08: max x^1/4 |M| = 4.922e-02, without the trivial-zero terms 2.844e-03 <= sum_rho |Gamma((1-rho)/2)/(2L'(rho))| = 2.895e-03
+    chi4    series vs zero expansion 6.0e-16, Moebius sum (N=1e+07) vs zero expansion 1.3e-11 (units of x^-1/4); 1e2 <= x <= 1e+08: max x^1/4 |M| = 3.108e-02, without the trivial-zero terms 1.266e-02 <= sum_rho |Gamma((1-rho)/2)/(2L'(rho))| = 1.318e-02
+    chi5_1  series vs zero expansion 1.7e-16, Moebius sum (N=1e+07) vs zero expansion 1.3e-11 (units of x^-1/4); 1e2 <= x <= 1e+08: max x^1/4 |M| = 4.707e-02, without the trivial-zero terms 4.134e-02 <= sum_rho |Gamma((1-rho)/2)/(2L'(rho))| = 4.381e-02
+    chi5_2  series vs zero expansion 1.5e-16, Moebius sum (N=1e+07) vs zero expansion 1.3e-11 (units of x^-1/4); 1e2 <= x <= 1e+08: max x^1/4 |M| = 5.757e-01, without the trivial-zero terms 6.246e-03 <= sum_rho |Gamma((1-rho)/2)/(2L'(rho))| = 6.664e-03
+    chi5_3  series vs zero expansion 5.6e-17, Moebius sum (N=1e+07) vs zero expansion 1.3e-11 (units of x^-1/4); 1e2 <= x <= 1e+08: max x^1/4 |M| = 4.707e-02, without the trivial-zero terms 4.134e-02 <= sum_rho |Gamma((1-rho)/2)/(2L'(rho))| = 4.381e-02
+    Ramanujan alpha beta = pi, alpha = 0.5: lhs -2.407940115695117e-05, zero side -2.407940115692440e-05, diff 2.7e-17
+    Ramanujan alpha beta = pi, alpha = 1.0: lhs +2.848814513378706e-05, zero side +2.848814513385967e-05, diff 7.3e-17
+    Ramanujan alpha beta = pi, alpha = 1.5: lhs +2.065435659948101e-05, zero side +2.065435659944256e-05, diff 3.8e-17
+    RMT: Mellin(M_chi)(s) = Gamma(s)/L(1-2s, chi); its poles sit at s = (1-rho)/2, so GRH <=> M_chi = O(x^(-1/4+eps)). 
+
+[hecke-zeros] CONSISTENT  (0.0s)
+    q =  3: 1 characters, zeros on the line 17; argument-principle counts equal: True; max |count - smooth N| 0.42
+    q =  4: 1 characters, zeros on the line 20; argument-principle counts equal: True; max |count - smooth N| 0.30
+    q =  5: 3 characters, zeros on the line 21, 21, 22; argument-principle counts equal: True; max |count - smooth N| 0.52
+    q =  7: 5 characters, zeros on the line 24, 24, 24, 23, 25; argument-principle counts equal: True; max |count - smooth N| 0.91
+    q =  8: 2 characters, zeros on the line 25, 25; argument-principle counts equal: True; max |count - smooth N| 0.22
+    q = 11: 9 characters, zeros on the line 28, 27, 27, 27, 28, 28, 28, 28, 28; argument-principle counts equal: True; max |count - smooth N| 0.75
+    q = 13: 11 characters, zeros on the line 29, 28, 29, 29, 29, 29, 29, 29, 30, 29, 29; argument-principle counts equal: True; max |count - smooth N| 0.92
+    839 zeros with 0 < gamma <= 50 for 32 primitive characters: every zero of Lambda(s, chi) in [-1/2, 3/2] x [0, 50] is on Re s = 1/2 (grid 0.1 and 0.05 give the same count) 
+
+[hecke-explicit-formula] CONSISTENT  (79.1s)
+    Weil explicit formula, h(r) = exp(-(r/w)^2), w in (4.0, 6.0), 32 characters: max |zero side - prime side| = 6.2e-15 (at ('chi7_3', 6.0))
+    adding one hypothetical zero pair 0.6 + 9i, 0.4 + 9i breaks it by at least 2.1e-01 
+
+[zero-multiplicities] CONSISTENT  (0.4s)
+    zeta of Q(zeta_5) (degree 4 = bound in Expectation 1.7.1): 74 zeros up to 50, min gap between ordinates 1.87e-04, min |Z'| at a zero 7.93e-01 -> all simple
+    zeta of Q(zeta_7) (degree 6 = bound in Expectation 1.7.1): 130 zeros up to 50, min gap between ordinates 3.53e-04, min |Z'| at a zero 7.93e-01 -> all simple
+    zeta of Q(zeta_11) (degree 10 = bound in Expectation 1.7.1): 259 zeros up to 50, min gap between ordinates 1.01e-04, min |Z'| at a zero 7.93e-01 -> all simple
+    zeta of Q(zeta_13) (degree 12 = bound in Expectation 1.7.1): 329 zeros up to 50, min gap between ordinates 1.05e-04, min |Z'| at a zero 7.93e-01 -> all simple
+    PSLQ on gamma_1..gamma_8 (30 digits, coefficients <= 1000): no relation
+    Thm 1.7.1.1 (finite order chi mod 7, p <= 60, |Im s| <= 200): poles shared by local factors at two distinct primes: [0.0] (expected: only s = 0) 
+
+[euler-products-1-line] CONSISTENT  (0.6s)
+    12 characters: |P(x)/L(1,chi) - 1| at x = 1e+07 between 6.8e-06 and 2.3e-05
+    scaled error |P/L - 1| sqrt(x)/log(x)^2: max 1.10e-03 on the upper half of the range; max ratio upper/lower half 0.49 (GRH: bounded)
+    Nicolas: N_k/phi(N_k) > e^gamma log log N_k for all 664578 primorials with p_k <= 1e+07: True (min ratio 1.0000395; scaled margin in [2.625, 4.063]) 
+
+[ramanujan-robin] CONSISTENT  (59.5s)
+    89992 colossally abundant n up to log n = 1.155e+06: Robin margin positive for all: True
+    (e^gamma loglog n - sigma(n)/n) sqrt(log n): mean 1.46372 on the first half, 1.43244 on the second (drifting down: True); min on the second half 1.39689 vs the RH liminf (Ramanujan; Robin 1984) 1.39322. It oscillates, so no monotone decrease is expected
+    c_q(n) closed form = sum of primitive q-th roots of unity for q, n < 60: True; zeta(2) sum_(q<=2000) c_q(n)/q^2 - sigma(n)/n: max 2.4e-05 (<= 10/Q)
+    sum_q c_q(n)/q = 0: partial sums = sum_(d|n) m(Q/d), m(x) = sum_(k<=x) mu(k)/k; for 1e3 <= x <= 1e+07 max |m(x)| sqrt(x) = 0.425, max log|m(x)|/log x = -0.563 (RH rate: <= -1/2 + eps) 
+
+[ramanujan-tau] CONSISTENT  (50.3s)
+    tau(1..10) = [1, -24, 252, -1472, 4830, -6048, -16744, 84480, -113643, -115920]
+    multiplicative True, tau(p^2) = tau(p)^2 - p^11 True, tau(p^3) recursion True, tau = sigma_11 mod 691 True (n <= 2000)
+    Deligne: max |tau(p)|/(2 p^5.5) = 0.9594 over 303 primes; Sato-Tate moments E[(2x)^2] = 0.951, E[(2x)^4] = 1.807, E[(2x)^6] = 4.321 (1, 2, 5): True
+    L(Delta, s): 8 sign changes of Lambda(6 + it) for 0 < t <= 30; argument principle on [4.5, 7.5] x [0, 30]: 8.000000; first zero 9.222379399921 (LMFDB 9.222379399921) 
+
+8/8 checks consistent; done in 700.0s
+
+real	11m41.261s
+user	25m51.782s
+sys	0m10.413s
