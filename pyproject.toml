@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "riemann-lab"
+version = "0.1.0"
+description = "Numerical experiments around the Riemann Hypothesis: zeros, explicit formulas, equivalent criteria, GUE statistics"
+requires-python = ">=3.9"
+dependencies = ["numpy", "scipy", "mpmath", "matplotlib"]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.setuptools]
+packages = ["riemann_lab"]

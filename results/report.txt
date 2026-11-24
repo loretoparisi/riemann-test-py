@@ -1,0 +1,18 @@
+== riemann-lab report: numerical checks of RH and its equivalents ==
+
+[zeros]    window (100, 5000]: N(T2)-N(T1) = 4520-29 = 4491, sign changes of Z = 4491 (grid oversample 10) -> ALL ZEROS ON THE CRITICAL LINE
+[gram]     {'n0': 0, 'n1': 1000, 'good': 959, 'bad': 42, 'fraction_good': 0.958041958041958}
+[primes]   {'xmax': 1000000, 'max_ratio': 0.9644527408495925, 'argmax_x': 2657.0, 'holds': True}
+[robin]    n in (5040, 1000000]: holds=True, max ratio 1.755814 at n=10080 (e^γ=1.781072)
+[robin-CA] 19992 colossally abundant n up to 10^96728: holds=True, max ratio 1.7808203
+[lagarias] n <= 1000000: holds=True
+[mertens]  x <= 1000000: max |M(x)|/sqrt(x) = 0.8944 at x=5
+[li]       lambda_1..20 all positive: True  (lambda_1 = 0.023095708966)
+[explicit] Weil/Guinand formula, Gaussian test function at r0=20:
+           spectral (zeros) = 1.186337317641
+           geometric        = 1.186337317641  [poles -5.263e-87, archimedean 0.922750, primes 0.263587]
+           residual         = 4.441e-16  using 60 zeros
+[toy]      Masullo toy trace (spectral vs geometric): {'gamma': 7.0, 'support_log': (-0.20000000000000007, 1.4), 'inside_(1,gamma)': False, 'spectral': 0.19790177145785004, 'geometric': 0.197901771457851, 'matrix': 0.19790177145785104}
+[gue]      KS distance of spacings near t=1e5: {'GUE': 0.01869071873029529, 'GOE': 0.08681266118485012, 'Poisson': 0.29859702253523374}
+
+done in 27.7s

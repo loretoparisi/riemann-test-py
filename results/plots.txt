@@ -1,0 +1,8 @@
+wrote docs/plots/01_hardy_Z.png
+wrote docs/plots/02_prime_staircase.png
+wrote docs/plots/03_robin.png
+wrote docs/plots/04_mertens.png
+wrote docs/plots/05_li_coefficients.png
+wrote docs/plots/06_gue.png
+wrote docs/plots/07_explicit_formula_scan.png
+wrote docs/plots/08_toy_trace.png
