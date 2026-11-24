@@ -1,6 +1,6 @@
 # riemann-test-py
 
-Numerical lab for exploring the Riemann Hypothesis: zeta zeros, prime counting, Robin/Mertens/Li criteria, explicit formula, GUE random-matrix statistics, Turing's method, the de Bruijn–Newman heat flow, Nyman–Beurling distances, Weil positivity, certified Li coefficients, and the Riesz and Redheffer criteria, with tests and plots. The Python package is `riemann_lab`.
+Numerical lab for exploring the Riemann Hypothesis: zeta zeros, prime counting, Robin/Mertens/Li criteria, explicit formula, GUE random-matrix statistics, Turing's method, the de Bruijn–Newman heat flow, Nyman–Beurling distances, Weil positivity, certified Li coefficients, the Riesz and Redheffer criteria, and Ramanujan-based checks of Masullo's GRH programme (Master Theorem, Hardy–Littlewood–Ramanujan, Dirichlet L-function zeros, tau), with tests and plots. The Python package is `riemann_lab`.
 
 Numerical experiments around the Riemann Hypothesis (RH), built alongside a
 reading of A. M. Masullo's manuscript *The Music of the Primes* (2026 draft),
@@ -14,11 +14,13 @@ to prove it. Floating-point checks are evidence, not certificates.
 
 ```bash
 pip install -e .[test,rigorous]   # numpy, scipy, mpmath, matplotlib (+ pytest, python-flint)
-pytest -q                   # 44 tests, ~20 s
+pytest -q                   # 67 tests, ~45 s
 python -m riemann_lab report --quick      # original checks, ~10 s
 python -m riemann_lab report              # bigger ranges, ~1 min
 python -m riemann_lab extended --quick    # new criteria with convergence verdicts, ~1.5 min
 python -m riemann_lab extended            # full run, ~11 min (results/extended_report.txt)
+python -m riemann_lab ramanujan --quick   # Ramanujan x Masullo checks, ~6 min
+python -m riemann_lab ramanujan           # full run, ~12 min on 4 cores (results/ramanujan_report.txt)
 python -m riemann_lab turing 1e6 1.0005e6 # Turing's method on one window
 python -m riemann_lab verify 100000 102000  # Turing-style check of one window
 python -m riemann_lab plots --out docs/plots
@@ -42,13 +44,16 @@ python -m riemann_lab plots --out docs/plots
 | `li_rigorous` | Keiper–Li λ_n to n = 10^4 in Arb ball arithmetic (python-flint), mpmath.iv fallback | `li_coefficients_rigorous`, `summary` |
 | `riesz_redheffer` | Riesz function R(x) to 10^10 with a rigorous truncation bound, checked against its zero expansion; det(Redheffer) = M(n) | `riesz`, `riesz_from_zeros`, `redheffer_check` |
 | `extended` | Runs the six new checks and gives each a convergence/consistency verdict | `run` |
+| `hecke` | Dirichlet L-functions = Hecke L-functions over Q (Masullo's GL(1) case): primitive characters mod 3, 4, 5, 7, 8, 11, 13, Z_χ(t), zeros on the line, argument-principle zero count in the strip, Weil explicit formula for χ, partial Euler products on the 1-line, Nicolas' primorial criterion | `primitive_characters`, `line_zeros`, `winding_count`, `explicit_formula`, `euler_product_1line`, `nicolas_primorials` |
+| `ramanujan` | Ramanujan's Master Theorem (Hardy's form) with Bernoulli-number coefficients of L(s, χ); Masullo's Hardy–Sobolev norms via RMT + Mellin–Plancherel; the Hardy–Littlewood–Ramanujan function Σμ(n)χ(n)/n e^{−x/n²} three ways (power series, Möbius sum, zero expansion); Ramanujan's αβ = π identity; Robin's constant at colossally abundant numbers; Ramanujan sums; τ(n) and zeros of L(Δ, s) | `rmt_check`, `hardy_sobolev_check`, `hl_series`, `MobiusTable`, `hl_zero_expansion`, `ramanujan_alpha_beta`, `tau_checks`, `DeltaL` |
+| `ramanujan_checks` | Runs the eight Ramanujan × Masullo checks against criteria fixed before they were built ([docs/ramanujan_done_criteria.md](docs/ramanujan_done_criteria.md)) | `run` |
 | `plots` | The figures below | `make_all` |
 
 ## Results of the full run
 
-Raw output is in [`results/`](results/): `pytest.txt`, `report.txt`, `verify_windows.txt`, `extended_report.txt`.
+Raw output is in [`results/`](results/): `pytest.txt`, `report.txt`, `verify_windows.txt`, `extended_report.txt`, `ramanujan_report.txt`.
 
-* Tests: 44 of 44 pass (25 original + 19 for the new criteria).
+* Tests: 67 of 67 pass (25 original + 19 for the extended criteria + 23 for the Ramanujan × Masullo checks).
 * Zeros: all 4,491 zeros with 100 < t ≤ 5000, all 4,626 with 10^5 < t ≤ 1.03·10^5 and all 3,812 with 10^6 < t ≤ 1.002·10^6 lie on the critical line (sign changes of Z equal N(T2) − N(T1)).
 * Gram's law holds for 959 of the first 1,001 Gram intervals.
 * Schoenfeld's RH bound |π(x) − li(x)| < √x log x / 8π holds up to 10^6 (tightest at x = 2657, ratio 0.964).
@@ -114,6 +119,69 @@ fact for small n and says nothing about all n.
 3. Pass 1, Riesz: the rigorous tail bound was 6% of the signal. Fix: a longer, chunked tail sum
    (L = 60 x^{7/12}) brings it under 1%.
 
+## Ramanujan × Masullo (third run)
+
+Raw output: [`results/ramanujan_report.txt`](results/ramanujan_report.txt). The done criteria were written
+before any code: [docs/ramanujan_done_criteria.md](docs/ramanujan_done_criteria.md). **All 8 checks are consistent
+in one full pass.** These are numerical tests of ideas, not a repair of Masullo's proof and not a proof of anything.
+
+**Why Ramanujan fits Masullo.** Masullo works with Mellin transforms on the idele class group: his Hardy–Sobolev
+norms are L² norms of Mellin transforms on two vertical lines, and his main consequence (§1.4.5) is that
+L′/L(s + 1/2, χ) has no poles in the open strip. Ramanujan's Master Theorem (RMT) gives Mellin transforms in closed
+form from Taylor coefficients: ∫₀^∞ x^{s−1} Σ λ(k)(−x)^k/k! dx = Γ(s) λ(−s). Chapter 13 of the draft ("holomorphic
+families of test functions", "main theorems on the location of the zeros") is empty, and RMT is a supply of explicit,
+holomorphic families whose Mellin side is known exactly. The proposals tested here:
+
+1. **RMT reconstructs L(s, χ) inside the critical strip from its values at negative integers** (generalized Bernoulli
+   numbers). Hardy's growth hypothesis holds with A = π/2 < π, so by Carlson's theorem those values determine L.
+   Measured: the Mellin integral equals Γ(s)L(s, χ) to 10^−20…10^−31 at six points per function (ζ and χ mod 4, 5, 7),
+   dps 20 and 30 agree, and the Hardy–Sobolev norm of (1+x)^−1.5 computed on the Mellin side via RMT equals the
+   x-side norm to 3·10^−15, with Masullo's norm equivalence holding.
+2. **A Ramanujan reformulation of Masullo's main consequence.** With λ(k) = 1/L(2k+1, χ), RMT gives
+   Mellin(M_χ)(s) = Γ(s)/L(1−2s, χ) for M_χ(x) = Σ μ(n)χ(n)/n e^{−x/n²} = Σ (−x)^k/(k! L(2k+1, χ)).
+   Its poles in the strip are at s = (1−ρ)/2, so **GRH for χ ⇔ M_χ(x) = O(x^{−1/4+ε})** (Hardy–Littlewood 1918
+   for ζ), and Hardy's RMT hypothesis on the half-plane Re z > −1/4 holds exactly when GRH holds for χ. A trace-formula
+   proof could aim at this growth bound instead of at the poles of L′/L.
+   Measured, for ζ and χ mod 3, 4, 5: the power series, the Möbius sum to N = 10^7 (with a rigorous tail bound) and the
+   residue expansion over zeros on the line agree to 10^−11 x^{−1/4} for 10² ≤ x ≤ 10^8. x^{1/4}|M_χ − trivial terms|
+   stays below the amplitude Σ|Γ((1−ρ)/2)/2L′(ρ)| computed from the zeros. Ramanujan's lost-notebook identity
+   (αβ = π), which needs simple zeros, holds to 7·10^−17 at three values of α.
+3. **GRH for Hecke L-functions over Q, to height 50.** For all 32 primitive characters mod 3, 4, 5, 7, 8, 11, 13: the
+   argument-principle count of zeros of Λ(s, χ) in [−1/2, 3/2] × [0, 50] equals the number of sign changes of Z_χ on
+   the line (839 zeros), at two grid densities.
+4. **Explicit formula for χ (Masullo App. B.4).** Zero side = prime side to 6·10^−15 for every character and two
+   Gaussian widths. One hypothetical zero pair 0.6 + 9i, 0.4 + 9i breaks it by at least 0.2.
+5. **Masullo's Expectation 1.7.1 (zero multiplicities ≤ [F : Q] for finite-order χ).** For the Dedekind zeta of
+   Q(ζ_q), q = 5, 7, 11, 13 (degree 4 … 12), every zero up to height 50 is simple (|Z′| ≥ 0.79) and no ordinate is
+   shared between characters (smallest gap 10^−4). That is multiplicity 1, which is stronger than the bound and in line
+   with the Grand Simplicity Hypothesis. PSLQ finds no integer relation among γ₁…γ₈. For Thm 1.7.1.1, the local factors at
+   different primes share no pole other than s = 0.
+6. **Partial Euler products on the 1-line (App. B.7).** ∏_{p≤x}(1 − χ(p)/p)^{−1} → L(1, χ) for 12 characters, with
+   |error|·√x/log²x shrinking (upper/lower half ratio 0.49) up to x = 10^7. Nicolas' criterion
+   N_k/φ(N_k) > e^γ log log N_k holds for all 664,578 primorials with p_k ≤ 10^7.
+7. **Ramanujan's highly composite numbers (RH-conditional part) and Robin's constant.** At 89,992 colossally abundant
+   n up to log n = 1.16·10^6, (e^γ log log n − σ(n)/n)√log n is positive. It drifts down from a mean of 1.464 to
+   1.432 and stays above the RH liminf e^γ(2√2 − 4 − γ + log 4π) = 1.3932 (minimum on the second half: 1.3969).
+   Ramanujan sums: the closed form matches the root-of-unity definition. Σ_q c_q(n)/q → 0 at the RH rate
+   (|m(x)| ≤ x^{−0.563} for 10³ ≤ x ≤ 10^7).
+8. **τ(n) and L(Δ, s) (GL(2), the empty §14.3 of the draft).** τ is multiplicative, satisfies the Hecke relations and
+   τ ≡ σ₁₁ (mod 691), and obeys Deligne's bound (max |τ(p)|/2p^{11/2} = 0.959). The Sato–Tate moments are 0.95, 1.81
+   and 4.32 (theory 1, 2, 5). All 8 zeros of L(Δ, s) with 0 < t ≤ 30 lie on Re s = 6, with the argument-principle
+   count equal to 8. The first zero is 9.222379399921.
+
+### Convergence log (Ramanujan run)
+
+1. Quick run, `ramanujan-robin`: the pre-written criterion asked the scaled Robin margin to decrease monotonically
+   across three stretches. It oscillates (1.468, 1.439, 1.470), as d_N² log N does in the Nyman–Beurling check, so the
+   test was wrong, not the numbers. The new criterion: positive everywhere, the second-half mean below the first-half mean,
+   and the second-half minimum above 1.3932 − 0.05. It is recorded in the criteria file.
+2. Full pass 1, 6/8: `rmt-mellin` for χ mod 7 (2.6·10^−8) and `hardy-littlewood-ramanujan` for χ̄ mod 5 (7.6·10^−8)
+   missed their 10^−10 and 10^−8 thresholds. The cause was the character values, which were rounded to 15 decimals, so
+   χ(n) = ±i came out as 10^−15 ± i: Σχ ≠ 0, a spurious pole at s = 1, and χ, χ̄ no longer exact conjugates.
+   The fix builds the values from one table of roots of unity, with exact 0/±1 components and exact conjugate pairs.
+   (mpmath's `dirichlet(1, χ)` is also unreliable for such χ, so L(1, χ) now uses the digamma formula.)
+3. Full pass 2: 8/8 consistent.
+
 ## Figures
 
 | | |
@@ -133,5 +201,6 @@ fact for small n and says nothing about all n.
 * Masullo's restricted-strip trace formula: for F = Q it says the geometric side equals
   the sum over zeros with |Re ρ − 1/2| ≤ α only. `explicit_formula.check(..., extra_zeros=...)`
   shows what an off-line zero would do to that identity.
-* Not implemented: Dirichlet/Hecke L-functions; the large-x (asymptotic) half of a de Bruijn–Newman upper bound;
+* Dirichlet L-functions are in `hecke` (Hecke characters of other number fields are not).
+* Not implemented: the large-x (asymptotic) half of a de Bruijn–Newman upper bound;
   interval arithmetic outside `li_rigorous`.
