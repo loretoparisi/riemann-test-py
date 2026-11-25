@@ -1,0 +1,82 @@
+== riemann-lab: Majorana x Masullo checks (done criteria in docs/majorana_done_criteria.md) ==
+   (numerical evidence, not proof; 'CONSISTENT' = every criterion met, two computations agree)
+
+[majorana-tower] CONSISTENT  (1.7s)
+    integer spins (j0, c) = (0, 1/2): 441 states up to j = 20: so(3,1) error 5.8e-14, Hermitian (unitary) error 0.0e+00, Gamma^mu 4-vector error 6.5e-13
+       rest masses m/(s+1/2) = [2.0, 0.666667, 0.4, 0.285714] (error 4.3e-15); boosted p = 0.7m: E - sqrt(M_s^2 + p^2) = 8.9e-16 at J = 80, J = 40 vs 80: 8.2e-08; 38 negative-energy solutions, all spacelike (|E| < p): True, max |E| = 0.6820
+    half-integer spins (j0, c) = (1/2, 0): 462 states up to j = 20.5: so(3,1) error 6.3e-14, Hermitian (unitary) error 0.0e+00, Gamma^mu 4-vector error 7.1e-13
+       rest masses m/(s+1/2) = [1.0, 0.5, 0.333333, 0.25] (error 3.3e-15); boosted p = 0.7m: E - sqrt(M_s^2 + p^2) = 2.3e-15 at J = 80, J = 40 vs 80: 4.2e-06; 38 negative-energy solutions, all spacelike (|E| < p): True, max |E| = 0.6821
+    spectral zeta of the tower, sum over states of (M/m)^s by Euler-Maclaurin vs 2 zeta(s-1) (half-integer) and 2(2^(s-1) - 1) zeta(s-1) (integer) at s = 3, 4.5, 6: max rel. error 2.2e-16
+       (so zeta(s - 1) is the trace of beta^s on Majorana's half-integer tower; a rewriting, not a spectral realisation of the zeros) 
+
+[discrete-series-hardy-sobolev] CONSISTENT  (23.4s)
+    D+_0.6: sl(2,R) error 5.0e-13, Casimir - a(a-1) 2.4e-13, masses m a/(a+n) error 0.0e+00, J0 = z d/dz + a and J+ = z^2 d/dz + 2a z match the matrices (1.8e-13), Plyushchay basis orthonormal (4.4e-16)
+    D+_0.75: sl(2,R) error 3.4e-13, Casimir - a(a-1) 2.3e-13, masses m a/(a+n) error 0.0e+00, J0 = z d/dz + a and J+ = z^2 d/dz + 2a z match the matrices (1.4e-14), Plyushchay basis orthonormal (1.1e-16)
+    D+_1: sl(2,R) error 4.5e-13, Casimir - a(a-1) 2.3e-13, masses m a/(a+n) error 0.0e+00, J0 = z d/dz + a and J+ = z^2 d/dz + 2a z match the matrices (2.1e-14), Plyushchay basis orthonormal (0.0e+00)
+    D+_1.5: sl(2,R) error 4.5e-13, Casimir - a(a-1) 2.3e-13, masses m a/(a+n) error 0.0e+00, J0 = z d/dz + a and J+ = z^2 d/dz + 2a z match the matrices (1.4e-14), Plyushchay basis orthonormal (0.0e+00)
+    alpha = 0.6: ||f||^2 = 3.12224222338 from coefficients, Laplace side, Mellin line Re z = 0.4 and disk: max rel. spread 0.0e+00
+    alpha = 0.75: ||f||^2 = 4.51997974134 from coefficients, Laplace side, Mellin line Re z = 0.25 and disk: max rel. spread 0.0e+00
+    alpha = 1: ||f||^2 = 8.8119205802 from coefficients, Laplace side, Mellin line Re z = 0 and disk: max rel. spread 0.0e+00
+    alpha = 1.5: ||f||^2 = 39.0060251864 from coefficients, Laplace side, Mellin line Re z = -0.5 and disk: max rel. spread 0.0e+00
+    alpha = 0.5: ||f||^2 = 2.47656022978 from coefficients, Laplace side, Mellin line Re z = 0.5 and circle: max rel. spread 0.0e+00
+    Masullo W^0_[0,0.4] norm^2 6.135488161; single-line norms (x side = Mellin side) 2.627593561 = 2.627593561, 5.320029276 = 5.320029276; max <= HS <= sum: True
+    Masullo W^0_[-0.5,0.25] norm^2 15.29555416; single-line norms (x side = Mellin side) 13.02084842 = 13.02084842, 3.471057722 = 3.471057722; max <= HS <= sum: True
+    So D+_alpha (the internal space of the (2+1)-d Majorana equation) is, through Cayley + Laplace + Mellin, the L2 space of the line Re z = 1 - alpha, and Masullo's W^0_[a,b] is D+_(1-a) + D+_(1-b) up to a factor 2 
+
+[local-rh-majorana-basis] CONSISTENT  (16.9s)
+    alpha = 0.6: zeros of Q_n, n <= 30: max |Re z - 0.4| = 2.1e-37; sign changes of i^-n Q_30 on the line: 30 and 30 (two grids; imag/abs <= 2e-15); quadrature vs closed form 2.6e-23; orthonormal on the line 1.7e-21; control F_6^(a) + F_5^(a+1/2): Re z spread 2.928
+    alpha = 0.75: zeros of Q_n, n <= 30: max |Re z - 0.25| = 5.6e-37; sign changes of i^-n Q_30 on the line: 30 and 30 (two grids; imag/abs <= 2e-16); quadrature vs closed form 1.4e-23; orthonormal on the line 1.7e-21; control F_6^(a) + F_5^(a+1/2): Re z spread 3.132
+    alpha = 1: zeros of Q_n, n <= 30: max |Re z - 0| = 2.4e-37; sign changes of i^-n Q_30 on the line: 30 and 30 (two grids; imag/abs <= 8e-16); quadrature vs closed form 5.6e-24; orthonormal on the line 5.1e-27; control F_6^(a) + F_5^(a+1/2): Re z spread 3.479
+    alpha = 1.5: zeros of Q_n, n <= 30: max |Re z - -0.5| = 3.0e-36; sign changes of i^-n Q_30 on the line: 30 and 30 (two grids; imag/abs <= 2e-15); quadrature vs closed form 3.0e-23; orthonormal on the line 9.0e-26; control F_6^(a) + F_5^(a+1/2): Re z spread 4.191
+    Every Majorana basis vector satisfies a 'local Riemann hypothesis' on Masullo's line (Meixner-Pollaczek zeros are real); a mixture of two different alpha does not 
+
+[xi-discrete-series-expansion] CONSISTENT  (12.8s)
+    lambda = 0.75: |a_n| from 0.481 to 4.94e-23 at n = 160 (smallest of the last ten 4.9e-23); dps 30 vs 40 agree to 6.3e-14 on 55 coefficients; S_160 - Xi(2x) on [0, 10]: 6.9e-15 of Xi(0)
+       zeros gamma_1..4 from real roots of S_N: errors at N = 80: 7.0e-11, 2.3e-07, 3.6e-04, 1.9e-01; at N = 160: 4.4e-14, 2.9e-10, 2.0e-08, 2.8e-05
+    lambda = 1: |a_n| from 0.4759 to 3.21e-25 at n = 160 (smallest of the last ten 3.2e-25); dps 30 vs 40 agree to 1.5e-14 on 55 coefficients; S_160 - Xi(2x) on [0, 10]: 8.1e-16 of Xi(0)
+       zeros gamma_1..4 from real roots of S_N: errors at N = 80: 1.2e-10, 4.2e-07, 5.0e-04, 4.5e-01; at N = 160: 1.1e-13, 2.1e-11, 9.4e-10, 4.1e-06
+    lambda = 3/4 and 1 give the same four zeros to 2.4e-05. Resolving the k-th zero needs degree N ~ gamma_k^2/3: the expansion converges, but it is not an efficient route to the zeros 
+
+[majorana-stars-jensen] CONSISTENT  (35.3s)
+    GORZ gamma(n), n <= 40: quadrature of Riemann's Phi vs mpmath Taylor of xi (n <= 6): 0.0
+    Jensen J^(d,n), d <= 10, n <= 30: 310 of 310 hyperbolic (exact Sturm counts); Majorana stars of the spin-d/2 states: max |Y| = 0.0e+00 (all on the great circle Y = 0)
+    control, Xi with an extra zero quadruple at s = 0.9 +- 2i, 0.1 +- 2i: 4 non-hyperbolic J^(d,n), first (d, n) = (7, 0), stars leave the circle by up to 0.167
+    control, Xi with an extra zero quadruple at s = 0.9 +- 1i, 0.1 +- 1i: 8 non-hyperbolic J^(d,n), first (d, n) = (3, 0), stars leave the circle by up to 0.352
+    control, Xi with an extra zero quadruple at s = 0.95 +- 3i, 0.05 +- 3i: not detected for d <= 10, n <= 30 (low-degree Jensen polynomials only see off-line zeros at small height) 
+
+[majorana-random-matrices-quadratic-L] CONSISTENT  (107.5s)
+    class D BdG (2N = 100, 20000 samples, particle-hole symmetry error 0e+00): L2 distance of the near-zero density to 1 + sinc 0.023, to 1 - sinc 0.964
+    class C BdG (2N = 100, 20000 samples, particle-hole symmetry error 0e+00): L2 distance of the near-zero density to 1 + sinc 0.963, to 1 - sinc 0.028
+    zeros of L(s, chi_d) below 10 for 10 discriminants: theta integral vs hecke.Z agree to 3.7e-11
+    1759 fundamental discriminants 100 < |d| <= 3000, zeros scaled by log|d|/2pi: one-level density on [0, 2] in bins of 1/4: [0.05, 0.34, 0.7, 1.06, 0.94, 0.72, 0.63, 0.88]
+       L2 distance to USp (class C) 0.387, SO(even) (class D) 1.069, U 0.646; first bin 0.048 (U: 1, USp: 0.127)
+       the quadratic Dirichlet family (Masullo's GL(1) over Q) has the repulsion of class C, not of the Majorana class D; at |d| ~ 10^3 the finite-conductor corrections are still large (cf. Rubinstein 2001) 
+
+[majorana-thomas-fermi] CONSISTENT  (224.4s)
+    a1 = 0.455996254682469 = 9 - sqrt 73 (0.0), = 2(1 - lambda) (0.0), lambda = (sqrt 73 - 7)/2 = 0.772001872659
+    400 terms: phi'(0) = -(3/16)^(1/3) sum a_n = -1.58807102261137531 (tail ~5.3e-34); literature -1.58807102261137523: 8.6e-17
+    a_n/a_(n-1) at n = 10, 50, 100, 399: 0.7954, 0.8170, 0.8229, 0.8293 (Majorana: ~4/5; it is ~0.80 at n ~ 10 and creeps up slowly)
+    independent shooting (double precision, s = sqrt x): phi'(0) = -1.588071022611368, vs series 7.4e-15
+    phi(x) on [0.1, 20]: full series vs 30-digit ODE 3.1e-11; truncated to 10, 12, 15 terms: max rel. error 0.50%, 0.25%, 0.09% (Esposito reports 'order of 0.1%' for 10 terms; we find 0.1% needs ~15)
+    Mellin Int_0^100 x^(s-1) phi dx at s = 0.5, 1.5, (1+1j), 2.5: Majorana's one quadrature vs ODE 5.8e-8; full Mellin M phi(0.5) = 2.12929713226, M phi(1+i) = (0.4572437574 + 0.3737315254j) (ODE + fitted tail: within 5.1e-6)
+    pole of M phi at s = 3: eps M phi(3 - eps) = 138.4769, 141.2058, 142.5946, extrapolated 143.9997 (Sommerfeld 144); exponent from x^3 phi/144 - 1 at x <= 10^6: 0.77159 vs 0.77200 
+
+[majorana-algebras-moonshine] CONSISTENT  (8.3s)
+    V_2A (dim 3): M1 True, M2 min 0 >= 0, spec ad(a) = {0, 1/4, 1}, dim V_1 = 1, fusion True, tau(a) automorphism True, |id| = 12/5 (Table 2.3: 12/5)
+    V_2B (dim 2): M1 True, M2 min 0 >= 0, spec ad(a) = {0, 1}, dim V_1 = 1, fusion True, tau(a) automorphism True, |id| = 2 (Table 2.3: 2)
+    V_3A (dim 4): M1 True, M2 min 0.0198 >= 0, spec ad(a) = {0, 1/32, 1/4, 1}, dim V_1 = 1, fusion True, tau(a) automorphism True, |id| = 116/35 (Table 2.3: 116/35)
+    V_3C (dim 3): M1 True, M2 min 0 >= 0, spec ad(a) = {0, 1/32, 1}, dim V_1 = 1, fusion True, tau(a) automorphism True, |id| = 32/11 (Table 2.3: 32/11)
+    V_4A (dim 5): M1 True, M2 min 0.858 >= 0, spec ad(a) = {0, 1/32, 1/4, 1}, dim V_1 = 1, fusion True, tau(a) automorphism True, |id| = 4 (Table 2.3: 4)
+    V_4B (dim 5): M1 True, M2 min 0 >= 0, spec ad(a) = {0, 1/32, 1/4, 1}, dim V_1 = 1, fusion True, tau(a) automorphism True, |id| = 19/5 (Table 2.3: 19/5)
+    V_5A (dim 6): M1 True, M2 min 0.457 >= 0, spec ad(a) = {0, 1/32, 1/4, 1}, dim V_1 = 1, fusion True, tau(a) automorphism True, |id| = 32/7 (Table 2.3: 32/7)
+    V_6A (dim 8): M1 True, M2 min 16.9 >= 0, spec ad(a) = {0, 1/32, 1/4, 1}, dim V_1 = 1, fusion True, tau(a) automorphism True, |id| = 51/10 (Table 2.3: 51/10)
+    j - 744 = q^-1 + 196884 q + 21493760 q^2 + 864299970 q^3 + ... (c(1) = 196884 = dim of the Griess algebra V_M, the Majorana algebra of the Monster)
+    Rademacher's Kloosterman-Bessel series, |error| for n = 1..5: cutoff 200: 0.014, 0.005, 0.008, 0.012, 0.051; cutoff 1000: 0.001, 0.001, 0.007, 0.001, 0.003
+    Weil: max |K(m,n;c)| / (d(c) gcd(m,n,c)^(1/2) c^(1/2)) = 1.0000 for m, n <= 5, c <= 1000 (RH for curves over F_p, a theorem)
+    McKay-Thompson: c(1) = 1 + 196883, c(2) = 1 + 196883 + 21296876, c(3) = 2 + 2*196883 + 21296876 + 842609326: True 
+
+8/8 checks consistent; done in 430.3s
+
+real	7m11.314s
+user	13m8.694s
+sys	0m4.297s
