@@ -1,4 +1,4 @@
-"""Command line: python -m riemann_lab {report,extended,plots,verify,turing} ..."""
+"""Command line: python -m riemann_lab {report,extended,ramanujan,plots,verify,turing} ..."""
 from __future__ import annotations
 
 import argparse
@@ -45,6 +45,10 @@ def main(argv=None):
     e = sub.add_parser("extended", help="Turing, de Bruijn-Newman, Nyman-Beurling, Weil, rigorous Li, Riesz, Redheffer")
     e.add_argument("--quick", action="store_true")
     e.add_argument("--only", nargs="*", help="subset, e.g. turing de_bruijn_newman nyman_beurling weil li_rigorous riesz redheffer")
+    rm = sub.add_parser("ramanujan", help="Ramanujan x Masullo: Master Theorem, Hardy-Littlewood-Ramanujan, Dirichlet L zeros, tau")
+    rm.add_argument("--quick", action="store_true")
+    rm.add_argument("--only", nargs="*", help="subset, e.g. rmt_mellin hardy_littlewood_ramanujan hecke_zeros "
+                    "hecke_explicit_formula zero_multiplicities euler_products ramanujan_robin ramanujan_tau")
     v = sub.add_parser("verify", help="Turing-style check that all zeros in (T1,T2] are on the line")
     v.add_argument("T1", type=float)
     v.add_argument("T2", type=float)
@@ -57,6 +61,9 @@ def main(argv=None):
     elif a.cmd == "extended":
         from . import extended
         extended.run(a.quick, a.only)
+    elif a.cmd == "ramanujan":
+        from . import ramanujan_checks
+        ramanujan_checks.run(a.quick, a.only)
     elif a.cmd == "turing":
         from . import turing
         print(turing.turing_verify(a.T1, a.T2))
