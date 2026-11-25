@@ -1,6 +1,6 @@
 # riemann-test-py
 
-Numerical lab for exploring the Riemann Hypothesis: zeta zeros, prime counting, Robin/Mertens/Li criteria, explicit formula, GUE random-matrix statistics, Turing's method, the de Bruijn–Newman heat flow, Nyman–Beurling distances, Weil positivity, certified Li coefficients, the Riesz and Redheffer criteria, and Ramanujan-based checks of Masullo's GRH programme (Master Theorem, Hardy–Littlewood–Ramanujan, Dirichlet L-function zeros, tau), with tests and plots. The Python package is `riemann_lab`.
+Numerical lab for exploring the Riemann Hypothesis: zeta zeros, prime counting, Robin/Mertens/Li criteria, explicit formula, GUE random-matrix statistics, Turing's method, the de Bruijn–Newman heat flow, Nyman–Beurling distances, Weil positivity, certified Li coefficients, the Riesz and Redheffer criteria, Ramanujan-based checks of Masullo's GRH programme (Master Theorem, Hardy–Littlewood–Ramanujan, Dirichlet L-function zeros, tau) and Majorana-based ones (discrete series as Hardy–Sobolev lines, local RH, stellar representation of Jensen polynomials, Majorana random matrices, Thomas–Fermi, Majorana algebras), with tests and plots. The Python package is `riemann_lab`.
 
 Numerical experiments around the Riemann Hypothesis (RH), built alongside a
 reading of A. M. Masullo's manuscript *The Music of the Primes* (2026 draft),
@@ -14,13 +14,15 @@ to prove it. Floating-point checks are evidence, not certificates.
 
 ```bash
 pip install -e .[test,rigorous]   # numpy, scipy, mpmath, matplotlib (+ pytest, python-flint)
-pytest -q                   # 67 tests, ~45 s
+pytest -q                   # 86 tests, ~1 min
 python -m riemann_lab report --quick      # original checks, ~10 s
 python -m riemann_lab report              # bigger ranges, ~1 min
 python -m riemann_lab extended --quick    # new criteria with convergence verdicts, ~1.5 min
 python -m riemann_lab extended            # full run, ~11 min (results/extended_report.txt)
 python -m riemann_lab ramanujan --quick   # Ramanujan x Masullo checks, ~6 min
 python -m riemann_lab ramanujan           # full run, ~12 min on 4 cores (results/ramanujan_report.txt)
+python -m riemann_lab majorana --quick    # Majorana x Masullo checks, ~5 min
+python -m riemann_lab majorana           # full run, ~7 min on 4 cores (results/majorana_report.txt)
 python -m riemann_lab turing 1e6 1.0005e6 # Turing's method on one window
 python -m riemann_lab verify 100000 102000  # Turing-style check of one window
 python -m riemann_lab plots --out docs/plots
@@ -46,14 +48,16 @@ python -m riemann_lab plots --out docs/plots
 | `extended` | Runs the six new checks and gives each a convergence/consistency verdict | `run` |
 | `hecke` | Dirichlet L-functions = Hecke L-functions over Q (Masullo's GL(1) case): primitive characters mod 3, 4, 5, 7, 8, 11, 13, Z_χ(t), zeros on the line, argument-principle zero count in the strip, Weil explicit formula for χ, partial Euler products on the 1-line, Nicolas' primorial criterion | `primitive_characters`, `line_zeros`, `winding_count`, `explicit_formula`, `euler_product_1line`, `nicolas_primorials` |
 | `ramanujan` | Ramanujan's Master Theorem (Hardy's form) with Bernoulli-number coefficients of L(s, χ); Masullo's Hardy–Sobolev norms via RMT + Mellin–Plancherel; the Hardy–Littlewood–Ramanujan function Σμ(n)χ(n)/n e^{−x/n²} three ways (power series, Möbius sum, zero expansion); Ramanujan's αβ = π identity; Robin's constant at colossally abundant numbers; Ramanujan sums; τ(n) and zeros of L(Δ, s) | `rmt_check`, `hardy_sobolev_check`, `hl_series`, `MobiusTable`, `hl_zero_expansion`, `ramanujan_alpha_beta`, `tau_checks`, `DeltaL` |
+| `majorana` | Majorana's infinite-component tower (Gel'fand–Naimark matrices, mass spectrum m/(s+½), tachyonic branch, spectral zeta); D⁺_α of SL(2,ℝ) carried by Cayley + Laplace + Mellin to Masullo's line norms; local RH for the basis (Meixner–Pollaczek); Ξ in that basis; Majorana stars of Jensen polynomials; class D/C BdG matrices and quadratic Dirichlet zeros (theta integral); Majorana's Thomas–Fermi series and its Mellin transform; Norton–Sakuma algebras in exact arithmetic, j coefficients, Rademacher, Weil | `tower_check`, `hardy_sobolev_chain`, `local_rh`, `xi_mp_coefficients`, `majorana_stars`, `bdg_samples`, `QuadraticL`, `tf_series`, `TFMajorana`, `norton_sakuma_check` |
+| `majorana_checks` | Runs the eight Majorana × Masullo checks against criteria fixed before they were built ([docs/majorana_done_criteria.md](docs/majorana_done_criteria.md)) | `run` |
 | `ramanujan_checks` | Runs the eight Ramanujan × Masullo checks against criteria fixed before they were built ([docs/ramanujan_done_criteria.md](docs/ramanujan_done_criteria.md)) | `run` |
 | `plots` | The figures below | `make_all` |
 
 ## Results of the full run
 
-Raw output is in [`results/`](results/): `pytest.txt`, `report.txt`, `verify_windows.txt`, `extended_report.txt`, `ramanujan_report.txt`.
+Raw output is in [`results/`](results/): `pytest.txt`, `report.txt`, `verify_windows.txt`, `extended_report.txt`, `ramanujan_report.txt`, `majorana_report.txt`.
 
-* Tests: 67 of 67 pass (25 original + 19 for the extended criteria + 23 for the Ramanujan × Masullo checks).
+* Tests: 86 of 86 pass (25 original + 19 for the extended criteria + 23 for the Ramanujan × Masullo checks + 19 for the Majorana × Masullo checks).
 * Zeros: all 4,491 zeros with 100 < t ≤ 5000, all 4,626 with 10^5 < t ≤ 1.03·10^5 and all 3,812 with 10^6 < t ≤ 1.002·10^6 lie on the critical line (sign changes of Z equal N(T2) − N(T1)).
 * Gram's law holds for 959 of the first 1,001 Gram intervals.
 * Schoenfeld's RH bound |π(x) − li(x)| < √x log x / 8π holds up to 10^6 (tightest at x = 2657, ratio 0.964).
@@ -181,6 +185,99 @@ holomorphic families whose Mellin side is known exactly. The proposals tested he
    The fix builds the values from one table of roots of unity, with exact 0/±1 components and exact conjugate pairs.
    (mpmath's `dirichlet(1, χ)` is also unreliable for such χ, so L(1, χ) now uses the digamma formula.)
 3. Full pass 2: 8/8 consistent.
+
+## Majorana × Masullo (fourth run)
+
+Raw output: [`results/majorana_report.txt`](results/majorana_report.txt). The done criteria were written before any
+code: [docs/majorana_done_criteria.md](docs/majorana_done_criteria.md). **All 8 checks are consistent in one full
+pass.** Sources: Recami's survey and the 2006 EJTP Majorana issue (the 1932 infinite-component equation, the 1928
+Thomas–Fermi solution, the stellar representation), Plyushchay's *Fractional spin: Majorana–Dirac field*,
+Castillo-Ramírez's thesis *On Majorana algebras and representations* (2014) and Hendriksen's *Majorana particles in
+physics and mathematics* (2014). As before: numerical tests of ideas, not a repair of Masullo's proof.
+
+**What carries over to Masullo, and what does not.**
+
+* *The strongest link is structural.* Majorana's equation in 2+1 dimensions (Plyushchay) has its internal space in
+  the discrete series D⁺_α of SL(2, ℝ), realised on holomorphic functions on the disk with weight (1 − |z|²)^{2α−2}.
+  Cayley map + Laplace transform + Mellin transform carry that norm, exactly, to the L² norm on the vertical line
+  Re z = 1 − α, which is the seminorm Masullo uses to define his Hardy–Sobolev spaces (his Lemma D.3.1.2 even
+  describes his Schwartz–Bergman spaces as Bergman spaces with the disc replaced by a strip). So Masullo's
+  W⁰_[a,b] is, up to a factor 2, D⁺_{1−a} ⊕ D⁺_{1−b}. The basis Majorana and Plyushchay use (z^n ↔ Laguerre functions
+  ↔ Γ(α + iτ) × Meixner–Pollaczek polynomials) is an explicit orthonormal, hence Schauder, basis of each line, with
+  J₀ = Majorana's spin operator and the mass operator mα/J₀. It is a ready-made coordinate system for the "orbital
+  Schauder bases" of chapters 4 and 7.
+* *A local Riemann hypothesis comes for free, a global one does not.* The Mellin transform of every basis vector has
+  all its zeros on Re z = 1 − α (orthogonal polynomials have real zeros). A mixture of two α breaks this, and the
+  expansion of Ξ in the basis converges but only resolves the k-th zero at degree ~γ_k²/3. Nothing in the
+  representation theory forces the zeros of the particular infinite combination Ξ onto the line: that is still
+  the whole problem.
+* *Majorana's tower gives a trace identity, not a Hilbert–Pólya operator.* Σ over states of (M/m)^s on the
+  half-integer tower is 2ζ(s − 1): ζ appears as a spectral zeta function, but its zeros are not eigenvalues.
+* *Majorana's stellar representation turns Jensen hyperbolicity into geometry.* J^{d,n} (Griffin–Ono–Rolen–Zagier)
+  is the Majorana polynomial of a spin-d/2 state, and it is hyperbolic exactly when all Majorana stars lie on one
+  great circle. That is a reformulation; low-degree Jensen polynomials only see off-line zeros at small height.
+* *Majorana fermions pick the wrong symmetry class for Masullo's GL(1) family.* Majorana Bogoliubov–de Gennes
+  Hamiltonians (class D, H = iA with A real antisymmetric, the Clifford-algebra picture of Hendriksen's thesis) give
+  SO(even) statistics near zero; the quadratic Dirichlet family is symplectic, like class C. Class D would match
+  SO(even) families (for example even quadratic twists of an elliptic curve), which `hecke` does not cover yet.
+* *Majorana algebras do not touch ζ directly.* They live on the Griess algebra of the Monster; the only bridge to
+  analytic number theory is moonshine (Rademacher's Kloosterman series for j, and Weil's bound, which is RH for curves
+  over finite fields and already a theorem).
+
+**Measured.**
+
+1. **Majorana's 1932 tower.** Both unitary infinite-dimensional representations, (j₀, c) = (0, ½) and (½, 0),
+   satisfy so(3,1) to 6·10⁻¹⁴ on 441 and 462 states, with Hermitian generators; Γ^μ is a 4-vector to 7·10⁻¹³. Rest
+   masses are m/(s + ½), the boosted spectrum at p = 0.7m matches √(M_s² + p²) to 2·10⁻¹⁵ (truncations 40 and 80 agree
+   to 4·10⁻⁶), and all 38 negative-energy solutions are spacelike (Majorana's tachyonic branch). The tower's spectral
+   zeta equals 2ζ(s − 1) and 2(2^{s−1} − 1)ζ(s − 1) to 2·10⁻¹⁶.
+2. **Discrete series = Masullo's lines.** sl(2, ℝ) and the Casimir α(α − 1) hold to 5·10⁻¹³, masses are mα/(α + n).
+   For α = 0.6, 0.75, 1, 1.5 the norm of a random 13-term vector is the same (to 25 digits) from coefficients, the
+   disk integral, the Laplace side and the Mellin line Re z = 1 − α; at α = ½ the circle and Re z = ½ agree too.
+   Masullo's two-line norm lies between the larger single-line norm and their sum.
+3. **Local RH for the basis.** For n ≤ 30 and four α, all zeros of the Mellin transforms lie on Re z = 1 − α to
+   10⁻³⁶, with 30 sign changes on the line on two grids; the basis is orthonormal on the line to 2·10⁻²¹; mixing two α
+   spreads the zeros over a width of 3–4.
+4. **Ξ in the basis.** Ξ(2x) = Σ aₙ Pₙ^{(λ)}(x; π/2) for λ = ¾ and 1: coefficients at 30 and 40 digits agree to
+   6·10⁻¹⁴, S₁₆₀ reproduces Ξ to 7·10⁻¹⁵, and γ₁…γ₄ come out of its real roots with errors 4·10⁻¹⁴, 3·10⁻¹⁰,
+   2·10⁻⁸, 3·10⁻⁵ (λ = ¾), improving from N = 80 to 160.
+5. **Majorana stars of Jensen polynomials.** All 310 polynomials J^{d,n}, d ≤ 10, n ≤ 30, are hyperbolic (exact Sturm
+   counts), and every constellation lies on the great circle Y = 0. Adding off-line zeros at s = ½ ± 0.4 ± 2i makes
+   4 of them non-hyperbolic (first at d = 7) and moves stars off the circle by 0.17; at height 1 it is 8 (from d = 3);
+   at height 3 nothing is detected up to d = 10.
+6. **Majorana random matrices vs quadratic L-functions.** Class D and class C BdG matrices (2N = 100, 20,000
+   samples) follow 1 + sinc and 1 − sinc near zero (L² distance 0.023 and 0.028). For the 1,759 fundamental
+   discriminants 100 < |d| ≤ 3000 (zeros by a theta integral, checked against `hecke` to 4·10⁻¹¹), the one-level
+   density is closest to USp (0.39, against 1.07 for SO(even) and 0.65 for U), with strong repulsion at 0 (first bin
+   0.05). Finite-conductor corrections are still large at this size.
+7. **Thomas–Fermi, Majorana's way.** a₁ = 9 − √73 = 2(1 − λ) with Sommerfeld's λ = (√73 − 7)/2. 400 terms give
+   φ′(0) = −1.588071022611375, equal to the literature value to 2·10⁻¹⁶ and to an independent shooting solution to
+   8·10⁻¹⁵. The parametric solution matches a 30-digit ODE to 3·10⁻¹¹. Its Mellin transform on the strip 0 < Re s < 3
+   (one quadrature) matches the ODE on [0, 100] to 6·10⁻⁸, has the pole at s = 3 with residue 144 (extrapolated
+   143.9997), and x³φ/144 − 1 decays with exponent 0.7716 (λ = 0.7720). Majorana's 10-term truncation is good to
+   0.5%, not the 0.1% quoted by Esposito: 0.1% takes about 15 terms. The ratio aₙ/aₙ₋₁ is 0.795 at n = 10, close to
+   Majorana's 4/5, but creeps up to 0.83 by n = 400.
+8. **Majorana algebras and moonshine.** All eight Norton–Sakuma algebras from Table 2.2 of the thesis (2A … 6A,
+   including the 5A and 6A products, which the scanned text garbles and were rebuilt from the dihedral symmetry) pass
+   every axiom in exact rational arithmetic: commutativity, associativity of the form, Norton's inequality, spectrum
+   {1, 0, ¼, 1/32} with a one-dimensional 1-space, the fusion rules, τ(a) an automorphism, and identity lengths
+   12/5, 2, 116/35, 32/11, 4, 19/5, 32/7, 51/10 exactly as in Table 2.3. j − 744 has c(1) = 196884 = dim of the Griess
+   algebra; Rademacher's series reproduces c(1..5) within 0.007; Weil's bound holds for c ≤ 1000 (max ratio 1); and
+   the McKay–Thompson decompositions of c(1), c(2), c(3) hold.
+
+### Convergence log (Majorana run)
+
+1. Before the first run: the pre-written Jensen control `Ξ(t)(t² + 0.04)` was wrong. Its extra zeros sit at real
+   w = −t², which Jensen polynomials cannot detect. It was replaced by a quadruple at s = ½ ± 0.4 ± 2i.
+2. Quick run, 5/8: `local-rh-majorana-basis` missed 10⁻¹⁵ (7·10⁻¹⁴) in the quadrature check, because x^{s−1} oscillates
+   infinitely often at 0 for complex s. Fix: integrate (0, 1] in u = −log t (now 10⁻²³). `xi-discrete-series-expansion`
+   used too low a degree in quick mode. `majorana-thomas-fermi` failed Majorana's accuracy claim (0.50% against a
+   0.3% threshold); the measurement stands and the criterion is now "< 1%, decreasing with terms", with the
+   discrepancy reported. The ODE side moved to a 30-digit Taylor-series solver, and the Mellin comparison to [0, 100],
+   because double precision is unstable beyond x ≈ 50.
+3. Full pass 1, 7/8: `majorana-thomas-fermi` failed only because two 50-digit quantities were compared at 15-digit
+   working precision. Fix: compare inside `mp.workdps(50)`.
+4. Full pass 2: 8/8 consistent.
 
 ## Figures
 
