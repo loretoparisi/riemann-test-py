@@ -8,4 +8,4 @@ from . import turing, dbn, nyman_beurling, weil, li_rigorous, riesz_redheffer
 
 __all__ = ["zeta", "zeros", "primes", "criteria", "explicit_formula", "rmt", "toy_trace",
            "turing", "dbn", "nyman_beurling", "weil", "li_rigorous", "riesz_redheffer"]
-__version__ = "0.2.0"
+__version__ = "0.3.0"
