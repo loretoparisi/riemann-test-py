@@ -2,6 +2,7 @@ name: Lean
 
 on:
   push:
+    branches: [main]
     paths: ["lean/**", "riemann_lab/lean_bridge.py", ".github/workflows/lean.yml"]
   pull_request:
     paths: ["lean/**", "riemann_lab/lean_bridge.py", ".github/workflows/lean.yml"]
