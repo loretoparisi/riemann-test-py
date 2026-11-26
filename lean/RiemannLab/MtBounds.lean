@@ -48,16 +48,17 @@ lemma norm_term_le (χ : DirichletCharacter ℂ N) (n : ℕ) {x θ : ℝ} (hx : 
   have hb := b_pos hn
   have hbn : b n ^ θ = (n : ℝ) ^ (-2 * θ) := by
     rw [b, Real.inv_rpow (by positivity), ← Real.rpow_natCast, ← Real.rpow_mul hn0.le,
-      Real.rpow_neg hn0.le]
+      ← Real.rpow_neg hn0.le]
+    congr 1
     norm_num
   rw [norm_mul]
   calc ‖coef χ n‖ * ‖g (b n * x)‖ ≤ (n : ℝ)⁻¹ * (b n * x) ^ θ :=
         mul_le_mul (norm_coef_le χ n) (norm_g_le_rpow (by positivity) hθ0.le hθ1)
           (norm_nonneg _) (by positivity)
     _ = x ^ θ * (n : ℝ) ^ (-1 - 2 * θ) := by
-        rw [Real.mul_rpow hb.le hx.le, hbn, ← Real.rpow_neg_one, mul_comm (_ ^ (-2 * θ)),
-          ← mul_assoc, ← Real.rpow_add hn0, mul_comm]
-        ring_nf
+        rw [Real.mul_rpow hb.le hx.le, hbn, ← Real.rpow_neg_one,
+          show (-1 - 2 * θ) = -1 + -2 * θ by ring, Real.rpow_add hn0]
+        ring
 
 lemma summable_term (χ : DirichletCharacter ℂ N) {x θ : ℝ} (hx : 0 < x) (hθ0 : 0 < θ)
     (hθ1 : θ ≤ 1) : Summable fun n => ‖coef χ n * g (b n * x)‖ :=
@@ -69,7 +70,7 @@ lemma norm_Mt_le (χ : DirichletCharacter ℂ N) {x θ : ℝ} (hx : 0 < x) (hθ0
     (hθ1 : θ ≤ 1) : ‖Mt χ x‖ ≤ Z θ * x ^ θ := by
   calc ‖Mt χ x‖ ≤ ∑' n, ‖coef χ n * g (b n * x)‖ :=
         norm_tsum_le_tsum_norm (summable_term χ hx hθ0 hθ1)
-    _ ≤ ∑' n, x ^ θ * (n : ℝ) ^ (-1 - 2 * θ) :=
+    _ ≤ ∑' n : ℕ, x ^ θ * (n : ℝ) ^ (-1 - 2 * θ) :=
         Summable.tsum_le_tsum (fun n => norm_term_le χ n hx hθ0 hθ1)
           (summable_term χ hx hθ0 hθ1) ((summable_Z hθ0).mul_left _)
     _ = Z θ * x ^ θ := by rw [tsum_mul_left, Z, mul_comm]
@@ -81,7 +82,7 @@ lemma continuousOn_Mt (χ : DirichletCharacter ℂ N) : ContinuousOn (Mt χ) (Io
   have hloc : ∀ R : ℝ, ContinuousOn (Mt χ) (Ioo 0 R) := by
     intro R
     unfold Mt
-    refine continuousOn_tsum (u := fun n => |R| * (n : ℝ) ^ (-1 - 2 * (1:ℝ))) ?_
+    refine continuousOn_tsum (u := fun n : ℕ => |R| * (n : ℝ) ^ (-1 - 2 * (1:ℝ))) ?_
       ((summable_Z one_pos).mul_left _) ?_
     · intro n
       exact (continuous_const.mul (continuous_g.comp (continuous_const.mul continuous_id))).continuousOn
@@ -100,13 +101,12 @@ lemma integrableOn_Ioi_of_bounds {F : ℝ → ℝ} (hF : ContinuousOn F (Ioi 0))
   rw [← Ioc_union_Ioi_eq_Ioi (zero_le_one' ℝ), integrableOn_union]
   constructor
   · have hint : IntegrableOn (fun t : ℝ => C * t ^ a) (Ioc 0 1) :=
-      Integrable.const_mul ((intervalIntegrable_iff_integrableOn_Ioc_of_le zero_le_one).mp
-        (intervalIntegral.intervalIntegrable_rpow' ha)) C
-    exact hint.mono' ((hF.mono Ioc_subset_Ioi_self).aestronglyMeasurable measurableSet_Ioc)
+      Integrable.const_mul (intervalIntegral.intervalIntegrable_rpow' ha).1 C
+    exact Integrable.mono' hint ((hF.mono Ioc_subset_Ioi_self).aestronglyMeasurable measurableSet_Ioc)
       ((ae_restrict_iff' measurableSet_Ioc).mpr (Eventually.of_forall h0))
   · have hint : IntegrableOn (fun t : ℝ => D * t ^ b) (Ioi 1) :=
       Integrable.const_mul (integrableOn_Ioi_rpow_of_lt hb zero_lt_one) D
-    exact hint.mono' ((hF.mono (Ioi_subset_Ioi zero_le_one)).aestronglyMeasurable
+    exact Integrable.mono' hint ((hF.mono (Ioi_subset_Ioi zero_le_one)).aestronglyMeasurable
       measurableSet_Ioi) ((ae_restrict_iff' measurableSet_Ioi).mpr (Eventually.of_forall h1))
 
 lemma rpow_mul_bound {t c θ Zc : ℝ} (ht : 0 < t) (hZ : 0 ≤ Zc) {m : ℝ} (hm : m ≤ Zc * t ^ θ) :

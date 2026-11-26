@@ -145,8 +145,8 @@ lemma continuousOn_M {N : ℕ} [NeZero N] (χ : DirichletCharacter ℂ N) :
 lemma integrableOn_Mt_Ioc {N : ℕ} (χ : DirichletCharacter ℂ N) {σ : ℝ} (hσ : -1 < σ) :
     IntegrableOn (fun t : ℝ => t ^ (σ - 1) * ‖Mt χ t‖) (Ioc 0 1) := by
   have hint : IntegrableOn (fun t : ℝ => Z 1 * t ^ (σ - 1 + 1)) (Ioc 0 1) :=
-    Integrable.const_mul ((intervalIntegrable_iff_integrableOn_Ioc_of_le zero_le_one).mp
-      (intervalIntegral.intervalIntegrable_rpow' (by linarith))) _
+    Integrable.const_mul (intervalIntegral.intervalIntegrable_rpow' (r := σ - 1 + 1)
+      (by linarith)).1 _
   have hc : ContinuousOn (fun t : ℝ => t ^ (σ - 1) * ‖Mt χ t‖) (Ioi 0) :=
     (continuousOn_id.rpow_const fun x hx => Or.inl (ne_of_gt hx)).mul (continuousOn_Mt χ).norm
   refine Integrable.mono' hint
