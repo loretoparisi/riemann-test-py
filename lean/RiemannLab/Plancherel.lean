@@ -27,30 +27,26 @@ namespace RiemannLab
 
 /-- `‖F‖² = ∫ |F|²` in `L²(ℝ)`. -/
 lemma L2_norm_sq_eq (F : Lp ℂ 2 (volume : Measure ℝ)) : ‖F‖ ^ 2 = ∫ x, ‖F x‖ ^ 2 := by
-  rw [norm_sq_eq_re_inner (𝕜 := ℂ) F, L2.inner_def]
-  have h : (fun a => (inner ℂ (F a) (F a) : ℂ)) = fun a => ((‖F a‖ ^ 2 : ℝ) : ℂ) := by
-    funext a
-    rw [inner_self_eq_norm_sq_to_K]
-    push_cast
-    rfl
-  rw [h, integral_ofReal]
-  simp
+  rw [norm_sq_eq_re_inner (𝕜 := ℂ) F, L2.inner_def, ← integral_re (L2.integrable_inner F F)]
+  refine integral_congr_ae (Eventually.of_forall fun a => ?_)
+  exact inner_self_eq_norm_sq (𝕜 := ℂ) (F a)
 
 /-- For `f ∈ L¹ ∩ L²`, the `L²` Fourier transform of `f` is a.e. its Fourier integral. -/
 lemma fourier_toLp_ae {f : ℝ → ℂ} (hf1 : Integrable f) (hf2 : MemLp f 2) :
-    (𝓕 (hf2.toLp f) : ℝ → ℂ) =ᵐ[volume] 𝓕 f := by
+    ((𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ)) : ℝ → ℂ) =ᵐ[volume] 𝓕 f := by
   have hcont : Continuous (𝓕 f) :=
     VectorFourier.fourierIntegral_continuous (L := innerₗ ℝ) Real.continuous_fourierChar
       continuous_inner hf1
-  refine ae_eq_of_integral_contDiff_smul_eq ((Lp.memLp _).locallyIntegrable (by norm_num))
+  refine ae_eq_of_integral_contDiff_smul_eq
+    ((Lp.memLp (𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ))).locallyIntegrable (by norm_num))
     hcont.locallyIntegrable ?_
   intro g hg hgs
   have hgc : HasCompactSupport (fun x => (g x : ℂ)) := hgs.comp_left Complex.ofReal_zero
   have hgd : ContDiff ℝ ⊤ (fun x => (g x : ℂ)) := Complex.ofRealCLM.contDiff.comp hg
   let φ : SchwartzMap ℝ ℂ := hgc.toSchwartzMap hgd
   have hφ : ∀ x, φ x = (g x : ℂ) := fun x => rfl
-  calc ∫ x, g x • (𝓕 (hf2.toLp f) : ℝ → ℂ) x
-      = Lp.toTemperedDistribution (𝓕 (hf2.toLp f)) φ := by
+  calc ∫ x, g x • ((𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ)) : ℝ → ℂ) x
+      = Lp.toTemperedDistribution (𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ)) φ := by
         rw [Lp.toTemperedDistribution_apply]
         congr 1
         funext x
@@ -76,9 +72,10 @@ lemma fourier_toLp_ae {f : ℝ → ℂ} (hf1 : Integrable f) (hf2 : MemLp f 2) :
 theorem plancherel {f : ℝ → ℂ} (hf1 : Integrable f) (hf2 : MemLp f 2) :
     ∫ ξ, ‖𝓕 f ξ‖ ^ 2 = ∫ x, ‖f x‖ ^ 2 := by
   have h := fourier_toLp_ae hf1 hf2
-  calc ∫ ξ, ‖𝓕 f ξ‖ ^ 2 = ∫ ξ, ‖(𝓕 (hf2.toLp f) : ℝ → ℂ) ξ‖ ^ 2 :=
+  calc ∫ ξ, ‖𝓕 f ξ‖ ^ 2
+        = ∫ ξ, ‖((𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ)) : ℝ → ℂ) ξ‖ ^ 2 :=
         integral_congr_ae (h.mono fun x hx => by simp only [hx])
-    _ = ‖𝓕 (hf2.toLp f)‖ ^ 2 := (L2_norm_sq_eq _).symm
+    _ = ‖(𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ))‖ ^ 2 := (L2_norm_sq_eq _).symm
     _ = ‖hf2.toLp f‖ ^ 2 := by rw [Lp.norm_fourier_eq]
     _ = ∫ x, ‖(hf2.toLp f : ℝ → ℂ) x‖ ^ 2 := L2_norm_sq_eq _
     _ = ∫ x, ‖f x‖ ^ 2 := integral_congr_ae (hf2.coeFn_toLp.mono fun x hx => by simp only [hx])
@@ -96,7 +93,10 @@ private theorem rexp_neg_image_aux : Real.exp ∘ Neg.neg '' univ = Ioi 0 := by
 private theorem rexp_neg_injOn_aux : univ.InjOn (Real.exp ∘ Neg.neg) :=
   Real.exp_injective.injOn.comp neg_injective.injOn (univ.mapsTo_univ _)
 
-private theorem rexp_cexp_aux (x : ℝ) (s : ℂ) (f : ℂ) :
+section
+variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+
+private theorem rexp_cexp_aux (x : ℝ) (s : ℂ) (f : E) :
     Real.exp (-x) • cexp (-↑x) ^ (s - 1) • f = cexp (-s * ↑x) • f := by
   change (Real.exp (-x) : ℂ) • _ = _ • f
   rw [← smul_assoc, smul_eq_mul]
@@ -105,6 +105,8 @@ private theorem rexp_cexp_aux (x : ℝ) (s : ℂ) (f : ℂ) :
   rw [← cpow_add _ _ (Complex.exp_ne_zero _), cpow_def_of_ne_zero (Complex.exp_ne_zero _),
     Complex.log_exp (by simp [Real.pi_pos]) (by simpa using Real.pi_nonneg)]
   ring_nf
+
+end
 
 /-- A Mellin-convergent function becomes integrable on `ℝ` after `x = e^{-u}`. -/
 theorem integrable_of_mellinConvergent {f : ℝ → ℂ} {σ : ℝ} (hf : MellinConvergent f σ) :
@@ -115,58 +117,62 @@ theorem integrable_of_mellinConvergent {f : ℝ → ℂ} {σ : ℝ} (hf : Mellin
     simpa [rexp_cexp_aux] using hf
   norm_cast at hf
 
+set_option maxHeartbeats 800000 in
 /-- **Mellin–Plancherel on the line `Re s = c`.** If `x^{c-1} f` and `x^{2c-1} |f|²` are integrable
 on `(0, ∞)`, then `∫₀^∞ |f(x)|² x^{2c-1} dx = (1/2π) ∫_ℝ |𝓜f(c + it)|² dt`. -/
 theorem mellin_plancherel {f : ℝ → ℂ} {c : ℝ} (hf1 : MellinConvergent f c)
     (hf2 : MellinConvergent (fun x => ((‖f x‖ ^ 2 : ℝ) : ℂ)) ((2 * c : ℝ) : ℂ)) :
     ∫ x in Ioi (0:ℝ), ‖f x‖ ^ 2 * x ^ (2 * c - 1)
       = (1 / (2 * Real.pi)) * ∫ t : ℝ, ‖mellin f (c + t * I)‖ ^ 2 := by
-  set g : ℝ → ℂ := fun u => Real.exp (-c * u) • f (Real.exp (-u)) with hg_def
-  have hg1 : Integrable g := integrable_of_mellinConvergent hf1
+  have hg1 : Integrable (fun u : ℝ => Real.exp (-c * u) • f (Real.exp (-u))) :=
+    integrable_of_mellinConvergent hf1
   have hg2' := integrable_of_mellinConvergent hf2
-  have hnorm : ∀ u, ‖g u‖ ^ 2 = Real.exp (-(2 * c) * u) * ‖f (Real.exp (-u))‖ ^ 2 := by
+  have hnorm : ∀ u : ℝ, ‖Real.exp (-c * u) • f (Real.exp (-u))‖ ^ 2
+      = Real.exp (-(2 * c) * u) * ‖f (Real.exp (-u))‖ ^ 2 := by
     intro u
     have he : Real.exp (-c * u) ^ 2 = Real.exp (-(2 * c) * u) := by
-      rw [sq, ← Real.exp_add]; ring_nf
-    rw [hg_def, norm_smul, mul_pow, Real.norm_eq_abs, abs_of_pos (Real.exp_pos _), he]
-  have hg2 : MemLp g 2 := by
+      rw [sq, ← Real.exp_add]; congr 1; ring
+    rw [norm_smul, mul_pow, Real.norm_eq_abs, abs_of_pos (Real.exp_pos _), he]
+  have hg2 : MemLp (fun u : ℝ => Real.exp (-c * u) • f (Real.exp (-u))) 2 := by
     rw [memLp_two_iff_integrable_sq_norm hg1.aestronglyMeasurable]
     refine hg2'.norm.congr (Eventually.of_forall fun u => ?_)
-    simp only
+    show ‖Real.exp (-(2 * c) * u) • ((‖f (Real.exp (-u))‖ ^ 2 : ℝ) : ℂ)‖
+      = ‖Real.exp (-c * u) • f (Real.exp (-u))‖ ^ 2
     rw [hnorm u, norm_smul, Complex.norm_real, Real.norm_eq_abs, Real.norm_eq_abs,
       abs_of_pos (Real.exp_pos _), abs_of_nonneg (sq_nonneg _)]
-  -- left side: the Mellin transform of |f|² at the real point 2c
+  -- left side: the Mellin transform of |f|² at the real point 2c, computed two ways
   have e1 : mellin (fun x => ((‖f x‖ ^ 2 : ℝ) : ℂ)) ((2 * c : ℝ) : ℂ)
       = ((∫ x in Ioi (0:ℝ), ‖f x‖ ^ 2 * x ^ (2 * c - 1) : ℝ) : ℂ) := by
-    rw [mellin, ← integral_ofReal]
+    rw [mellin, ← integral_complex_ofReal]
     refine setIntegral_congr_fun measurableSet_Ioi (fun x hx => ?_)
     simp only [smul_eq_mul]
     rw [show ((2 * c : ℝ) : ℂ) - 1 = ((2 * c - 1 : ℝ) : ℂ) by push_cast; ring,
-      ← ofReal_cpow (le_of_lt hx), ← ofReal_mul, mul_comm]
+      ← ofReal_cpow (le_of_lt hx), ofReal_mul]
+    ring
   have e2 : mellin (fun x => ((‖f x‖ ^ 2 : ℝ) : ℂ)) ((2 * c : ℝ) : ℂ)
-      = ((∫ u, ‖g u‖ ^ 2 : ℝ) : ℂ) := by
-    rw [mellin_eq_fourier, Real.fourier_real_eq, ← integral_ofReal]
-    congr 1
-    funext u
+      = ((∫ u : ℝ, ‖Real.exp (-c * u) • f (Real.exp (-u))‖ ^ 2 : ℝ) : ℂ) := by
+    rw [mellin_eq_fourier, Real.fourier_real_eq, ← integral_complex_ofReal]
+    refine integral_congr_ae (Eventually.of_forall fun u => ?_)
     simp only [ofReal_re, ofReal_im, zero_div, mul_zero, neg_zero, AddChar.map_zero_eq_one,
       one_smul]
     rw [hnorm u, Complex.real_smul, ofReal_mul]
-  have hL : ∫ x in Ioi (0:ℝ), ‖f x‖ ^ 2 * x ^ (2 * c - 1) = ∫ u, ‖g u‖ ^ 2 :=
+  have hL : ∫ x in Ioi (0:ℝ), ‖f x‖ ^ 2 * x ^ (2 * c - 1)
+      = ∫ u : ℝ, ‖Real.exp (-c * u) • f (Real.exp (-u))‖ ^ 2 :=
     ofReal_injective (e1.symm.trans e2)
-  -- right side: the Fourier transform of g on the line, rescaled
-  have hR : ∫ t : ℝ, ‖mellin f (c + t * I)‖ ^ 2 = 2 * Real.pi * ∫ ξ, ‖𝓕 g ξ‖ ^ 2 := by
-    have hpt : ∀ t : ℝ, mellin f (c + t * I) = 𝓕 g (t / (2 * Real.pi)) := by
-      intro t
-      rw [mellin_eq_fourier]
-      congr 1
-      · congr 1
-        funext u
-        simp [hg_def]
-      · simp
-    simp_rw [hpt]
-    rw [Measure.integral_comp_div (fun ξ => ‖𝓕 g ξ‖ ^ 2) (2 * Real.pi), smul_eq_mul,
-      abs_of_pos (by positivity)]
-  rw [hL, hR, plancherel hg1 hg2, ← mul_assoc, one_div,
+  -- right side: on the line, the Mellin transform is the Fourier transform of g, rescaled
+  set G : ℝ → ℝ := fun ξ => ‖𝓕 (fun u : ℝ => Real.exp (-c * u) • f (Real.exp (-u))) ξ‖ ^ 2
+    with hG
+  have hpt : ∀ t : ℝ, ‖mellin f (c + t * I)‖ ^ 2 = G (t / (2 * Real.pi)) := by
+    intro t
+    have hre : ((c : ℂ) + t * I).re = c := by simp
+    have him : ((c : ℂ) + t * I).im = t := by simp
+    rw [mellin_eq_fourier, hre, him]
+  have hR : ∫ t : ℝ, ‖mellin f (c + t * I)‖ ^ 2 = 2 * Real.pi * ∫ ξ, G ξ := by
+    rw [integral_congr_ae (Eventually.of_forall hpt), Measure.integral_comp_div G (2 * Real.pi),
+      smul_eq_mul, abs_of_pos (by positivity : (0:ℝ) < 2 * Real.pi)]
+  rw [hL, hR]
+  simp only [hG]
+  rw [plancherel hg1 hg2, ← mul_assoc, one_div,
     inv_mul_cancel₀ (by positivity : (2 * Real.pi) ≠ 0), one_mul]
 
 end RiemannLab
