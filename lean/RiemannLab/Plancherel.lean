@@ -48,6 +48,8 @@ lemma fourier_toLp_ae {f : ℝ → ℂ} (hf1 : Integrable f) (hf2 : MemLp f 2) :
   calc ∫ x, g x • ((𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ)) : ℝ → ℂ) x
       = Lp.toTemperedDistribution (𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ)) φ := by
         rw [Lp.toTemperedDistribution_apply]
+        refine integral_congr_ae (Eventually.of_forall fun x => ?_)
+        rw [hφ, Complex.real_smul, smul_eq_mul]
     _ = 𝓕 (Lp.toTemperedDistribution (hf2.toLp f)) φ := by
         rw [Lp.fourier_toTemperedDistribution_eq]
     _ = ∫ x, 𝓕 φ x • (hf2.toLp f : ℝ → ℂ) x := by
