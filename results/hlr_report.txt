@@ -1,0 +1,140 @@
+== riemann-lab: Hardy-Littlewood-Ramanujan reformulation of GRH (done criteria in docs/hlr_done_criteria.md) ==
+   (numerical evidence, not proof; 'CONSISTENT' = every criterion met)
+
+[mellin-strip] CONSISTENT  (406.3s)
+    zeta    int_0^oo x^(s-1) (M - 1/L(1)) dx vs Gamma(s)/L(1-2s) at s = -0.3, -0.7, -0.5+3i, -0.9, cut X0 = 30 and 50: max rel. err 3.7e-17
+    chi4    int_0^oo x^(s-1) (M - 1/L(1)) dx vs Gamma(s)/L(1-2s) at s = -0.3, -0.7, -0.5+3i, -0.9, cut X0 = 30 and 50: max rel. err 3.0e-15
+    chi5_2  int_0^oo x^(s-1) (M - 1/L(1)) dx vs Gamma(s)/L(1-2s) at s = -0.3, -0.7, -0.5+3i, -0.9, cut X0 = 30 and 50: max rel. err 1.6e-14
+    chi7_1  int_0^oo x^(s-1) (M - 1/L(1)) dx vs Gamma(s)/L(1-2s) at s = -0.3, -0.7, -0.5+3i, -0.9, cut X0 = 30 and 50: max rel. err 3.7e-15
+    Unconditional on -1 < Re s < 0 (Fubini). For M itself on 0 < Re s < 1/4 the integral converges iff GRH. 
+
+[hardy-hypothesis-edge] CONSISTENT  (4.2s)
+    zeta    max |phi(-delta + i gamma/2)| at delta = 0.2: 6.17e+12, 0.24: 3.23e+13, 0.249: 3.27e+14, 0.2499: 3.27e+15; (1/4 - delta) max|phi| constant to 1.1e-02; Hardy A on Re z = -0.2: 1.556 (pi/2 = 1.571)
+    chi5_2  max |phi(-delta + i gamma/2)| at delta = 0.2: 1.66e+13, 0.24: 8.18e+13, 0.249: 8.15e+14, 0.2499: 8.15e+15; (1/4 - delta) max|phi| constant to 4.4e-03; Hardy A on Re z = -0.2: 1.561 (pi/2 = 1.571)
+    chi7_1  max |phi(-delta + i gamma/2)| at delta = 0.2: 1.05e+13, 0.24: 5.11e+13, 0.249: 5.07e+14, 0.2499: 5.07e+15; (1/4 - delta) max|phi| constant to 7.7e-03; Hardy A on Re z = -0.2: 1.566 (pi/2 = 1.571)
+    So Hardy's hypothesis holds on every closed half-plane Re z >= -delta, delta < 1/4 (under GRH), with
+    constants that blow up as delta -> 1/4: not uniformly on the open half-plane Re z > -1/4. 
+
+[moebius-large-x] CONSISTENT  (418.9s)
+    zeta    series vs zeros 2.8e-13; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 2.918e-05 <= A = 2.934e-05
+    chi3_1  series vs zeros 1.2e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 2.753e-03 <= A = 2.895e-03
+    chi4    series vs zeros 2.7e-17; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.258e-02 <= A = 1.318e-02
+    chi5_1  series vs zeros 1.1e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 4.239e-02 <= A = 4.381e-02
+    chi5_2  series vs zeros 2.2e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 6.207e-03 <= A = 6.664e-03
+    chi5_3  series vs zeros 1.1e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 4.239e-02 <= A = 4.381e-02
+    chi7_1  series vs zeros 1.3e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.932e-01 <= A = 1.940e-01
+    chi7_2  series vs zeros 2.8e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 2.650e-02 <= A = 2.797e-02
+    chi7_3  series vs zeros 2.7e-15; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 4.492e-02 <= A = 5.498e-02
+    chi7_4  series vs zeros 1.2e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 2.650e-02 <= A = 2.797e-02
+    chi7_5  series vs zeros 1.1e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.932e-01 <= A = 1.940e-01
+    chi8a   series vs zeros 2.2e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 2.542e-02 <= A = 2.694e-02
+    chi8b   series vs zeros 8.1e-17; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 8.877e-02 <= A = 9.346e-02
+    chi11_1 series vs zeros 9.6e-17; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.009e-01 <= A = 1.160e-01
+    chi11_2 series vs zeros 2.5e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 5.413e-02 <= A = 6.192e-02
+    chi11_3 series vs zeros 1.1e-15; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 6.928e-01 <= A = 7.048e-01
+    chi11_4 series vs zeros 8.2e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.182e-01 <= A = 1.192e-01
+    chi11_5 series vs zeros 8.8e-17; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.4e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 2.395e-01 <= A = 2.467e-01
+    chi11_6 series vs zeros 7.6e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.182e-01 <= A = 1.192e-01
+    chi11_7 series vs zeros 1.2e-15; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 6.928e-01 <= A = 7.048e-01
+    chi11_8 series vs zeros 1.5e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 5.413e-02 <= A = 6.192e-02
+    chi11_9 series vs zeros 9.1e-17; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.4e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.009e-01 <= A = 1.160e-01
+    chi13_1 series vs zeros 1.6e-15; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.817e-01 <= A = 1.886e-01
+    chi13_2 series vs zeros 1.5e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 5.720e-02 <= A = 7.035e-02
+    chi13_3 series vs zeros 8.8e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 2.297e-01 <= A = 2.429e-01
+    chi13_4 series vs zeros 5.6e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.809e-01 <= A = 1.880e-01
+    chi13_5 series vs zeros 3.2e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 9.516e-01 <= A = 9.580e-01
+    chi13_6 series vs zeros 2.6e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 9.508e-02 <= A = 1.044e-01
+    chi13_7 series vs zeros 4.2e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 9.516e-01 <= A = 9.580e-01
+    chi13_8 series vs zeros 4.3e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.809e-01 <= A = 1.880e-01
+    chi13_9 series vs zeros 8.8e-16; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 2.297e-01 <= A = 2.429e-01
+    chi13_10 series vs zeros 4.9e-17; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 5.720e-02 <= A = 7.035e-02
+    chi13_11 series vs zeros 1.6e-15; Moebius (N = 1e+07, J = 3) vs zeros incl. error budget 2.5e-10 (budget 2.5e-10) for 1e2 <= x <= 1e+11; max x^1/4 |M - trivial| = 1.817e-01 <= A = 1.886e-01
+    33 functions (zeta and every primitive chi mod 3, 4, 5, 7, 8, 11, 13), all in units of x^(-1/4). 
+
+[reciprocity] CONSISTENT  (304.2s)
+    zeta    (zeta) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 8.2e-15 (zeros to T = 40: 8.2e-15, T = 80: 7.8e-17)
+    chi3_1  (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 2.8e-15 (zeros to T = 40: 2.8e-15, T = 80: 2.5e-16)
+    chi4    (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 2.8e-14 (zeros to T = 40: 2.8e-14, T = 80: 8.1e-17)
+    chi5_1  (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.9e-14 (zeros to T = 40: 1.9e-14, T = 80: 6.8e-17)
+    chi5_2  (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.1e-15 (zeros to T = 40: 1.1e-15, T = 80: 1.2e-16)
+    chi5_3  (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.9e-14 (zeros to T = 40: 1.9e-14, T = 80: 1.1e-16)
+    chi7_1  (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.0e-14 (zeros to T = 40: 1.0e-14, T = 80: 1.6e-16)
+    chi7_2  (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 3.9e-15 (zeros to T = 40: 3.9e-15, T = 80: 1.2e-16)
+    chi7_3  (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 3.1e-14 (zeros to T = 40: 3.1e-14, T = 80: 1.2e-15)
+    chi7_4  (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 3.9e-15 (zeros to T = 40: 3.9e-15, T = 80: 1.1e-16)
+    chi7_5  (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.0e-14 (zeros to T = 40: 1.0e-14, T = 80: 5.2e-17)
+    chi8a   (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 2.2e-15 (zeros to T = 40: 2.2e-15, T = 80: 1.2e-16)
+    chi8b   (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 6.7e-15 (zeros to T = 40: 6.7e-15, T = 80: 7.8e-17)
+    chi11_1 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.6e-14 (zeros to T = 40: 1.6e-14, T = 80: 1.3e-16)
+    chi11_2 (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 3.5e-15 (zeros to T = 40: 3.5e-15, T = 80: 6.0e-17)
+    chi11_3 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.1e-14 (zeros to T = 40: 1.1e-14, T = 80: 3.1e-16)
+    chi11_4 (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.2e-15 (zeros to T = 40: 1.2e-15, T = 80: 4.1e-16)
+    chi11_5 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 4.6e-15 (zeros to T = 40: 4.6e-15, T = 80: 4.6e-17)
+    chi11_6 (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.2e-15 (zeros to T = 40: 1.2e-15, T = 80: 4.1e-16)
+    chi11_7 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.1e-14 (zeros to T = 40: 1.1e-14, T = 80: 4.5e-16)
+    chi11_8 (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 3.5e-15 (zeros to T = 40: 3.5e-15, T = 80: 3.6e-17)
+    chi11_9 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.6e-14 (zeros to T = 40: 1.6e-14, T = 80: 1.5e-16)
+    chi13_1 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 2.4e-14 (zeros to T = 40: 2.4e-14, T = 80: 1.1e-15)
+    chi13_2 (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 5.9e-15 (zeros to T = 40: 5.9e-15, T = 80: 6.1e-17)
+    chi13_3 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.1e-14 (zeros to T = 40: 1.1e-14, T = 80: 3.3e-16)
+    chi13_4 (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 3.4e-15 (zeros to T = 40: 3.4e-15, T = 80: 3.9e-16)
+    chi13_5 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 8.9e-15 (zeros to T = 40: 8.9e-15, T = 80: 2.7e-16)
+    chi13_6 (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 7.1e-16 (zeros to T = 40: 7.1e-16, T = 80: 5.8e-17)
+    chi13_7 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 8.7e-15 (zeros to T = 40: 8.7e-15, T = 80: 1.4e-16)
+    chi13_8 (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 3.4e-15 (zeros to T = 40: 3.4e-15, T = 80: 3.6e-16)
+    chi13_9 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 1.1e-14 (zeros to T = 40: 1.1e-14, T = 80: 4.2e-16)
+    chi13_10 (even) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 6.0e-15 (zeros to T = 40: 6.0e-15, T = 80: 3.8e-17)
+    chi13_11 (odd ) alpha beta = pi/q, alpha = 0.7, 1, 1.6: max |lhs - rhs| = 2.4e-14 (zeros to T = 40: 2.4e-14, T = 80: 9.9e-16)
+    Character analogue of Ramanujan's alpha beta = pi (Dixit 2012, Thms 1.9-1.10, normalised as in hlr.py);
+    it needs simple zeros and the convergence of the zero sum, both automatic in this range. 
+
+[amplitude] CONSISTENT  (554.8s)
+    zeta    A = 2.9341e-05 (T = 50 vs 80: 1e-14); two largest terms carry 99.71% (the two lowest zeros 99.71%, zeros with |gamma| <= 20: 99.7082%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999997 A
+    chi3_1  A = 2.8950e-03 (T = 50 vs 80: 6e-16); two largest terms carry 94.88% (the two lowest zeros 94.88%, zeros with |gamma| <= 20: 99.9976%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999965 A
+    chi4    A = 1.3179e-02 (T = 50 vs 80: 1e-16); two largest terms carry 97.54% (the two lowest zeros 97.54%, zeros with |gamma| <= 20: 99.9997%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999978 A
+    chi5_1  A = 4.3806e-02 (T = 50 vs 80: 0e+00); two largest terms carry 97.44% (the two lowest zeros 97.44%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999902 A
+    chi5_2  A = 6.6645e-03 (T = 50 vs 80: 3e-16); two largest terms carry 92.06% (the two lowest zeros 92.06%, zeros with |gamma| <= 20: 99.9998%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999907 A
+    chi5_3  A = 4.3806e-02 (T = 50 vs 80: 2e-16); two largest terms carry 97.44% (the two lowest zeros 97.44%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999902 A
+    chi7_1  A = 1.9398e-01 (T = 50 vs 80: 1e-16); two largest terms carry 98.80% (the two lowest zeros 98.80%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999846 A
+    chi7_2  A = 2.7975e-02 (T = 50 vs 80: 2e-16); two largest terms carry 93.57% (the two lowest zeros 93.57%, zeros with |gamma| <= 20: 99.9997%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998974 A
+    chi7_3  A = 5.4984e-02 (T = 50 vs 80: 4e-16); two largest terms carry 91.55% (the two lowest zeros 91.55%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999948 A
+    chi7_4  A = 2.7975e-02 (T = 50 vs 80: 2e-16); two largest terms carry 93.57% (the two lowest zeros 93.57%, zeros with |gamma| <= 20: 99.9997%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998974 A
+    chi7_5  A = 1.9398e-01 (T = 50 vs 80: 1e-16); two largest terms carry 98.80% (the two lowest zeros 98.80%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999846 A
+    chi8a   A = 2.6944e-02 (T = 50 vs 80: 0e+00); two largest terms carry 92.16% (the two lowest zeros 92.16%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999905 A
+    chi8b   A = 9.3463e-02 (T = 50 vs 80: 0e+00); two largest terms carry 96.80% (the two lowest zeros 96.80%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999929 A
+    chi11_1 A = 1.1597e-01 (T = 50 vs 80: 1e-16); two largest terms carry 88.39% (the two lowest zeros 88.39%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998649 A
+    chi11_2 A = 6.1916e-02 (T = 50 vs 80: 1e-16); two largest terms carry 88.92% (the two lowest zeros 88.92%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998114 A
+    chi11_3 A = 7.0483e-01 (T = 50 vs 80: 0e+00); two largest terms carry 98.37% (the two lowest zeros 98.06%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999834 A
+    chi11_4 A = 1.1915e-01 (T = 50 vs 80: 0e+00); two largest terms carry 97.08% (the two lowest zeros 97.08%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999177 A
+    chi11_5 A = 2.4669e-01 (T = 50 vs 80: 1e-16); two largest terms carry 97.98% (the two lowest zeros 97.98%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999905 A
+    chi11_6 A = 1.1915e-01 (T = 50 vs 80: 0e+00); two largest terms carry 97.08% (the two lowest zeros 97.08%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999177 A
+    chi11_7 A = 7.0483e-01 (T = 50 vs 80: 3e-16); two largest terms carry 98.37% (the two lowest zeros 98.06%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999834 A
+    chi11_8 A = 6.1916e-02 (T = 50 vs 80: 3e-16); two largest terms carry 88.92% (the two lowest zeros 88.92%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998114 A
+    chi11_9 A = 1.1597e-01 (T = 50 vs 80: 2e-16); two largest terms carry 88.39% (the two lowest zeros 88.39%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998649 A
+    chi13_1 A = 1.8859e-01 (T = 50 vs 80: 0e+00); two largest terms carry 90.75% (the two lowest zeros 90.75%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998908 A
+    chi13_2 A = 7.0347e-02 (T = 50 vs 80: 0e+00); two largest terms carry 84.64% (the two lowest zeros 84.64%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.997945 A
+    chi13_3 A = 2.4292e-01 (T = 50 vs 80: 0e+00); two largest terms carry 93.02% (the two lowest zeros 93.02%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998981 A
+    chi13_4 A = 1.8800e-01 (T = 50 vs 80: 1e-16); two largest terms carry 96.87% (the two lowest zeros 96.87%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999268 A
+    chi13_5 A = 9.5797e-01 (T = 50 vs 80: 0e+00); two largest terms carry 99.16% (the two lowest zeros 99.16%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999793 A
+    chi13_6 A = 1.0441e-01 (T = 50 vs 80: 1e-16); two largest terms carry 95.72% (the two lowest zeros 95.72%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999830 A
+    chi13_7 A = 9.5797e-01 (T = 50 vs 80: 0e+00); two largest terms carry 99.16% (the two lowest zeros 99.16%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999793 A
+    chi13_8 A = 1.8800e-01 (T = 50 vs 80: 0e+00); two largest terms carry 96.87% (the two lowest zeros 96.87%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.999268 A
+    chi13_9 A = 2.4292e-01 (T = 50 vs 80: 2e-16); two largest terms carry 93.02% (the two lowest zeros 93.02%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998981 A
+    chi13_10 A = 7.0347e-02 (T = 50 vs 80: 2e-16); two largest terms carry 84.64% (the two lowest zeros 84.64%, zeros with |gamma| <= 20: 99.9999%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.997945 A
+    chi13_11 A = 1.8859e-01 (T = 50 vs 80: 0e+00); two largest terms carry 90.75% (the two lowest zeros 90.75%, zeros with |gamma| <= 20: 100.0000%); sup over log x <= 1e+05 of x^1/4|M - trivial| = 0.998908 A
+    A is the bound x^1/4 |M - trivial| <= A that GRH + simple zeros give; the sup approaching A is the
+    Kronecker-type behaviour expected if the ordinates are linearly independent (Grand Simplicity). 
+
+[sensitivity] CONSISTENT  (11.1s)
+    zeta, Moebius sum N = 1e+07 vs on-line zero expansion: error budget 1.7e-13 .. 2.5e-10 x^-1/4 for 1e2 <= x <= 1e11
+    injected quadruple 1/2 +- 0.2 +- i gamma (|zeta'(rho)| modelled as 1): detected at gamma = 15, 20, 25, 30, 35; invisible at 40, 45, 50, 60, 80
+    largest detected height 35 (first missed 40); predicted from |Gamma((1-rho)/2)|/2 x^(delta/2) > eta: 30.5
+    log10 x at which an off-line zero would dominate the on-line amplitude A = 2.93e-05 (eta = A):
+        gamma = 14.13 first zero: delta 0.01: 81.1, delta 0.1: 8.87, delta 0.5: 2.45
+        gamma = 1000 : delta 0.01: 6.74e+04, delta 0.1: 6.75e+03, delta 0.5: 1.35e+03
+        gamma = 1e+06 : delta 0.01: 6.82e+07, delta 0.1: 6.82e+06, delta 0.5: 1.36e+06
+        gamma = 3e+12 RH verified height (Platt-Trudgian): delta 0.01: 2.05e+14, delta 0.1: 2.05e+13, delta 0.5: 4.09e+12
+        chi mod 13 at Platt's GRH height 1e8/q = 7.69e+06: delta 0.5: 1.05e+07
+    So agreement at reachable x tests only zeros below height ~40, already known to be on the line. 
+
+6/6 checks consistent; done in 1699.5s

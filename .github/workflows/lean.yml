@@ -1,0 +1,25 @@
+name: Lean
+
+on:
+  push:
+    branches: [main]
+    paths: ["lean/**", "riemann_lab/lean_bridge.py", ".github/workflows/lean.yml"]
+  pull_request:
+    paths: ["lean/**", "riemann_lab/lean_bridge.py", ".github/workflows/lean.yml"]
+  workflow_dispatch:
+
+jobs:
+  lean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # installs elan + the toolchain in lean/lean-toolchain, fetches the Mathlib cache, runs lake build
+      - uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: lean
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install numpy scipy mpmath
+      # axiom audit (proved vs sorry) + numeric cross-checks; fails if a proved theorem picks up sorryAx
+      - run: python -m riemann_lab lean --skip-build
