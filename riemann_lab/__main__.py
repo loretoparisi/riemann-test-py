@@ -1,4 +1,4 @@
-"""Command line: python -m riemann_lab {report,extended,ramanujan,majorana,hlr,combined,plots,verify,turing} ..."""
+"""Command line: python -m riemann_lab {report,extended,ramanujan,majorana,hlr,combined,lean,plots,verify,turing} ..."""
 from __future__ import annotations
 
 import argparse
@@ -66,6 +66,9 @@ def main(argv=None):
     cb.add_argument("--quick", action="store_true")
     cb.add_argument("--only", nargs="*", help="subset, e.g. line_norm majorana_holomorphic critical_blowup "
                     "off_line_control visibility")
+    ln = sub.add_parser("lean", help="Lean 4 + Mathlib: build lean/, audit axioms (proved vs sorry), numeric cross-check")
+    ln.add_argument("--skip-build", action="store_true")
+    ln.add_argument("--skip-numerics", action="store_true")
     v = sub.add_parser("verify", help="Turing-style check that all zeros in (T1,T2] are on the line")
     v.add_argument("T1", type=float)
     v.add_argument("T2", type=float)
@@ -90,6 +93,10 @@ def main(argv=None):
     elif a.cmd == "combined":
         from . import combined_checks
         combined_checks.run(a.quick, a.only)
+    elif a.cmd == "lean":
+        import sys
+        from . import lean_bridge
+        sys.exit(0 if lean_bridge.run(a.skip_build, a.skip_numerics) else 1)
     elif a.cmd == "turing":
         from . import turing
         print(turing.turing_verify(a.T1, a.T2))
