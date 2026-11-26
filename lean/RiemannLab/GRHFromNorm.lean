@@ -38,15 +38,15 @@ namespace RiemannLab
 
 /-! ### Mellin integrals over a subset of `(0, ∞)` and their holomorphy -/
 
-/-- `|log t| ≤ (t^δ + t^{-δ})/δ` for `t > 0`, `δ > 0`. -/
-lemma abs_log_le {t δ : ℝ} (ht : 0 < t) (hδ : 0 < δ) :
-    |Real.log t| ≤ (t ^ δ + t ^ (-δ)) / δ := by
-  have h1 := Real.log_le_rpow_div ht.le hδ
-  have h2 := Real.neg_rpow_div_le_log ht.le hδ
-  have h3 : 0 ≤ t ^ δ / δ := div_nonneg (Real.rpow_nonneg ht.le _) hδ.le
-  have h4 : 0 ≤ t ^ (-δ) / δ := div_nonneg (Real.rpow_nonneg ht.le _) hδ.le
+/-- `|log t| ≤ (t^d + t^{-d})/d` for `t > 0`, `d > 0`. -/
+lemma abs_log_le {t d : ℝ} (ht : 0 < t) (hd : 0 < d) :
+    |Real.log t| ≤ (t ^ d + t ^ (-d)) / d := by
+  have h1 := Real.log_le_rpow_div ht.le hd
+  have h2 := Real.neg_rpow_div_le_log ht.le hd
+  have h3 : 0 ≤ t ^ d / d := div_nonneg (Real.rpow_nonneg ht.le _) hd.le
+  have h4 : 0 ≤ t ^ (-d) / d := div_nonneg (Real.rpow_nonneg ht.le _) hd.le
   rw [add_div, abs_le]
-  constructor <;> linarith [neg_div δ (t ^ (-δ))]
+  constructor <;> linarith [neg_div d (t ^ (-d))]
 
 /-- `∫_S t^{s-1} f(t) dt` over a set `S ⊆ (0, ∞)`. -/
 def mellinOn (S : Set ℝ) (f : ℝ → ℂ) (s : ℂ) : ℂ := ∫ t in S, (t : ℂ) ^ (s - 1) • f t
@@ -213,7 +213,7 @@ def I0 (χ : DirichletCharacter ℂ N) : ℂ → ℂ := mellinOn (Ioc 0 1) (Mt �
 def I1 (χ : DirichletCharacter ℂ N) : ℂ → ℂ := mellinOn (Ioi 1) (M χ)
 
 /-- `K(s) = s (I₀(s) + I₁(s)) + C_χ`. -/
-def K (χ : DirichletCharacter ℂ N) (s : ℂ) : ℂ := s * (I0 χ s + I1 χ s) + Cχ χ
+def Kc (χ : DirichletCharacter ℂ N) (s : ℂ) : ℂ := s * (I0 χ s + I1 χ s) + Cχ χ
 
 lemma differentiableAt_I0 (χ : DirichletCharacter ℂ N) {s : ℂ} (hs : -1 < s.re) :
     DifferentiableAt ℂ (I0 χ) s := by
@@ -235,8 +235,8 @@ lemma differentiableAt_I1 (χ : DirichletCharacter ℂ N) (hfin : FiniteNorms χ
   intro j hj
   exact integrableOn_M_Ioi χ hfin (by linarith [hj.2])
 
-lemma differentiableAt_K (χ : DirichletCharacter ℂ N) (hfin : FiniteNorms χ) {s : ℂ}
-    (h1 : -1 < s.re) (h2 : s.re < 1 / 4) : DifferentiableAt ℂ (K χ) s := by
+lemma differentiableAt_Kc (χ : DirichletCharacter ℂ N) (hfin : FiniteNorms χ) {s : ℂ}
+    (h1 : -1 < s.re) (h2 : s.re < 1 / 4) : DifferentiableAt ℂ (Kc χ) s := by
   have h := ((differentiableAt_id (x := s)).mul ((differentiableAt_I0 χ h1).add
     (differentiableAt_I1 χ hfin h2))).add_const (Cχ χ)
   exact h
@@ -283,7 +283,7 @@ lemma mellin_Mt_split (χ : DirichletCharacter ℂ N) (hfin : FiniteNorms χ) {s
 /-- For `-1 < Re s < 0`: `K(s) L(1-2s, χ) = Γ(s+1)`. -/
 lemma K_mul_LFunction_eq (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) (hfin : FiniteNorms χ)
     {s : ℂ} (h1 : -1 < s.re) (h0 : s.re < 0) :
-    K χ s * LFunction χ (1 - 2 * s) = Gamma (s + 1) := by
+    Kc χ s * LFunction χ (1 - 2 * s) = Gamma (s + 1) := by
   have hs0 : s ≠ 0 := by
     intro h
     rw [h, zero_re] at h0
@@ -292,8 +292,8 @@ lemma K_mul_LFunction_eq (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) (hfin 
   have hL : LFunction χ (1 - 2 * s) = LSeries ↗χ (1 - 2 * s) := LFunction_eq_LSeries χ hre
   have hL0 : LFunction χ (1 - 2 * s) ≠ 0 :=
     LFunction_ne_zero_of_one_le_re χ (Or.inl hχ) hre.le
-  have hK : K χ s = s * mellin (Mt χ) s := by
-    rw [mellin_Mt_split χ hfin h1 h0, K, mul_add s (I0 χ s + I1 χ s), mul_div_cancel₀ _ hs0]
+  have hK : Kc χ s = s * mellin (Mt χ) s := by
+    rw [mellin_Mt_split χ hfin h1 h0, Kc, mul_add s (I0 χ s + I1 χ s), mul_div_cancel₀ _ hs0]
   rw [hK, mellin_Mt χ h1 h0, ← hL, Gamma_add_one s hs0, mul_assoc, div_mul_cancel₀ _ hL0]
 
 /-- **No zeros in `1/2 < Re w < 1`** if the weighted norms of `M_χ` are finite. -/
@@ -308,13 +308,14 @@ theorem LFunction_ne_zero_of_finiteNorms (χ : DirichletCharacter ℂ N) (hχ : 
   have hGamma : ∀ s ∈ U, DifferentiableAt ℂ (fun s : ℂ => Gamma (s + 1)) s := by
     intro s hs
     refine (differentiableAt_Gamma (s + 1) fun m h => ?_).comp s (differentiableAt_id.add_const 1)
+    have h1 : -1 < s.re := hs.1
     have := congrArg re h
     simp only [add_re, one_re, neg_re, natCast_re] at this
-    linarith [hs.1, (Nat.cast_nonneg m : (0:ℝ) ≤ m)]
+    linarith [(Nat.cast_nonneg m : (0:ℝ) ≤ m)]
   have hLd : Differentiable ℂ (LFunction χ) := differentiable_LFunction hχ
-  have hf : AnalyticOnNhd ℂ (fun s : ℂ => K χ s * LFunction χ (1 - 2 * s)) U := by
+  have hf : AnalyticOnNhd ℂ (fun s : ℂ => Kc χ s * LFunction χ (1 - 2 * s)) U := by
     refine DifferentiableOn.analyticOnNhd (fun s hs => ?_) hUo
-    refine ((differentiableAt_K χ hfin hs.1 hs.2).mul ?_).differentiableWithinAt
+    refine ((differentiableAt_Kc χ hfin hs.1 hs.2).mul ?_).differentiableWithinAt
     exact hLd.differentiableAt.comp s
       ((differentiableAt_const _).sub ((differentiableAt_const _).mul differentiableAt_id))
   have hg : AnalyticOnNhd ℂ (fun s : ℂ => Gamma (s + 1)) U :=
@@ -328,8 +329,10 @@ theorem LFunction_ne_zero_of_finiteNorms (χ : DirichletCharacter ℂ N) (hχ : 
       norm_num
     · show (-1 / 2 : ℂ).re < 0
       norm_num
-  have hz0U : (-1 / 2 : ℂ) ∈ U := ⟨hz0V.1, lt_trans hz0V.2 (by norm_num)⟩
-  have hfg : (fun s : ℂ => K χ s * LFunction χ (1 - 2 * s)) =ᶠ[𝓝 (-1 / 2 : ℂ)]
+  have hz0U : (-1 / 2 : ℂ) ∈ U := by
+    have h2 : (-1 / 2 : ℂ).re < 0 := hz0V.2
+    exact ⟨hz0V.1, show (-1 / 2 : ℂ).re < 1 / 4 by linarith⟩
+  have hfg : (fun s : ℂ => Kc χ s * LFunction χ (1 - 2 * s)) =ᶠ[𝓝 (-1 / 2 : ℂ)]
       (fun s : ℂ => Gamma (s + 1)) :=
     Filter.eventuallyEq_of_mem (hVo.mem_nhds hz0V)
       (fun s hs => K_mul_LFunction_eq χ hχ hfin hs.1 hs.2)
