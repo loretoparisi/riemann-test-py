@@ -14,7 +14,7 @@ to prove it. Floating-point checks are evidence, not certificates.
 
 ```bash
 pip install -e .[test,rigorous]   # numpy, scipy, mpmath, matplotlib (+ pytest, python-flint)
-pytest -q                   # 86 tests, ~1 min
+pytest -q                   # 106 tests, ~2 min
 python -m riemann_lab report --quick      # original checks, ~10 s
 python -m riemann_lab report              # bigger ranges, ~1 min
 python -m riemann_lab extended --quick    # new criteria with convergence verdicts, ~1.5 min
@@ -23,6 +23,8 @@ python -m riemann_lab ramanujan --quick   # Ramanujan x Masullo checks, ~6 min
 python -m riemann_lab ramanujan           # full run, ~12 min on 4 cores (results/ramanujan_report.txt)
 python -m riemann_lab majorana --quick    # Majorana x Masullo checks, ~5 min
 python -m riemann_lab majorana           # full run, ~7 min on 4 cores (results/majorana_report.txt)
+python -m riemann_lab hlr                # Hardy-Littlewood-Ramanujan investigation, ~28 min (results/hlr_report.txt)
+python -m riemann_lab combined           # Ramanujan + Majorana + Masullo combined norm, ~60 min (results/combined_report.txt)
 python -m riemann_lab turing 1e6 1.0005e6 # Turing's method on one window
 python -m riemann_lab verify 100000 102000  # Turing-style check of one window
 python -m riemann_lab plots --out docs/plots
@@ -51,13 +53,17 @@ python -m riemann_lab plots --out docs/plots
 | `majorana` | Majorana's infinite-component tower (Gel'fand–Naimark matrices, mass spectrum m/(s+½), tachyonic branch, spectral zeta); D⁺_α of SL(2,ℝ) carried by Cayley + Laplace + Mellin to Masullo's line norms; local RH for the basis (Meixner–Pollaczek); Ξ in that basis; Majorana stars of Jensen polynomials; class D/C BdG matrices and quadratic Dirichlet zeros (theta integral); Majorana's Thomas–Fermi series and its Mellin transform; Norton–Sakuma algebras in exact arithmetic, j coefficients, Rademacher, Weil | `tower_check`, `hardy_sobolev_chain`, `local_rh`, `xi_mp_coefficients`, `majorana_stars`, `bdg_samples`, `QuadraticL`, `tf_series`, `TFMajorana`, `norton_sakuma_check` |
 | `majorana_checks` | Runs the eight Majorana × Masullo checks against criteria fixed before they were built ([docs/majorana_done_criteria.md](docs/majorana_done_criteria.md)) | `run` |
 | `ramanujan_checks` | Runs the eight Ramanujan × Masullo checks against criteria fixed before they were built ([docs/ramanujan_done_criteria.md](docs/ramanujan_done_criteria.md)) | `run` |
+| `hlr` | The Hardy–Littlewood–Ramanujan function M_χ(x) = Σμ(n)χ(n)/n e^{−x/n²} with exact character values: power series, Möbius sum with order-J tails (to x = 10^11 at N = 10^7), residue expansion, Mellin transform on −1 < Re s < 0, Hardy's hypothesis at its edge, the α β = π/q reciprocity for even and odd χ, amplitude, off-line-zero sensitivity | `Series`, `MobiusSum`, `ZeroExpansion`, `mellin_strip`, `reciprocity`, `amplitude_sup`, `log10_x_to_see` |
+| `hlr_checks` | Runs the six HLR checks ([docs/hlr_done_criteria.md](docs/hlr_done_criteria.md)) | `run` |
+| `combined` | One norm, four computations: Majorana's D⁺_α (holomorphic F_χ(w) = Σμχ(n) n/(1 − i n² w), Paley–Wiener), the Laplace side, Masullo's line seminorm on Re z = 1 − α, and RMT + Plancherel (|Γ/L|² on the line); blow-up at the critical line; an off-line-zero model | `line_norm_x`, `line_norm_mellin`, `Holo`, `hline_integral`, `laplace_weighted`, `B_from_zeros`, `moved_zero_L` |
+| `combined_checks` | Runs the five combined checks ([docs/combined_done_criteria.md](docs/combined_done_criteria.md)) | `run` |
 | `plots` | The figures below | `make_all` |
 
 ## Results of the full run
 
 Raw output is in [`results/`](results/): `pytest.txt`, `report.txt`, `verify_windows.txt`, `extended_report.txt`, `ramanujan_report.txt`, `majorana_report.txt`.
 
-* Tests: 86 of 86 pass (25 original + 19 for the extended criteria + 23 for the Ramanujan × Masullo checks + 19 for the Majorana × Masullo checks).
+* Tests: 106 of 106 pass (25 original + 19 for the extended criteria + 23 for the Ramanujan × Masullo checks + 19 for the Majorana × Masullo checks + 13 for the HLR investigation + 7 for the combined norm).
 * Zeros: all 4,491 zeros with 100 < t ≤ 5000, all 4,626 with 10^5 < t ≤ 1.03·10^5 and all 3,812 with 10^6 < t ≤ 1.002·10^6 lie on the critical line (sign changes of Z equal N(T2) − N(T1)).
 * Gram's law holds for 959 of the first 1,001 Gram intervals.
 * Schoenfeld's RH bound |π(x) − li(x)| < √x log x / 8π holds up to 10^6 (tightest at x = 2657, ratio 0.964).
@@ -146,6 +152,10 @@ holomorphic families whose Mellin side is known exactly. The proposals tested he
    Its poles in the strip are at s = (1−ρ)/2, so **GRH for χ ⇔ M_χ(x) = O(x^{−1/4+ε})** (Hardy–Littlewood 1918
    for ζ), and Hardy's RMT hypothesis on the half-plane Re z > −1/4 holds exactly when GRH holds for χ. A trace-formula
    proof could aim at this growth bound instead of at the poles of L′/L.
+   *Correction (HLR investigation below): this equivalence is a published theorem (Hardy–Littlewood 1918; Garg–Maji,
+   arXiv:2208.07596, for χ). The Mellin identity is unconditional only for M_χ − 1/L(1, χ) on −1 < Re s < 0, Hardy's
+   hypothesis holds on each closed half-plane Re z ≥ −δ, δ < 1/4, not on the open one, and the growth bound is no
+   easier a target than GRH itself.*
    Measured, for ζ and χ mod 3, 4, 5: the power series, the Möbius sum to N = 10^7 (with a rigorous tail bound) and the
    residue expansion over zeros on the line agree to 10^−11 x^{−1/4} for 10² ≤ x ≤ 10^8. x^{1/4}|M_χ − trivial terms|
    stays below the amplitude Σ|Γ((1−ρ)/2)/2L′(ρ)| computed from the zeros. Ramanujan's lost-notebook identity
@@ -278,6 +288,74 @@ physics and mathematics* (2014). As before: numerical tests of ideas, not a repa
 3. Full pass 1, 7/8: `majorana-thomas-fermi` failed only because two 50-digit quantities were compared at 15-digit
    working precision. Fix: compare inside `mp.workdps(50)`.
 4. Full pass 2: 8/8 consistent.
+
+## Hardy–Littlewood–Ramanujan investigation (fifth run)
+
+`python -m riemann_lab hlr` checks the result above line by line. Criteria: [docs/hlr_done_criteria.md](docs/hlr_done_criteria.md).
+Full pass 3: **6/6 consistent** (raw output in `results/hlr_report.txt`).
+
+**Prior art.** GRH ⇔ M_χ(x) = O(x^{−1/4+ε}) is Hardy–Littlewood (Acta Math. 41, 1918) for ζ and Garg–Maji
+(arXiv:2208.07596, Thm 2.2) for primitive χ. The character analogue of Ramanujan's α β = π identity is Dixit
+(Pacific J. Math. 255, 2012, Thms 1.9–1.10). Nothing here is new mathematics.
+
+1. `mellin-strip`: ∫x^{s−1}(M_χ − 1/L(1,χ))dx = Γ(s)/L(1−2s,χ) on −1 < Re s < 0 (unconditional, Fubini) to ≤ 2·10^−14 for ζ, χ4, χ5, χ7.
+2. `hardy-hypothesis-edge`: |φ| on Re z = −δ grows like (1/4 − δ)^−1 (constant to 1%), Hardy's A = 1.556–1.566 ≈ π/2.
+3. `moebius-large-x`: for ζ and all 32 primitive χ mod 3, 4, 5, 7, 8, 11, 13, the Möbius sum to N = 10^7 (order-3 tails,
+   rigorous Taylor remainder plus a floating-point estimate) agrees with the zero expansion within a budget of
+   2.5·10^−10 x^{−1/4} for 10² ≤ x ≤ 10^11; the measured differences are ~10^−13.
+4. `reciprocity`: M_χ(α²) = ε̄√(π/q)/α (M_χ̄(β²) − 1/L(1,χ̄)) + Z_χ(α²) + √π/(2αL′(0,χ)) (even χ) and the
+   √x Σμχ/n² e^{−x/n²} version (odd χ), α β = π/q, hold to ≤ 3·10^−14 for all 33 functions.
+5. `amplitude`: A_χ = Σ|Γ((1−ρ)/2)/(2L′(ρ))|; zeros with |γ| ≤ 20 carry > 99.7% of it; sup of x^{1/4}|M − trivial| over
+   log x ≤ 10^5 is 0.998–0.99999 A (Kronecker-type).
+6. `sensitivity`: an injected off-line quadruple (β = ½ ± 0.2) is detected at x ≤ 10^11 only for γ ≤ 35. Seeing one at the
+   verified height 3·10^12 would need log10 x ≈ 4·10^12.
+
+### Convergence log (HLR run)
+
+1. Quick run, 6/6. The Möbius tail was first order 1 (bound x²/8N⁴, too big beyond 10^9); order 3 with 70-digit tails
+   and an mpmath head to n = 2·10^5 for m ≥ 5 reaches 10^11.
+2. Full pass 1, 5/6: `moebius-large-x` failed by 10^15 for complex χ mod 7, 11, 13: character values stored as
+   doubles carry 10^−16 errors that x³ T_7 amplifies. Fix: exact roots of unity (`hlr.exact_values`).
+3. Full pass 2, 5/6: `amplitude` failed its guess that the first zero pair carries > 90% of A (84–89% for six
+   characters mod 11, 13). Criterion amended to the statement the argument needs: zeros with |γ| ≤ 20 carry > 99%.
+4. Full pass 3: 6/6 consistent.
+
+## Ramanujan + Majorana + Masullo: one combined norm (sixth run)
+
+`python -m riemann_lab combined`. Criteria: [docs/combined_done_criteria.md](docs/combined_done_criteria.md). **5/5 consistent**
+(`results/combined_report.txt`). This is a reformulation of GRH in Hilbert-space form, not a proof.
+
+With F_χ(w) = Σ μ(n)χ(n) n/(1 − i n² w) (the Laplace transform of M_χ) and c = 1 − α:
+
+    ||F_χ||²_{D⁺_α}  =  ∫|M_χ(t)|² t^{1−2α} dt  =  ∫|M_χ(x)|² x^{2c} dx/x  =  (1/2π) ∫|Γ(c+it)/L(1−2c−2it, χ)|² dt
+     (Majorana tower)     (Laplace side)            (Masullo line norm)          (Ramanujan: RMT + Plancherel)
+
+* Unconditional for M_χ − 1/L(1, χ) on α ∈ (1, 2). For M_χ on every α ∈ (3/4, 1) it holds **iff GRH** (Hardy–Littlewood /
+  Garg–Maji), and with simple zeros (α − 3/4)||F_χ||² → B_χ = (1/8)Σ|Γ((1−ρ)/2)/L′(ρ)|² as α → 3/4.
+* An off-line zero with real part β leaves the norm finite for α > (1 + β)/2 and infinite below: coarse spaces hide it,
+  only the finest exclude it, and membership there is GRH.
+
+1. `line-norm`: x side = Mellin side (no zeros used) to ≤ 5·10^−13 for ζ and all 11 primitive χ mod 3, 4, 5, 7, at
+   c = −0.6, −0.3 (unconditional) and 0.05, 0.1, 0.15, 0.2 (GRH range).
+2. `majorana-holomorphic`: ∫|F_χ(u+iv)|² du from the n-sum = 2π∫|M_χ|² e^{−2vt} dt to ≤ 4·10^−16 (ζ, χ4, χ5_2; v = 0.05, 0.2, 1).
+3. `critical-blowup`: (1/4 − c)||M||²_c → B_χ linearly (error ratios 10.00 per decade), extrapolated to ≤ 1.4·10^−9 of B
+   (ζ: B = 2.1·10^−10, so the blow-up only shows at 1/4 − c ≈ 10^−10).
+4. `off-line-control`: moving ζ's first zero pair to β = 0.6 makes h||M||²_{0.2−h} → K = 4.767774·10^−11, equal to the
+   predicted residue sum; the coarse norms (c = 0.05–0.15) stay finite, within 2·10^−4 of ζ's.
+5. `visibility`: on Re z = c a zero above |γ| ≈ 20 weighs < 10^−16; every check here sees only the lowest zeros.
+
+### Convergence log (combined run)
+
+1. Trials before the first full pass: the critical-blowup h range (10^−2…10^−5) was replaced by h = (10…0.01)·B/||M||²_{0.2},
+   since the smooth part dominates until h ≈ B; the coarse-space criterion "agree to 10^−8" became "finite and within
+   10^−3", since the model multiplies L by a rational factor that shifts the norm by ~2·10^−4 everywhere.
+2. A first attempt was stopped during `line-norm` to add the unconditional range c < 0 (Loreto asked for the equality); its [0, 1]
+   quadrature was 1% off for c < 0 until rewritten as ∫|G|² dy with M − c0 = x G(x).
+3. Pass 1, 3/5: `critical-blowup` missed for ζ by 3.4·10^−6: c = 1/4 − h was formed in 15 digits, which shifts
+   h = 2·10^−12 by 5·10^−5 relative. Fixed (c at working precision, exact β = 3/5). `off-line-control` needed the
+   smooth background removed (Richardson for K).
+4. Pass 2, 4/5: `critical-blowup` missed for χ5_1 by 1.1·10^−6, which is the b h² term of a first-order Richardson.
+   Second order on the three smallest h. Pass 3 of that check: consistent (all within 1.4·10^−9).
 
 ## Figures
 

@@ -1,4 +1,4 @@
-"""Command line: python -m riemann_lab {report,extended,ramanujan,majorana,plots,verify,turing} ..."""
+"""Command line: python -m riemann_lab {report,extended,ramanujan,majorana,hlr,combined,plots,verify,turing} ..."""
 from __future__ import annotations
 
 import argparse
@@ -56,6 +56,16 @@ def main(argv=None):
     mj.add_argument("--only", nargs="*", help="subset, e.g. majorana_tower discrete_series_hardy_sobolev "
                     "local_rh_majorana_basis xi_discrete_series_expansion majorana_stars_jensen "
                     "majorana_random_matrices_quadratic_L majorana_thomas_fermi majorana_algebras_moonshine")
+    hl = sub.add_parser("hlr", help="Hardy-Littlewood-Ramanujan reformulation of GRH: Mellin strip, Hardy's hypothesis "
+                        "at the edge, Moebius sums to 1e11, alpha beta = pi/q, amplitude, off-line-zero sensitivity")
+    hl.add_argument("--quick", action="store_true")
+    hl.add_argument("--only", nargs="*", help="subset, e.g. mellin_strip hardy_hypothesis_edge moebius_large_x "
+                    "reciprocity amplitude sensitivity")
+    cb = sub.add_parser("combined", help="Ramanujan + Majorana + Masullo: one norm four ways (line norm, D+_alpha, "
+                        "Mellin side), blow-up at the critical line, off-line-zero control")
+    cb.add_argument("--quick", action="store_true")
+    cb.add_argument("--only", nargs="*", help="subset, e.g. line_norm majorana_holomorphic critical_blowup "
+                    "off_line_control visibility")
     v = sub.add_parser("verify", help="Turing-style check that all zeros in (T1,T2] are on the line")
     v.add_argument("T1", type=float)
     v.add_argument("T2", type=float)
@@ -74,6 +84,12 @@ def main(argv=None):
     elif a.cmd == "majorana":
         from . import majorana_checks
         majorana_checks.run(a.quick, a.only)
+    elif a.cmd == "hlr":
+        from . import hlr_checks
+        hlr_checks.run(a.quick, a.only)
+    elif a.cmd == "combined":
+        from . import combined_checks
+        combined_checks.run(a.quick, a.only)
     elif a.cmd == "turing":
         from . import turing
         print(turing.turing_verify(a.T1, a.T2))
