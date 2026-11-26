@@ -1,4 +1,4 @@
-import RiemannLab.CombinedNormFull
+import RiemannLab.MtBounds
 import RiemannLab.Open
 import Mathlib.Analysis.Complex.CauchyIntegral
 import Mathlib.Analysis.Analytic.Uniqueness
