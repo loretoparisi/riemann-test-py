@@ -1,6 +1,6 @@
 # riemann-test-py
 
-Numerical lab for exploring the Riemann Hypothesis: zeta zeros, prime counting, Robin/Mertens/Li criteria, explicit formula, GUE random-matrix statistics, Turing's method, the de Bruijn–Newman heat flow, Nyman–Beurling distances, Weil positivity, certified Li coefficients, the Riesz and Redheffer criteria, Ramanujan-based checks of Masullo's GRH programme (Master Theorem, Hardy–Littlewood–Ramanujan, Dirichlet L-function zeros, tau) and Majorana-based ones (discrete series as Hardy–Sobolev lines, local RH, stellar representation of Jensen polynomials, Majorana random matrices, Thomas–Fermi, Majorana algebras), with tests and plots. The Python package is `riemann_lab`.
+Numerical lab for exploring the Riemann Hypothesis: zeta zeros, prime counting, Robin/Mertens/Li criteria, explicit formula, GUE random-matrix statistics, Turing's method, the de Bruijn–Newman heat flow, Nyman–Beurling distances, Weil positivity, certified Li coefficients, the Riesz and Redheffer criteria, Ramanujan-based checks of Masullo's GRH programme (Master Theorem, Hardy–Littlewood–Ramanujan, Dirichlet L-function zeros, tau) and Majorana-based ones (discrete series as Hardy–Sobolev lines, local RH, stellar representation of Jensen polynomials, Majorana random matrices, Thomas–Fermi, Majorana algebras), the Hardy–Littlewood–Ramanujan GRH criterion and a combined Ramanujan + Majorana + Masullo norm (prior art: Hardy–Littlewood 1918, Dixit 2012, Garg–Maji 2022; see [what is new](#prior-art-and-what-is-new-fifth-and-sixth-runs)), with tests and plots. The Python package is `riemann_lab`.
 
 Numerical experiments around the Riemann Hypothesis (RH), built alongside a
 reading of A. M. Masullo's manuscript *The Music of the Primes* (2026 draft),
@@ -289,6 +289,61 @@ physics and mathematics* (2014). As before: numerical tests of ideas, not a repa
    working precision. Fix: compare inside `mp.workdps(50)`.
 4. Full pass 2: 8/8 consistent.
 
+## Prior art and what is new (fifth and sixth runs)
+
+**Prior art, up front.** The central statements of the fifth and sixth runs are known theorems:
+
+| Year | Result | Reference |
+| --- | --- | --- |
+| 1918 | RH ⇔ Σ (−x)^k/(k! ζ(2k+1)) = Σ μ(n)/n e^{−x/n²} = O(x^{−1/4+ε}); the αβ = π identity (Ramanujan's lost-notebook claim, corrected), assuming simple zeros | G. H. Hardy, J. E. Littlewood, Acta Math. 41 (1918), 119–196, §2.5 |
+| 2012 | Character analogues of the αβ identity for even and odd primitive χ (normalised with αβ = 1 and Gauss sums), assuming simple zeros | A. Dixit, Pacific J. Math. 255 (2012), 317–348, Thms 1.9–1.10 ([arXiv:1102.2680](https://arxiv.org/abs/1102.2680)) |
+| 2022 | GRH for primitive χ ⇔ Σ χ(n)μ(n) n^{−k} e^{−x/n^ℓ} = O(x^{−k/ℓ+1/(2ℓ)+ε}) (k = 1, ℓ = 2 is our M_χ), plus a one-sided zero expansion | M. Garg, B. Maji ([arXiv:2208.07596](https://arxiv.org/abs/2208.07596)), Thms 2.1–2.2 |
+
+**What is new here, and of what kind.** None of it is a new result about where the zeros are, and none of it
+brings RH closer. Each item is labelled by kind: *reformulation* (an equivalent restatement), *corollary* (a
+short consequence with a proof sketch, conditional where marked), *numerical extension* or *new test*.
+
+1. **The combined norm identity**, beyond Hardy–Littlewood and Garg–Maji (*reformulation*). Their criterion is a
+   sup bound on M_χ. Here it becomes membership in a Hilbert scale, with one norm computed four ways:
+
+       ||F_χ||²_{D⁺_α} = ∫|M_χ(t)|² t^{1−2α} dt = ∫|M_χ(x)|² x^{2c} dx/x = (1/2π)∫|Γ(c+it)/L(1−2c−2it, χ)|² dt,   c = 1 − α,
+
+   with F_χ(w) = Σ μ(n)χ(n) n/(1 − i n² w) the holomorphic (Majorana discrete-series) vector.
+   *Statement:* GRH for χ ⇔ F_χ ∈ D⁺_α for every α ∈ (3/4, 1). The proof is the Hardy–Littlewood argument with
+   Cauchy–Schwarz and Mellin–Plancherel. ⇒: M_χ = O(x^{−1/4+ε}) and M_χ → 1/L(1, χ) at 0 make every line norm
+   finite. ⇐: finite norms on two lines c₁ < c₂ give absolute convergence of the Mellin integral on c₁ < Re s < c₂,
+   so Γ(s)/L(1−2s, χ) has no poles in 0 < Re s < 1/4. The same identity for M_χ − 1/L(1, χ) on α ∈ (1, 2) is
+   unconditional. *Example:* χ5_2 (even, mod 5) at α = 0.9 has ||F||² = 27.31576149, the same from the x side and
+   from |Γ/L|² alone (no zeros), to 4·10^−16.
+2. **The critical-line blow-up constant**, beyond Hardy–Littlewood and Garg–Maji (*corollary, conditional*).
+   Assume GRH for χ, simple zeros, and that the zero expansion of M_χ converges absolutely. Then
+       lim_{α→3/4⁺} (α − 3/4) ||F_χ||²_{D⁺_α} = B_χ = (1/8) Σ_ρ |Γ((1−ρ)/2)/L′(ρ, χ)|².
+   *Sketch:* x^{1/4}M_χ(e^u) = f(u) + O(e^{−u/4}), with f(u) = Σ c_ρ e^{iγu/2} almost periodic and Σ|c_ρ| < ∞. Then
+   (α − 3/4)∫|M|² x^{1−2α}dx = h∫e^{−2hu}|f(u)|²du + O(h) → (1/2)·mean|f|² = (1/2)Σ|c_ρ|² (Parseval for
+   absolutely convergent almost periodic series; distinct ordinates follow from simplicity). It is a mean-square
+   version of the amplitude bound, and the fastest-diverging line pins Re ρ: an off-line zero with real part β
+   moves the divergence to α = (1+β)/2. We have not found this limit stated in the three papers above. It is
+   elementary, so it may well be known elsewhere. *Example:* for ζ, B = 2.139767·10^−10, matched by the
+   extrapolated norm to 1·10^−15 relative (`critical-blowup`).
+3. **Reciprocity with αβ = π/q, written out in full**, beyond Dixit (*reformulation + new test*). Even χ:
+   M_χ(α²) = ε̄ √(π/q)/α · (M_χ̄(β²) − 1/L(1, χ̄)) + Z_χ(α²) + √π/(2α L′(0, χ)). Odd χ:
+   N_χ(α²) = ε̄ √(π/q)/α · N_χ̄(β²) + Z^odd_χ(α²), with N_χ(x) = √x Σ μχ(n)/n² e^{−x/n²}. Here ε is the root number.
+   It is derived here independently, by a contour shift, with the constant 1/L(1, χ̄) and the trivial-zero term at
+   s = 1/2 shown explicitly. We have not checked whether Dixit's normalisation absorbs them. The new part is the
+   test: it holds to ≤ 3·10^−14 for ζ and all 32 primitive characters mod 3, 4, 5, 7, 8, 11, 13, at three α and two
+   zero heights.
+4. **Large-x evidence**, beyond all three (*numerical extension*). Möbius sums to N = 10^7, with exact character
+   values and order-3 tails (rigorous Taylor remainder), match the zero expansion up to x = 10^11 for 33
+   L-functions. The budget is 2.5·10^−10 x^{−1/4}, and the measured differences are ~10^−13. We did not find
+   comparable computations in the three papers.
+5. **What the criterion can see**, beyond all three (*elementary estimate + new test*). An off-line zero at height γ
+   enters with weight |Γ((1−ρ)/2)| ≈ e^{−π|γ|/4}. At x ≤ 10^11 it is detectable only for γ ≲ 35 (measured, with
+   injected zeros). Making it dominant at the RH-verified height 3·10^12 needs log10 x ≈ 4·10^12. Hence agreement at
+   reachable x is not evidence about high zeros.
+6. **Precision of the classical statements** (*corrections, not new theorems*). The Mellin identity holds
+   unconditionally only for M_χ − 1/L(1, χ) on −1 < Re s < 0, by Fubini, not by RMT. Hardy's RMT hypothesis holds
+   on each closed half-plane Re z ≥ −δ, δ < 1/4, under GRH, never uniformly on the open one.
+
 ## Hardy–Littlewood–Ramanujan investigation (fifth run)
 
 `python -m riemann_lab hlr` checks the result above line by line. Criteria: [docs/hlr_done_criteria.md](docs/hlr_done_criteria.md).
@@ -296,7 +351,8 @@ Full pass 3: **6/6 consistent** (raw output in `results/hlr_report.txt`).
 
 **Prior art.** GRH ⇔ M_χ(x) = O(x^{−1/4+ε}) is Hardy–Littlewood (Acta Math. 41, 1918) for ζ and Garg–Maji
 (arXiv:2208.07596, Thm 2.2) for primitive χ. The character analogue of Ramanujan's α β = π identity is Dixit
-(Pacific J. Math. 255, 2012, Thms 1.9–1.10). Nothing here is new mathematics.
+(Pacific J. Math. 255, 2012, Thms 1.9–1.10). Nothing here is a new theorem about the zeros; what is new, and of
+what kind, is listed in [Prior art and what is new](#prior-art-and-what-is-new-fifth-and-sixth-runs).
 
 1. `mellin-strip`: ∫x^{s−1}(M_χ − 1/L(1,χ))dx = Γ(s)/L(1−2s,χ) on −1 < Re s < 0 (unconditional, Fubini) to ≤ 2·10^−14 for ζ, χ4, χ5, χ7.
 2. `hardy-hypothesis-edge`: |φ| on Re z = −δ grows like (1/4 − δ)^−1 (constant to 1%), Hardy's A = 1.556–1.566 ≈ π/2.
@@ -323,7 +379,8 @@ Full pass 3: **6/6 consistent** (raw output in `results/hlr_report.txt`).
 ## Ramanujan + Majorana + Masullo: one combined norm (sixth run)
 
 `python -m riemann_lab combined`. Criteria: [docs/combined_done_criteria.md](docs/combined_done_criteria.md). **5/5 consistent**
-(`results/combined_report.txt`). This is a reformulation of GRH in Hilbert-space form, not a proof.
+(`results/combined_report.txt`). This is a reformulation of GRH in Hilbert-space form, not a proof. See
+[Prior art and what is new](#prior-art-and-what-is-new-fifth-and-sixth-runs) for how it relates to the 1918, 2012 and 2022 results.
 
 With F_χ(w) = Σ μ(n)χ(n) n/(1 − i n² w) (the Laplace transform of M_χ) and c = 1 − α:
 
