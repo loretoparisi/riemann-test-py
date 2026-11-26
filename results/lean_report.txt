@@ -1,0 +1,26 @@
+== riemann-lab lean: combined norm identity in Lean 4 + Mathlib ==
+(GitHub Actions run 45774968608, Lean 4.36.0, Mathlib v4.36.0; lake build by leanprover/lean-action, then
+ python -m riemann_lab lean --skip-build)
+
+[build]    lake build: OK. RiemannLab/CombinedNorm.lean: no sorry. RiemannLab/Open.lean: 2 declarations use sorry.
+[audit]    OK
+   PROVED  mellin_g                 int_0^oo x^(s-1) (e^-x - 1) dx = Gamma(s) on -1 < Re s < 0
+   PROVED  integrableOn_g_norm      x^(sigma-1) |e^-x - 1| is integrable on (0, oo) for -1 < sigma < 0
+   PROVED  scale_identity           x^-1 ((x^2)^-1)^(-s) = x^-(1-2s) for x > 0 (complex powers)
+   PROVED  integral_norm_F          int |n-th Mellin integrand| <= K(sigma) n^(2 sigma - 1) (Tonelli bound)
+   PROVED  mellin_Mt_eq_LSeries     Mellin(M~_chi)(s) = Gamma(s) L(mu chi, 1-2s) on -1 < Re s < 0 (Fubini)
+   PROVED  mellin_Mt                Mellin(M~_chi)(s) = Gamma(s) / L(1-2s, chi) on -1 < Re s < 0
+   PROVED  combined_norm_identity   int |M~_chi|^2 x^(1-2 alpha) dx = (1/2pi) int |Gamma/L|^2 dt, 1 < alpha < 2, given the named hypothesis MellinPlancherel
+   HYPOTH  MellinPlancherel         Mellin-Plancherel on Re s = c (classical; not in this Mathlib in L1 n L2 integral form)
+   OPEN    grh_iff_finite_norm      GRH(chi) <=> int |M_chi|^2 x^(1-2 alpha) < oo for all alpha in (3/4, 1)  [sorry]
+   OPEN    blowup_limit             (alpha - 3/4) ||M_chi||^2 -> (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2, given GRH, simple zeros, absolute convergence  [sorry]
+[numerics] OK
+   mellin_g rel errors: 1.1e-31, 1.6e-30, 1.8e-31, 3.8e-31
+   K(sigma) = -Gamma(sigma) rel errors: 1.1e-31, 1.0e-17, 4.1e-17
+   scale_identity max rel error: 3.3e-16
+   Lean Mt (direct sum) vs M_chi - 1/L(1,chi), chi mod 5: max abs diff 7.6e-14
+   mellin_Mt rel errors (chi mod 5): 6.8e-16, 4.3e-15
+   combined_norm_c=-0.5: x side 2.550795610262, L side 2.550795610262, rel err 3.5e-16
+   combined_norm_c=-0.25: x side 5.380396489925, L side 5.380396489925, rel err 3.3e-16
+
+result: PASS
