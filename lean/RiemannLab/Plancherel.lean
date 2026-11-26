@@ -49,6 +49,7 @@ lemma fourier_toLp_ae {f : ℝ → ℂ} (hf1 : Integrable f) (hf2 : MemLp f 2) :
       = Lp.toTemperedDistribution (𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ)) φ := by
         rw [Lp.toTemperedDistribution_apply]
         refine integral_congr_ae (Eventually.of_forall fun x => ?_)
+        show g x • _ = φ x • _
         rw [hφ, Complex.real_smul, smul_eq_mul]
     _ = 𝓕 (Lp.toTemperedDistribution (hf2.toLp f)) φ := by
         rw [Lp.fourier_toTemperedDistribution_eq]
@@ -59,10 +60,11 @@ lemma fourier_toLp_ae {f : ℝ → ℂ} (hf1 : Integrable f) (hf2 : MemLp f 2) :
         filter_upwards [hf2.coeFn_toLp] with x hx
         rw [hx, SchwartzMap.fourier_coe]
     _ = ∫ ξ, φ ξ • 𝓕 f ξ := by
-        have := VectorFourier.integral_fourierIntegral_smul_eq_flip (L := innerₗ ℝ)
-          Real.continuous_fourierChar continuous_inner φ.integrable hf1
-        rw [flip_innerₗ] at this
-        exact this
+        have h := VectorFourier.integral_fourierIntegral_smul_eq_flip (μ := volume)
+          (ν := volume) (L := innerₗ ℝ) Real.continuous_fourierChar continuous_inner
+          φ.integrable hf1
+        rw [flip_innerₗ] at h
+        exact h
     _ = ∫ ξ, g ξ • 𝓕 f ξ := by
         congr 1
 
