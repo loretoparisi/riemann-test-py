@@ -24,7 +24,7 @@ noncomputable section
 
 namespace RiemannLab
 
-variable {N : ℕ}
+variable {N : ℕ} [NeZero N]
 
 /-- The Ramanujan–Hardy–Littlewood function `M_χ(x) = Σ μ(n) χ(n)/n · e^{-x/n²}`. -/
 def M (χ : DirichletCharacter ℂ N) (x : ℝ) : ℂ :=
