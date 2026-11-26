@@ -1,0 +1,58 @@
+== riemann-lab: Ramanujan + Majorana + Masullo combined formulation (criteria in docs/combined_done_criteria.md) ==
+   (a reformulation of GRH, known in substance: Hardy-Littlewood 1918, Garg-Maji 2022, Dixit 2012;
+    numerical evidence, not proof; 'CONSISTENT' = every criterion met)
+
+[line-norm] CONSISTENT  (2293.1s)
+    zeta    ||M||^2 on Re z = c: c=-0.6: 0.7797694809, c=-0.3: 0.62020448, c=0.05: 0.8488880471, c=0.1: 0.9229653349, c=0.15: 1.012496284, c=0.2: 1.120531548; x side (X0 = 30, 50) vs Mellin side max rel. diff 2.2e-16
+    chi3_1  ||M||^2 on Re z = c: c=-0.6: 2.13398422, c=-0.3: 3.261464787, c=0.05: 25.5974402, c=0.1: 12.19637438, c=0.15: 7.881536954, c=0.2: 5.823772475; x side (X0 = 30, 50) vs Mellin side max rel. diff 0.0e+00
+    chi4    ||M||^2 on Re z = c: c=-0.6: 1.623804986, c=-0.3: 2.235310088, c=0.05: 14.84151716, c=0.1: 6.911585019, c=0.15: 4.360648981, c=0.2: 3.142570729; x side (X0 = 30, 50) vs Mellin side max rel. diff 1.8e-15
+    chi5_1  ||M||^2 on Re z = c: c=-0.6: 1.497207093, c=-0.3: 1.946330005, c=0.05: 11.45059974, c=0.1: 5.261661134, c=0.15: 3.273664241, c=0.2: 2.329130823; x side (X0 = 30, 50) vs Mellin side max rel. diff 2.1e-15
+    chi5_2  ||M||^2 on Re z = c: c=-0.6: 2.433686765, c=-0.3: 4.247637042, c=0.05: 53.52427645, c=0.1: 27.31576149, c=0.15: 19.17376928, c=0.2: 15.68245115; x side (X0 = 30, 50) vs Mellin side max rel. diff 3.6e-16
+    chi5_3  ||M||^2 on Re z = c: c=-0.6: 1.497207093, c=-0.3: 1.946330005, c=0.05: 11.45059974, c=0.1: 5.261661134, c=0.15: 3.273664241, c=0.2: 2.329130823; x side (X0 = 30, 50) vs Mellin side max rel. diff 2.1e-15
+    chi7_1  ||M||^2 on Re z = c: c=-0.6: 1.664354442, c=-0.3: 2.175507846, c=0.05: 11.29054274, c=0.1: 5.247198715, c=0.15: 3.346423807, c=0.2: 2.573413608; x side (X0 = 30, 50) vs Mellin side max rel. diff 5.2e-13
+    chi7_2  ||M||^2 on Re z = c: c=-0.6: 1.963418165, c=-0.3: 3.08258295, c=0.05: 32.227314, c=0.1: 16.02050196, c=0.15: 10.9323148, c=0.2: 8.676494279; x side (X0 = 30, 50) vs Mellin side max rel. diff 2.9e-16
+    chi7_3  ||M||^2 on Re z = c: c=-0.6: 1.114845843, c=-0.3: 1.286920951, c=0.05: 6.249974192, c=0.1: 2.79649329, c=0.15: 1.693086557, c=0.2: 1.173393735; x side (X0 = 30, 50) vs Mellin side max rel. diff 1.9e-16
+    chi7_4  ||M||^2 on Re z = c: c=-0.6: 1.963418165, c=-0.3: 3.08258295, c=0.05: 32.227314, c=0.1: 16.02050196, c=0.15: 10.9323148, c=0.2: 8.676494279; x side (X0 = 30, 50) vs Mellin side max rel. diff 2.9e-16
+    chi7_5  ||M||^2 on Re z = c: c=-0.6: 1.664354442, c=-0.3: 2.175507846, c=0.05: 11.29054274, c=0.1: 5.247198715, c=0.15: 3.346423807, c=0.2: 2.573413608; x side (X0 = 30, 50) vs Mellin side max rel. diff 5.2e-13
+    Mellin side uses only |Gamma/L|^2 on the line (no zeros); x side uses the power series and, beyond X0,
+    the zero expansion (checked against the Moebius sum to 1e11 in `python -m riemann_lab hlr`).
+    Equal norms = M_chi in Masullo's line space for c and in Majorana's D+_alpha, alpha = 1 - c.
+    c < 0 (alpha in (1, 2)): the identity for M - 1/L(1, chi) is a theorem. c in (0, 1/4) (alpha in (3/4, 1)): it
+    holds for all such c iff GRH; here it is only verified, with zeros below height ~25 doing all the work. 
+
+[majorana-holomorphic] CONSISTENT  (39.3s)
+    zeta    int |F(u+iv)|^2 du (n-sum, N = 1e3 and 3e3) vs 2pi int |M|^2 e^(-2vt) dt: v=0.05: 8.929772769, v=0.2: 3.370965318, v=1.0: 0.2982006882; max rel. diff 2.0e-16
+    chi4    int |F(u+iv)|^2 du (n-sum, N = 1e3 and 3e3) vs 2pi int |M|^2 e^(-2vt) dt: v=0.05: 7.24105063, v=0.2: 5.622789547, v=1.0: 2.882281216; max rel. diff 2.5e-16
+    chi5_2  int |F(u+iv)|^2 du (n-sum, N = 1e3 and 3e3) vs 2pi int |M|^2 e^(-2vt) dt: v=0.05: 55.06562307, v=0.2: 31.18746917, v=1.0: 11.78847006; max rel. diff 3.4e-16
+    F_chi(w) = sum mu chi(n) n/(1 - i n^2 w) is the holomorphic (Majorana-Plyushchay) vector; integrating
+    v^(2alpha-2) over v turns these into ||F||^2_{D+_alpha} = the line norm of check 1 at c = 1 - alpha. 
+
+[critical-blowup] CONSISTENT  (2290.4s)
+    zeta    B = (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2 = 2.139767e-10; (1/4 - c) ||M||_c^2 at h = 1/4 - c = 1.9e-09: 12.164093973 B, 1.9e-10: 2.116409402 B, 1.9e-11: 1.111640940 B, 1.9e-12: 1.011164094 B; error ratios per decade 10.00, 10.00, 10.00; extrapolated 1.1e-15 from B
+    chi3_1  B = (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2 = 1.891325e-06; (1/4 - c) ||M||_c^2 at h = 1/4 - c = 3.2e-06: 9.007230009 B, 3.2e-07: 1.800714047 B, 3.2e-08: 1.080071315 B, 3.2e-09: 1.008007131 B; error ratios per decade 10.00, 10.00, 10.00; extrapolated 2.4e-14 from B
+    chi4    B = (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2 = 4.133182e-05; (1/4 - c) ||M||_c^2 at h = 1/4 - c = 1.3e-04: 8.801329571 B, 1.3e-05: 1.779729848 B, 1.3e-06: 1.077968956 B, 1.3e-07: 1.007796855 B; error ratios per decade 10.01, 10.00, 10.00; extrapolated 2.8e-12 from B
+    chi5_1  B = (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2 = 6.871192e-04; (1/4 - c) ||M||_c^2 at h = 1/4 - c = 3.0e-03: 8.722857140 B, 3.0e-04: 1.762558584 B, 3.0e-05: 1.076159891 B, 3.0e-06: 1.007615031 B; error ratios per decade 10.13, 10.01, 10.00; extrapolated 1.4e-09 from B
+    chi5_2  B = (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2 = 9.466045e-06; (1/4 - c) ||M||_c^2 at h = 1/4 - c = 6.0e-06: 10.100540733 B, 6.0e-07: 1.910049478 B, 6.0e-08: 1.091004902 B, 6.0e-09: 1.009100490 B; error ratios per decade 10.00, 10.00, 10.00; extrapolated 6.3e-15 from B
+    chi5_3  B = (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2 = 6.871192e-04; (1/4 - c) ||M||_c^2 at h = 1/4 - c = 3.0e-03: 8.722857140 B, 3.0e-04: 1.762558584 B, 3.0e-05: 1.076159891 B, 3.0e-06: 1.007615031 B; error ratios per decade 10.13, 10.01, 10.00; extrapolated 1.4e-09 from B
+    h is scaled to h0 = B/||M||^2_{0.2}: below h0 the zeros on the line dominate the norm. For zeta
+    B = 2e-10, so the critical-line blow-up only shows up at 1/4 - c ~ 1e-10. 
+
+[off-line-control] CONSISTENT  (31.5s)
+    model zeta with its first zero pair moved to beta = 0.6 / 0.4: h ||M||^2 at c = 0.2 - h: h=1e-10: 1.597081e-10, h=1e-11: 5.888077e-11, h=1e-12: 4.879804e-11; Richardson K = 4.767774e-11, 4.767774e-11 vs predicted (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2 over the moved zeros = 4.767774e-11: norm ~ K/h, diverges at c = 0.2
+    true zeta at c = 0.2: 1.120531548 (finite)
+    coarse space c = 0.05 (alpha = 0.95): model norm 0.84871549158 (finite), true norm 0.848888047056, rel. diff 2.0e-04 (the global factor 1 - delta^2/(w - rho)^2 of the model, delta^2/gamma^2 ~ 5e-5)
+    coarse space c = 0.1 (alpha = 0.90): model norm 0.922777473998 (finite), true norm 0.922965334852, rel. diff 2.0e-04 (the global factor 1 - delta^2/(w - rho)^2 of the model, delta^2/gamma^2 ~ 5e-5)
+    coarse space c = 0.15 (alpha = 0.85): model norm 1.01229000552 (finite), true norm 1.01249628376, rel. diff 2.0e-04 (the global factor 1 - delta^2/(w - rho)^2 of the model, delta^2/gamma^2 ~ 5e-5)
+    In the coarse spaces (c < 0.2) the model with an off-line zero is a perfectly good element: finite norm,
+    within 2e-4 of the true one. It leaves the space only at c >= (1 - beta)/2 = 0.2. A coarse space does
+    not exclude off-line zeros; only the finest spaces (c -> 1/4) do, and membership there is GRH itself. 
+
+[visibility] CONSISTENT  (0.0s)
+    line Re z = 0.05: zeros above |gamma| = 19.5 carry weight |Gamma(c + i gamma/2)|^2 < 1e-16 |Gamma(c)|^2 (invisible in double precision)
+    line Re z = 0.1: zeros above |gamma| = 20.6 carry weight |Gamma(c + i gamma/2)|^2 < 1e-16 |Gamma(c)|^2 (invisible in double precision)
+    line Re z = 0.2: zeros above |gamma| = 21.8 carry weight |Gamma(c + i gamma/2)|^2 < 1e-16 |Gamma(c)|^2 (invisible in double precision)
+    line Re z = 0.25: zeros above |gamma| = 22.2 carry weight |Gamma(c + i gamma/2)|^2 < 1e-16 |Gamma(c)|^2 (invisible in double precision)
+    for comparison: RH is verified to height 3.00e+12 (Platt-Trudgian 2021), GRH for
+    q <= 4e5 to height 1e8/q (Platt 2016). Every check here only sees zeros far below those heights. 
+
+5/5 checks consistent (critical-blowup from pass 3 with second-order Richardson; the other four from pass 2, code unchanged since); done in 4971.6s

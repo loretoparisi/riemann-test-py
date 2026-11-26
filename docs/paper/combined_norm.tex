@@ -1,0 +1,317 @@
+\documentclass[11pt]{amsart}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=1.15in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{fancyvrb}
+\usepackage{url}
+\makeatletter\g@addto@macro\UrlBreaks{\do\_\do\.}\makeatother
+\newcommand{\lean}{\path}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=green!40!black,urlcolor=blue!50!black]{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{hypothesis}[theorem]{Hypothesis}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Mt}{\widetilde{M}_\chi}
+\newcommand{\Mel}{\mathcal{M}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+\newcommand{\status}[1]{\textsf{\small[#1]}}
+
+\definecolor{leankw}{RGB}{0,0,150}
+\newcommand{\kw}[1]{\textcolor{leankw}{\textbf{#1}}}
+\fvset{commandchars=\\\{\},fontsize=\scriptsize,frame=single,framerule=0.3pt,rulecolor=\color{gray!60},
+  framesep=6pt,codes={\catcode`$=3}}
+
+\title[A Hilbert-scale form of the Hardy--Littlewood--Ramanujan criterion]{A Hilbert-scale form of the
+Hardy--Littlewood--Ramanujan criterion for GRH, with a Lean~4 verification of its unconditional half}
+
+\author{riemann-lab project}
+\date{November 2026}
+
+\sloppy
+\begin{document}
+
+\begin{abstract}
+For a Dirichlet character $\chi$ let $M_\chi(x)=\sum_{n\ge1}\mu(n)\chi(n)n^{-1}e^{-x/n^2}$. Hardy and
+Littlewood (1918, for $\zeta$) and Garg and Maji (2022, for primitive $\chi$) showed that the generalised Riemann
+hypothesis for $\chi$ is equivalent to $M_\chi(x)=O(x^{-1/4+\varepsilon})$. We restate this criterion as membership
+in a Hilbert scale: one weighted norm, which can be read as a discrete-series norm of $SL(2,\R)$, as a Laplace-side
+integral, or as a line seminorm of Masullo's Hardy--Sobolev spaces, equals $\frac1{2\pi}\int|\Gamma(c+it)/L(1-2c-2it,\chi)|^2\,dt$.
+On the range $c\in(-1,0)$ the identity is unconditional, and we verify it in Lean~4 with Mathlib: the Mellin
+transform of $\Mt=M_\chi-1/L(1,\chi)$ equals $\Gamma(s)/L(1-2s,\chi)$ on $-1<\Re s<0$ with no \texttt{sorry} and no
+axioms beyond Lean's standard three, and the norm identity follows given Mellin--Plancherel, which enters as a named
+hypothesis. On $c\in(0,1/4)$ finiteness of the norm for all $c$ is equivalent to GRH, and, under GRH and simplicity of
+zeros, the norm blows up at $c=1/4$ with an explicit constant $B_\chi=\frac18\sum_\rho|\Gamma(\frac{1-\rho}2)/L'(\rho,\chi)|^2$.
+These two statements are stated in Lean and left open. We report numerical evidence for every part and a visibility
+estimate showing why such evidence says nothing about high zeros. Nothing in this paper proves GRH.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction}
+
+This note grew out of a numerical reading of A.~M.~Masullo's draft \emph{The Music of the Primes} \cite{Masullo}, which
+proposes a proof of GRH for Hecke $L$-functions through a trace formula on Hardy--Sobolev completions of the idele
+class group. Masullo's spaces are defined by $L^2$ norms of Mellin transforms on vertical lines. Ramanujan's Master
+Theorem produces explicit functions whose Mellin transforms are known in closed form, and the function $M_\chi$ above
+is the case where that transform is $\Gamma(s)/L(1-2s,\chi)$. The question we asked was whether the resulting
+criterion, put into Masullo's norms, gives anything a trace-formula argument could use. The answer recorded here is
+a clean reformulation, a formally verified unconditional half, and a precise statement of where the difficulty sits.
+
+\subsection*{Status labels}
+Every statement carries one label. \status{Lean} means machine-checked in Lean~4 + Mathlib with only the standard
+axioms; \status{Lean, given H} means checked from the named hypothesis H; \status{classical} means a published theorem;
+\status{conditional} means proved here on paper under stated hypotheses (a sketch where marked); \status{numerical}
+means floating-point evidence, which is not a certificate.
+
+\subsection*{Prior art}
+\begin{itemize}[leftmargin=1.5em]
+\item Hardy and Littlewood \cite{HL} proved $\mathrm{RH}\iff\sum_k(-x)^k/(k!\,\zeta(2k+1))=O(x^{-1/4+\varepsilon})$ and
+corrected Ramanujan's $\alpha\beta=\pi$ identity, which needs simple zeros.
+\item Dixit \cite{Dixit} gave the character analogues of the $\alpha\beta$ identity for even and odd primitive $\chi$.
+\item Garg and Maji \cite{GM} proved that GRH for primitive $\chi$ holds if and only if
+\[\textstyle\sum\chi(n)\mu(n)n^{-k}e^{-x/n^\ell}=O(x^{-k/\ell+1/(2\ell)+\varepsilon}),\]
+and $k=1$, $\ell=2$ is $M_\chi$.
+\end{itemize}
+
+\subsection*{What is new, and of what kind}
+\begin{enumerate}[leftmargin=1.5em]
+\item The criterion as membership in a Hilbert scale, with one norm computed four ways (Theorem~\ref{thm:combined}),
+a \emph{reformulation}.
+\item A Lean~4 proof of the unconditional half (Section~\ref{sec:lean}), the main new artefact.
+\item The blow-up constant at the critical exponent (Proposition~\ref{prop:blowup}), a short \emph{conditional
+corollary}. We have not found it stated in \cite{HL,Dixit,GM}; it is elementary and may be known elsewhere.
+\item Numerical tests to $x=10^{11}$ for 33 $L$-functions and a visibility estimate (Section~\ref{sec:numerics}).
+\end{enumerate}
+
+\section{The function $M_\chi$ and its Mellin transform}
+
+Throughout, $\chi$ is a Dirichlet character modulo $N\ge1$, $\mu$ is the M\"obius function and
+$L(s,\chi)=\sum\chi(n)n^{-s}$ for $\Re s>1$. Put
+\[
+ g(t)=e^{-t}-1,\qquad \Mt(x)=\sum_{n\ge1}\frac{\mu(n)\chi(n)}{n}\,g\!\left(\frac{x}{n^2}\right),\qquad
+ \Mel f(s)=\int_0^\infty x^{s-1}f(x)\,dx .
+\]
+The series for $\Mt$ converges absolutely since $|g(t)|\le\min(t,1)$. For nonprincipal $\chi$ one has
+$\sum\mu(n)\chi(n)/n=1/L(1,\chi)$, so $\Mt=M_\chi-1/L(1,\chi)$; we use $\Mt$ as the definition, which is what Lean
+formalises, and check the identification numerically (Section~\ref{sec:numerics}).
+
+\begin{lemma}[Shifted Euler integral]\label{lem:euler}\status{Lean: \lean{mellin_g}}
+For $-1<\Re s<0$, $\int_0^\infty x^{s-1}(e^{-x}-1)\,dx=\Gamma(s)$.
+\end{lemma}
+\begin{proof}
+Integrate by parts with $u=e^{-x}-1$ and $v=x^s/s$. The boundary terms vanish: $|uv|\le x^{\sigma+1}/|s|$ near $0$
+and $|uv|\le x^\sigma/|s|$ near $\infty$, $\sigma=\Re s$. The integrability of $u\,v'$ follows from
+$|g(x)|x^{\sigma-1}\le x^\sigma$ on $(0,1]$ and $\le x^{\sigma-1}$ on $(1,\infty)$, and that of $u'v$ from Euler's
+integral at $s+1$. Hence the integral equals $\frac1s\int_0^\infty x^se^{-x}dx=\Gamma(s+1)/s=\Gamma(s)$.
+\end{proof}
+
+\begin{lemma}[Tonelli bound]\label{lem:tonelli}\status{Lean: \lean{integral_norm_F}}
+Let $-1<\sigma<0$ and $K(\sigma)=\int_0^\infty t^{\sigma-1}|g(t)|dt<\infty$. Then
+\[\int_0^\infty x^{\sigma-1}\Bigl|\frac{\mu(n)\chi(n)}{n}\,g\Bigl(\frac{x}{n^2}\Bigr)\Bigr|\,dx\le K(\sigma)\,n^{2\sigma-1}.\]
+\end{lemma}
+\begin{proof}
+Substitute $x=n^2t$: the integral is $|\mu(n)\chi(n)|\,n^{-1}\,n^{2\sigma}K(\sigma)$, and $|\mu\chi|\le1$.
+(In fact $K(\sigma)=-\Gamma(\sigma)$; Lean only needs $K(\sigma)<\infty$.)
+\end{proof}
+
+\begin{proposition}[Mellin transform on the unconditional strip]\label{prop:mellin}\status{Lean: \lean{mellin_Mt}}
+For every Dirichlet character $\chi$ and $-1<\Re s<0$,
+\[ \Mel\Mt(s)=\frac{\Gamma(s)}{L(1-2s,\chi)} . \]
+\end{proposition}
+\begin{proof}
+By Lemma~\ref{lem:tonelli} and $2\sigma-1<-1$ the sum over $n$ of the absolute integrals converges, so Fubini lets us
+integrate termwise. By Lemma~\ref{lem:euler} and the scaling $\Mel[g(\cdot/n^2)](s)=n^{2s}\Gamma(s)$, the $n$-th term is
+$\Gamma(s)\mu(n)\chi(n)n^{-(1-2s)}$. Summing, $\Mel\Mt(s)=\Gamma(s)\sum\mu(n)\chi(n)n^{-(1-2s)}$, and since
+$\Re(1-2s)>1$ the Dirichlet series of $\mu\chi$ is $1/L(1-2s,\chi)$ by $L(\chi,w)L(\mu\chi,w)=1$.
+\end{proof}
+
+\section{The combined norm identity}
+
+\begin{hypothesis}[Mellin--Plancherel on a line]\label{hyp:plancherel}
+For $c\in\R$ and $f$ with $x^{c-1}f\in L^1(0,\infty)$,
+$\int_0^\infty|f(x)|^2x^{2c-1}dx=\frac1{2\pi}\int_\R|\Mel f(c+it)|^2dt$.
+\end{hypothesis}
+
+This is Plancherel's theorem after $x=e^{-u}$, so it is classical (for $f$ in $L^1\cap L^2$ of the weighted measure).
+Mathlib has the substitution (\lean{mellin_eq_fourier}) and Plancherel for $L^2$ classes and Schwartz functions,
+but not yet the integral form for $L^1\cap L^2$ functions, so in Lean it is the named hypothesis
+\texttt{MellinPlancherel} and is not proved.
+
+\begin{theorem}[Combined norm identity]\label{thm:combined}
+Let $c=1-\alpha$ and $F_\chi(w)=\sum_n\mu(n)\chi(n)\,n/(1-in^2w)$, the Laplace transform of $M_\chi$.
+\begin{enumerate}[label=(\roman*),leftmargin=2em]
+\item \status{Lean, given Hypothesis~\ref{hyp:plancherel}: \lean{combined_norm_identity}} For $1<\alpha<2$,
+\[\int_0^\infty|\Mt(x)|^2x^{1-2\alpha}\,dx=\frac1{2\pi}\int_\R\left|\frac{\Gamma(1-\alpha+it)}{L(2\alpha-1-2it,\chi)}\right|^2dt.\]
+\item \status{classical: Paley--Wiener; numerical check} The left side is $\|\Phi\|^2_{D^+_\alpha}$, the norm of the
+Laplace transform $\Phi$ of $\Mt$ in the weighted Bergman realisation of the discrete series $D^+_\alpha$ of
+$SL(2,\R)$ (the internal space of Majorana's infinite-component equation in $2+1$ dimensions), up to the constant
+$2\pi\,\Gamma(2\alpha-1)2^{1-2\alpha}$ coming from the Paley--Wiener isometry.
+\item \status{classical \cite{HL,GM}, Lean statement open: \lean{grh_iff_finite_norm}} For primitive
+nonprincipal $\chi$: GRH for $\chi$ holds if and only if $\int_0^\infty|M_\chi(x)|^2x^{1-2\alpha}dx<\infty$ for every
+$\alpha\in(3/4,1)$; then the same identity holds with $M_\chi$ in place of $\Mt$, i.e.\ $\|F_\chi\|^2_{D^+_\alpha}$
+equals the line integral.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) Apply Hypothesis~\ref{hyp:plancherel} to $\Mt$ on $\Re s=c\in(-1,0)$; the integrability of $x^{c-1}\Mt$ is part of
+the proof of Proposition~\ref{prop:mellin}, and Proposition~\ref{prop:mellin} identifies $\Mel\Mt$ on the line.
+(ii) For $\Phi(w)=\int_0^\infty M(t)e^{iwt}dt$ on the upper half-plane, $\int_\R|\Phi(u+iv)|^2du=2\pi\int_0^\infty|M(t)|^2e^{-2vt}dt$;
+integrating against $v^{2\alpha-2}dv$ gives $\Gamma(2\alpha-1)2^{1-2\alpha}\cdot2\pi\int|M|^2t^{1-2\alpha}dt$.
+(iii) $\Rightarrow$: under GRH, $M_\chi=O(x^{-1/4+\varepsilon})$ \cite{GM} and $M_\chi\to1/L(1,\chi)$ at $0$, so the norm is
+finite for $c<1/4$. $\Leftarrow$: finite norms on $c_1<c_2$ give, by Cauchy--Schwarz, absolute convergence of
+$\Mel M_\chi$ on $c_1<\Re s<c_2$, so $\Gamma(s)/L(1-2s,\chi)$ is holomorphic on $0<\Re s<1/4$, i.e.\ $L(w,\chi)\ne0$
+for $1/2<\Re w<1$; the functional equation covers $0<\Re w<1/2$.
+\end{proof}
+
+\begin{proposition}[Blow-up at the critical exponent]\label{prop:blowup}\status{conditional, sketch; Lean statement
+open: \lean{blowup_limit}}
+Assume GRH for primitive nonprincipal $\chi$, that all zeros $\rho$ in the strip are simple, and that
+$\sum_\rho|\Gamma(\frac{1-\rho}2)/L'(\rho,\chi)|<\infty$. Then
+\[\lim_{\alpha\to3/4^+}\Bigl(\alpha-\frac34\Bigr)\int_0^\infty|M_\chi(x)|^2x^{1-2\alpha}dx
+ =B_\chi:=\frac18\sum_\rho\left|\frac{\Gamma(\frac{1-\rho}2)}{L'(\rho,\chi)}\right|^2 .\]
+\end{proposition}
+\begin{proof}[Sketch]
+Shifting the inverse Mellin contour past $\Re s=1/4$ gives $x^{1/4}M_\chi(e^u)=f(u)+O(e^{-u/4})$ with
+$f(u)=\sum_\rho c_\rho e^{-i\gamma u/2}$, $c_\rho=\Gamma(\frac{1-\rho}2)/(2L'(\rho,\chi))$, an absolutely convergent
+almost periodic series. With $h=\alpha-3/4$ the left side is $h\int e^{-2hu}|f(u)|^2du+O(h)\to\frac12\,\mathrm{mean}|f|^2
+=\frac12\sum|c_\rho|^2$ by Parseval for almost periodic functions (distinct ordinates by simplicity).
+\end{proof}
+
+\begin{remark}[Coarse and fine spaces]
+A zero $\rho=\beta+i\gamma$ with $\beta>1/2$ moves the divergence to $\alpha=(1+\beta)/2>3/4$: the norm stays finite for
+$\alpha>(1+\beta)/2$. Coarse members of the scale ($\alpha$ near $1$) therefore cannot see an off-line zero, and only the
+finest ones ($\alpha\downarrow3/4$) exclude it; membership there \emph{is} GRH. This is the precise form in which the
+hypothesis ``GRH is a topological phenomenon of a coarse enough Hilbert space'' fails as a proof strategy, and it is
+the same gap as in Connes' trace-formula approach \cite{Connes}: the positivity needed is exactly the statement to be
+proved.
+\end{remark}
+
+\section{Formal verification in Lean 4}\label{sec:lean}
+
+The project \texttt{lean/} builds against Lean~4.36.0 and Mathlib~v4.36.0 \cite{Mathlib}. The file
+\path{RiemannLab/CombinedNorm.lean} contains the proved part; \texttt{RiemannLab/Open.lean} contains the open statements, each ending in \texttt{sorry}.
+The main statements, verbatim:
+
+\begin{Verbatim}
+\kw{def} g (t : $\mathbb{R}$) : $\mathbb{C}$ := ((Real.exp (-t) - 1 : $\mathbb{R}$) : $\mathbb{C}$)
+\kw{def} b (n : $\mathbb{N}$) : $\mathbb{R}$ := ((n : $\mathbb{R}$) ^ 2)$\sp{-1}$
+\kw{def} coef ($\chi$ : DirichletCharacter $\mathbb{C}$ N) (n : $\mathbb{N}$) : $\mathbb{C}$ := ($\nearrow$$\chi$ * $\nearrow$$\mu$) n / n
+\kw{def} Mt ($\chi$ : DirichletCharacter $\mathbb{C}$ N) (x : $\mathbb{R}$) : $\mathbb{C}$ := $\sum$' n : $\mathbb{N}$, coef $\chi$ n * g (b n * x)
+
+\kw{theorem} mellin_g {s : $\mathbb{C}$} (h1 : -1 < s.re) (h0 : s.re < 0) : mellin g s = Gamma s
+
+\kw{theorem} mellin_Mt ($\chi$ : DirichletCharacter $\mathbb{C}$ N) {s : $\mathbb{C}$} (h1 : -1 < s.re) (h0 : s.re < 0) :
+    mellin (Mt $\chi$) s = Gamma s / LSeries $\nearrow$$\chi$ (1 - 2 * s)
+
+\kw{def} MellinPlancherel (f : $\mathbb{R}$ $\to$ $\mathbb{C}$) (c : $\mathbb{R}$) : \kw{Prop} :=
+  $\int$ x in Ioi (0:$\mathbb{R}$), $\Vert$f x$\Vert$ ^ 2 * x ^ (2 * c - 1)
+    = (1 / (2 * Real.pi)) * $\int$ t : $\mathbb{R}$, $\Vert$mellin f (c + t * I)$\Vert$ ^ 2
+
+\kw{theorem} combined_norm_identity ($\chi$ : DirichletCharacter $\mathbb{C}$ N) {$\alpha$ : $\mathbb{R}$} (h1 : 1 < $\alpha$) (h2 : $\alpha$ < 2)
+    (hP : MellinPlancherel (Mt $\chi$) (1 - $\alpha$)) :
+    $\int$ x in Ioi (0:$\mathbb{R}$), $\Vert$Mt $\chi$ x$\Vert$ ^ 2 * x ^ (1 - 2 * $\alpha$)
+      = (1 / (2 * Real.pi)) * $\int$ t : $\mathbb{R}$,
+          $\Vert$Gamma ((1 - $\alpha$ : $\mathbb{R}$) + t * I) / LSeries $\nearrow$$\chi$ (1 - 2 * ((1 - $\alpha$ : $\mathbb{R}$) + t * I))$\Vert$ ^ 2
+\end{Verbatim}
+
+The proof of \lean{mellin_g} uses Mathlib's integration by parts on $(0,\infty)$
+(\lean{integral_Ioi_mul_deriv_eq_deriv_mul}) and $\Gamma(s+1)=s\Gamma(s)$; \lean{mellin_Mt} uses
+\lean{integral_tsum_of_summable_integral_norm} (Fubini--Tonelli), \lean{mellin_comp_mul_left} (scaling) and
+\lean{DirichletCharacter.LSeries.mul_mu_eq_one}. In total about 360 lines.
+
+\subsection*{What Lean checks and what it does not}
+\begin{center}
+\small\begin{tabular}{@{}p{0.47\textwidth}p{0.17\textwidth}p{0.26\textwidth}@{}}
+\toprule
+Declaration & Status & \#print axioms \\
+\midrule
+\lean{mellin_g}, \lean{integrableOn_g_norm}, \lean{scale_identity} & proved & standard three \\
+\lean{integral_norm_F}, \lean{mellin_Mt_eq_LSeries}, \lean{mellin_Mt} & proved & standard three \\
+\lean{combined_norm_identity} & proved from \texttt{hP} & standard three \\
+\texttt{MellinPlancherel} & named hypothesis & --- \\
+\lean{grh_iff_finite_norm} & open & includes \texttt{sorryAx} \\
+\lean{blowup_limit} & open & includes \texttt{sorryAx} \\
+\bottomrule
+\end{tabular}
+\end{center}
+The standard three are \texttt{propext}, \texttt{Classical.choice} and \texttt{Quot.sound}.
+The Python launcher
+\texttt{python -m riemann\_lab lean} runs \texttt{lake build}, parses the \texttt{\#print axioms} output of
+\texttt{Audit.lean}, and fails if a theorem listed as proved depends on \texttt{sorryAx} or on any other axiom, or if a
+theorem listed as open no longer depends on \texttt{sorryAx}. The same check runs in continuous integration.
+
+Two caveats. First, Lean's Bochner integral is $0$ for non-integrable functions, so
+\lean{combined_norm_identity} states an equality of integrals and does not by itself assert that they are finite;
+finiteness of the right side follows from Stirling and $|1/L(w,\chi)|\le\zeta(\Re w)/\zeta(2\Re w)$, which is not
+formalised. Second, the identification $\Mt=M_\chi-1/L(1,\chi)$, i.e.\ $\sum\mu\chi(n)/n=1/L(1,\chi)$, is a prime
+number theorem in progressions and is not formalised here; it is checked numerically.
+
+\section{Numerical evidence}\label{sec:numerics}
+
+All computations use mpmath with exact roots of unity for character values; details and convergence logs are in
+\texttt{docs/TESTS.md} of the repository. Each item is \status{numerical}.
+
+\begin{center}
+\small\begin{tabular}{@{}p{0.46\textwidth}p{0.44\textwidth}@{}}
+\toprule
+Check & Result \\
+\midrule
+Lean statements: \lean{mellin_g} at 4 points; $K(\sigma)=-\Gamma(\sigma)$; \lean{mellin_Mt} ($\chi$ mod 5)
+ & rel.\ errors $\le2\cdot10^{-30}$; $\le5\cdot10^{-17}$; $\le5\cdot10^{-15}$ \\
+Lean $\Mt$ (direct sum) vs.\ $M_\chi-1/L(1,\chi)$ (power series), $\chi$ mod 5 & $\le8\cdot10^{-14}$ \\
+Theorem~\ref{thm:combined}(i), $x$ side vs.\ $|\Gamma/L|^2$ side, $c=-0.5,-0.25$ & $\le4\cdot10^{-16}$ \\
+Theorem~\ref{thm:combined}, $\zeta$ and 11 characters mod 3,4,5,7, $c\in\{-0.6,-0.3,0.05,\dots,0.2\}$ & $\le5\cdot10^{-13}$ \\
+Theorem~\ref{thm:combined}(ii), Paley--Wiener ($\zeta,\chi_4,\chi_{5,2}$) & $\le4\cdot10^{-16}$ \\
+Proposition~\ref{prop:blowup}: extrapolated $(\alpha-\frac34)\|M\|^2$ vs.\ $B_\chi$; $\zeta$: $B=2.139767\cdot10^{-10}$ & rel.\ $\le1.4\cdot10^{-9}$ ($\zeta$: $1.1\cdot10^{-15}$) \\
+Off-line control: first $\zeta$ pair moved to $\beta=0.6$ & divergence moves to $\alpha=0.8$, residue matches; coarse norms finite \\
+$M_\chi$ by M\"obius sums to $N=10^7$ vs.\ zero expansion, $10^2\le x\le10^{11}$, 33 functions & differences $\sim10^{-13}$ (budget $2.5\cdot10^{-10}x^{-1/4}$) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection*{Visibility}
+A zero at height $\gamma$ enters $M_\chi$ with weight $|\Gamma(\frac{1-\rho}2)|\approx e^{-\pi|\gamma|/4}$. At
+$x\le10^{11}$ an injected off-line zero is detectable only for $\gamma\lesssim35$; making a zero at the verified height
+$3\cdot10^{12}$ \cite{PT} dominant would need $\log_{10}x\approx4\cdot10^{12}$. Agreement at reachable $x$ is therefore no evidence
+about high zeros, and none of the numbers above bear on GRH beyond the zeros already known to lie on the line.
+
+\section{Conclusion}
+The Hardy--Littlewood--Ramanujan criterion has a natural Hilbert-scale form in which Ramanujan's Master Theorem,
+Majorana's discrete-series norm and Masullo's line seminorms compute the same number. Its unconditional half is now a
+Lean theorem (modulo Mellin--Plancherel, a classical fact pending in Mathlib); its GRH half is equivalent to GRH and
+remains open. The blow-up constant $B_\chi$ gives a quantitative form of the criterion, and the coarse/fine analysis shows
+that no coarse member of the scale can exclude off-line zeros.
+
+\begin{thebibliography}{9}
+\bibitem{HL} G.~H. Hardy and J.~E. Littlewood, \emph{Contributions to the theory of the Riemann zeta-function and the
+theory of the distribution of primes}, Acta Math. \textbf{41} (1918), 119--196.
+\bibitem{Dixit} A.~Dixit, \emph{Character analogues of Ramanujan-type integrals involving the Riemann $\Xi$-function},
+Pacific J. Math. \textbf{255} (2012), 317--348. arXiv:1102.2680.
+\bibitem{GM} M.~Garg and B.~Maji, \emph{Hardy--Littlewood--Riesz type equivalent criteria for the generalized Riemann
+hypothesis}, arXiv:2208.07596.
+\bibitem{Connes} A.~Connes, \emph{Trace formula in noncommutative geometry and the zeros of the Riemann zeta function},
+Selecta Math. \textbf{5} (1999), 29--106.
+\bibitem{Masullo} A.~M. Masullo, \emph{The Music of the Primes}, manuscript, 2026.
+\bibitem{PT} D.~Platt and T.~Trudgian, \emph{The Riemann hypothesis is true up to $3\cdot10^{12}$}, Bull. Lond. Math.
+Soc. \textbf{53} (2021), 792--797.
+\bibitem{Mathlib} The mathlib Community, \emph{The Lean mathematical library}, CPP 2020, 367--381.
+\end{thebibliography}
+
+\end{document}
