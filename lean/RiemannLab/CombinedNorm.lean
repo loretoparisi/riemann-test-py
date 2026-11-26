@@ -131,7 +131,7 @@ theorem mellin_g {s : ℂ} (h1 : -1 < s.re) (h0 : s.re < 0) : mellin g s = Gamma
     have hlim : Tendsto (fun t : ℝ => t ^ (s.re + 1) / ‖s‖) (𝓝[>] 0) (𝓝 0) := by
       have hc : ContinuousAt (fun t : ℝ => t ^ (s.re + 1) / ‖s‖) 0 :=
         (Real.continuousAt_rpow_const 0 _ (Or.inr (by linarith))).div_const _
-      have h00 : (fun t : ℝ => t ^ (s.re + 1) / ‖s‖) 0 = 0 := by
+      have h00 : (0:ℝ) ^ (s.re + 1) / ‖s‖ = 0 := by
         simp [Real.zero_rpow (by linarith : s.re + 1 ≠ 0)]
       have ht := hc.tendsto
       rw [h00] at ht
