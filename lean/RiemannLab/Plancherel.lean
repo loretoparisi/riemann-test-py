@@ -19,7 +19,7 @@ through the substitution `x = e^{-u}` (Mathlib's `mellin_eq_fourier`).
 -/
 
 open MeasureTheory Complex Set Filter
-open scoped FourierTransform
+open scoped FourierTransform ContDiff
 
 noncomputable section
 
@@ -42,15 +42,12 @@ lemma fourier_toLp_ae {f : ℝ → ℂ} (hf1 : Integrable f) (hf2 : MemLp f 2) :
     hcont.locallyIntegrable ?_
   intro g hg hgs
   have hgc : HasCompactSupport (fun x => (g x : ℂ)) := hgs.comp_left Complex.ofReal_zero
-  have hgd : ContDiff ℝ ⊤ (fun x => (g x : ℂ)) := Complex.ofRealCLM.contDiff.comp hg
+  have hgd : ContDiff ℝ ∞ (fun x => (g x : ℂ)) := Complex.ofRealCLM.contDiff.comp hg
   let φ : SchwartzMap ℝ ℂ := hgc.toSchwartzMap hgd
   have hφ : ∀ x, φ x = (g x : ℂ) := fun x => rfl
   calc ∫ x, g x • ((𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ)) : ℝ → ℂ) x
       = Lp.toTemperedDistribution (𝓕 (hf2.toLp f) : Lp ℂ 2 (volume : Measure ℝ)) φ := by
         rw [Lp.toTemperedDistribution_apply]
-        congr 1
-        funext x
-        rw [hφ, Complex.real_smul, smul_eq_mul]
     _ = 𝓕 (Lp.toTemperedDistribution (hf2.toLp f)) φ := by
         rw [Lp.fourier_toTemperedDistribution_eq]
     _ = ∫ x, 𝓕 φ x • (hf2.toLp f : ℝ → ℂ) x := by
@@ -62,11 +59,10 @@ lemma fourier_toLp_ae {f : ℝ → ℂ} (hf1 : Integrable f) (hf2 : MemLp f 2) :
     _ = ∫ ξ, φ ξ • 𝓕 f ξ := by
         have := VectorFourier.integral_fourierIntegral_smul_eq_flip (L := innerₗ ℝ)
           Real.continuous_fourierChar continuous_inner φ.integrable hf1
-        simpa using this
+        rw [flip_innerₗ] at this
+        exact this
     _ = ∫ ξ, g ξ • 𝓕 f ξ := by
         congr 1
-        funext ξ
-        rw [hφ, Complex.real_smul, smul_eq_mul]
 
 /-- **Plancherel, integral form.** For `f ∈ L¹(ℝ) ∩ L²(ℝ)`, `∫ |𝓕 f|² = ∫ |f|²`. -/
 theorem plancherel {f : ℝ → ℂ} (hf1 : Integrable f) (hf2 : MemLp f 2) :
@@ -93,29 +89,21 @@ private theorem rexp_neg_image_aux : Real.exp ∘ Neg.neg '' univ = Ioi 0 := by
 private theorem rexp_neg_injOn_aux : univ.InjOn (Real.exp ∘ Neg.neg) :=
   Real.exp_injective.injOn.comp neg_injective.injOn (univ.mapsTo_univ _)
 
-section
-variable {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
-
-private theorem rexp_cexp_aux (x : ℝ) (s : ℂ) (f : E) :
-    Real.exp (-x) • cexp (-↑x) ^ (s - 1) • f = cexp (-s * ↑x) • f := by
-  change (Real.exp (-x) : ℂ) • _ = _ • f
-  rw [← smul_assoc, smul_eq_mul]
-  push_cast
-  conv in cexp _ * _ => lhs; rw [← cpow_one (cexp _)]
-  rw [← cpow_add _ _ (Complex.exp_ne_zero _), cpow_def_of_ne_zero (Complex.exp_ne_zero _),
-    Complex.log_exp (by simp [Real.pi_pos]) (by simpa using Real.pi_nonneg)]
-  ring_nf
-
-end
-
 /-- A Mellin-convergent function becomes integrable on `ℝ` after `x = e^{-u}`. -/
 theorem integrable_of_mellinConvergent {f : ℝ → ℂ} {σ : ℝ} (hf : MellinConvergent f σ) :
     Integrable (fun u : ℝ => Real.exp (-σ * u) • f (Real.exp (-u))) := by
   rw [MellinConvergent, ← rexp_neg_image_aux, integrableOn_image_iff_integrableOn_abs_deriv_smul
-    MeasurableSet.univ rexp_neg_deriv_aux rexp_neg_injOn_aux] at hf
-  replace hf : Integrable fun (x : ℝ) ↦ cexp (-↑σ * ↑x) • f (Real.exp (-x)) := by
-    simpa [rexp_cexp_aux] using hf
-  norm_cast at hf
+    MeasurableSet.univ rexp_neg_deriv_aux rexp_neg_injOn_aux, integrableOn_univ] at hf
+  refine hf.congr (Eventually.of_forall fun x => ?_)
+  have hpos := Real.exp_pos (-x)
+  have h1 : ((Real.exp (-x) : ℝ) : ℂ) ^ ((σ : ℂ) - 1) = ((Real.exp (-x) ^ (σ - 1) : ℝ) : ℂ) := by
+    rw [ofReal_cpow hpos.le, ofReal_sub, ofReal_one]
+  have h2 : Real.exp (-x) * Real.exp (-x) ^ (σ - 1) = Real.exp (-σ * x) := by
+    rw [Real.rpow_def_of_pos hpos, Real.log_exp, ← Real.exp_add]
+    congr 1
+    ring
+  simp only [Function.comp_apply, abs_neg, abs_of_pos hpos]
+  rw [h1, smul_eq_mul, Complex.real_smul, Complex.real_smul, ← mul_assoc, ← ofReal_mul, h2]
 
 set_option maxHeartbeats 800000 in
 /-- **Mellin–Plancherel on the line `Re s = c`.** If `x^{c-1} f` and `x^{2c-1} |f|²` are integrable

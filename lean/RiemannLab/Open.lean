@@ -26,9 +26,16 @@ namespace RiemannLab
 
 variable {N : ℕ} [NeZero N]
 
-/-- The Ramanujan–Hardy–Littlewood function `M_χ(x) = Σ μ(n) χ(n)/n · e^{-x/n²}`. -/
+/-- The Ramanujan–Hardy–Littlewood function `M_χ(x) = Σ μ(n) χ(n)/n · e^{-x/n²}`.
+
+The series converges only conditionally: `Σ |μ(n) χ(n)| / n` diverges. A Lean `tsum` of a series
+that is not absolutely summable is `0` by definition, so writing `M` as a `tsum` would silently
+make it the zero function. We therefore write it through the absolutely convergent `M̃_χ`:
+`M_χ(x) = M̃_χ(x) + Σ μ(n) χ(n)/n`, and use the classical value `Σ μ(n) χ(n)/n = 1/L(1, χ)` for
+`χ ≠ 1` (de la Vallée Poussin–Landau, a prime number theorem strength fact not in Mathlib) as the
+definition of the constant. -/
 def M (χ : DirichletCharacter ℂ N) (x : ℝ) : ℂ :=
-  ∑' n : ℕ, coef χ n * ((Real.exp (-(b n * x)) : ℝ) : ℂ)
+  Mt χ x + 1 / DirichletCharacter.LFunction χ 1
 
 /-- GRH for `χ`: every zero of `L(s, χ)` with `0 < Re s < 1` has `Re s = 1/2`. -/
 def GRH (χ : DirichletCharacter ℂ N) : Prop :=
