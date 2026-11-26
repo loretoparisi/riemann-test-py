@@ -83,8 +83,8 @@ lemma integrableOn_g_norm {σ : ℝ} (h1 : -1 < σ) (h0 : σ < 0) :
   · -- near ∞: bounded by t^{σ-1}
     have hint : IntegrableOn (fun t : ℝ => t ^ (σ - 1)) (Ioi 1) :=
       integrableOn_Ioi_rpow_of_lt (by linarith) zero_lt_one
-    refine hint.mono' ((hcont.mono fun x (hx : 1 < x) => (zero_lt_one.trans hx :
-      (0:ℝ) < x)).aestronglyMeasurable measurableSet_Ioi) ?_
+    refine hint.mono' ((hcont.mono (Ioi_subset_Ioi zero_le_one)).aestronglyMeasurable
+      measurableSet_Ioi) ?_
     refine (ae_restrict_iff' measurableSet_Ioi).mpr (Eventually.of_forall fun t ht => ?_)
     have ht0 : (0:ℝ) < t := zero_lt_one.trans ht
     rw [Real.norm_eq_abs, abs_of_nonneg (mul_nonneg (Real.rpow_nonneg ht0.le _) (norm_nonneg _))]
@@ -108,9 +108,8 @@ theorem mellin_g {s : ℂ} (h1 : -1 < s.re) (h0 : s.re < 0) : mellin g s = Gamma
   set v' : ℝ → ℂ := fun y => (y : ℂ) ^ (s - 1)
   have hu : ∀ x ∈ Ioi (0:ℝ), HasDerivAt g (u' x) x := by
     intro x _
-    have h := ((Real.hasDerivAt_exp (-x)).comp x (hasDerivAt_neg x)).sub_const 1
-    have h2 := h.ofReal_comp
-    simpa [g, u', Function.comp_def] using h2
+    have h := (((Real.hasDerivAt_exp (-x)).comp x (hasDerivAt_neg x)).sub_const 1).ofReal_comp
+    exact h.congr_deriv (by simp [u'])
   have hv : ∀ x ∈ Ioi (0:ℝ), HasDerivAt v (v' x) x := fun x hx =>
     hasDerivAt_ofReal_cpow_const' (ne_of_gt hx) hr
   have hss : s - 1 + 1 = s := by ring
@@ -123,12 +122,10 @@ theorem mellin_g {s : ℂ} (h1 : -1 < s.re) (h0 : s.re < 0) : mellin g s = Gamma
   -- integrability of u' * v
   have hu'v : IntegrableOn (u' * v) (Ioi 0) := by
     have hG := (GammaIntegral_convergent (s := s + 1) (by simp; linarith)).const_mul (-1 / s)
-    refine hG.congr_fun (fun t _ => ?_) measurableSet_Ioi
-    simp only [Pi.mul_apply, u', v', v, hss]
-    rw [show s + 1 - 1 = s by ring]
+    refine IntegrableOn.congr_fun (f := fun x : ℝ => -1 / s * (((Real.exp (-x) : ℝ) : ℂ) *
+      (x : ℂ) ^ (s + 1 - 1))) hG (fun t _ => ?_) measurableSet_Ioi
+    simp only [Pi.mul_apply, u', v, hss, show s + 1 - 1 = s by ring]
     field_simp
-    push_cast
-    ring
   -- boundary term at 0
   have h_zero : Tendsto (g * v) (𝓝[>] 0) (𝓝 0) := by
     have hlim : Tendsto (fun t : ℝ => t ^ (s.re + 1) / ‖s‖) (𝓝[>] 0) (𝓝 0) := by
@@ -136,8 +133,9 @@ theorem mellin_g {s : ℂ} (h1 : -1 < s.re) (h0 : s.re < 0) : mellin g s = Gamma
         (Real.continuousAt_rpow_const 0 _ (Or.inr (by linarith))).div_const _
       have h00 : (fun t : ℝ => t ^ (s.re + 1) / ‖s‖) 0 = 0 := by
         simp [Real.zero_rpow (by linarith : s.re + 1 ≠ 0)]
-      rw [← h00]
-      exact hc.tendsto.mono_left nhdsWithin_le_nhds
+      have ht := hc.tendsto
+      rw [h00] at ht
+      exact ht.mono_left nhdsWithin_le_nhds
     refine squeeze_zero_norm' ?_ hlim
     filter_upwards [self_mem_nhdsWithin] with t (ht : 0 < t)
     simp only [Pi.mul_apply, v, hss, norm_mul, norm_div, norm_cpow_eq_rpow_re_of_pos ht]
@@ -161,8 +159,7 @@ theorem mellin_g {s : ℂ} (h1 : -1 < s.re) (h0 : s.re < 0) : mellin g s = Gamma
   have hparts := integral_Ioi_mul_deriv_eq_deriv_mul hu hv huv' hu'v h_zero h_infty
   -- assemble
   have hG : ∫ t in Ioi (0:ℝ), u' t * v t = -(Gamma (s + 1) / s) := by
-    rw [Gamma_eq_integral (by simp; linarith), GammaIntegral, ← integral_neg,
-      ← integral_div]
+    rw [Gamma_eq_integral (by simp; linarith), GammaIntegral, ← integral_div, ← integral_neg]
     refine setIntegral_congr_fun measurableSet_Ioi (fun t _ => ?_)
     simp only [u', v, hss, show s + 1 - 1 = s by ring]
     ring
