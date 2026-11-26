@@ -13,17 +13,31 @@ Detailed results of every run: [docs/TESTS.md](docs/TESTS.md).
 
 ## Main results
 
-### 1. The combined norm identity, formally verified on the unconditional range
+### 1. The combined norm identity, formally verified (and half of the GRH equivalence)
 
 For a Dirichlet character χ, let M̃_χ(x) = Σ_n μ(n)χ(n)/n · (e^{−x/n²} − 1), which is the
 Hardy–Littlewood–Ramanujan function M_χ minus its limit 1/L(1, χ) at 0. Lean 4 + Mathlib checks, with no
-`sorry` and no axiom beyond Lean's standard three:
+`sorry`, no named hypothesis and no axiom beyond Lean's standard three:
 
     ∫₀^∞ x^{s−1} M̃_χ(x) dx = Γ(s) / L(1 − 2s, χ)        for −1 < Re s < 0          (mellin_Mt)
 
-and from it, given Mellin–Plancherel on the line Re s = 1 − α (a named hypothesis, see below):
+    ∫₀^∞ |M̃_χ(x)|² x^{1−2α} dx = (1/2π) ∫_ℝ |Γ(1−α+it) / L(2α−1−2it, χ)|² dt      for 1 < α < 2
+                                                              (combined_norm_identity_unconditional)
 
-    ∫₀^∞ |M̃_χ(x)|² x^{1−2α} dx = (1/2π) ∫_ℝ |Γ(1−α+it) / L(2α−1−2it, χ)|² dt      for 1 < α < 2   (combined_norm_identity)
+The second line used to rest on a named hypothesis (Mellin–Plancherel). That is now proved too: Plancherel in
+integral form for L¹ ∩ L² functions (`plancherel`, derived from Mathlib's L² Fourier isometry and tempered
+distributions), its Mellin form on a vertical line (`mellin_plancherel`), and the two integrability conditions for
+M̃_χ (`MtBounds.lean`).
+
+Lean also checks one direction of the GRH-sensitive half (Hardy–Littlewood 1918 for ζ, Garg–Maji 2022 for χ):
+
+    if ∫₀^∞ |M_χ(x)|² x^{1−2α} dx < ∞ for every α ∈ (3/4, 1), for χ and for χ⁻¹,
+    then every zero of L(s, χ) with 0 < Re s < 1 has Re s = 1/2          (grh_of_finiteNorms, χ primitive)
+
+The proof continues K(s) = s(∫₀¹ x^{s−1}M̃_χ + ∫₁^∞ x^{s−1}M_χ) + 1/L(1, χ) holomorphically to −1 < Re s < 1/4,
+shows K(s) L(1 − 2s, χ) = Γ(s + 1) there by the identity theorem, and uses the functional equation for the zeros
+left of 1/2. This is a conditional statement: it does not say the norms are finite. Proving they are finite is
+equivalent to GRH and is not attempted.
 
 This is the unconditional half of the combined Ramanujan + Majorana + Masullo equation: the left side is the
 Ramanujan/Laplace side, which equals Majorana's discrete-series norm ‖F_χ‖²_{D⁺_α} (checked numerically), and the
@@ -31,9 +45,9 @@ right side is Masullo's line seminorm.
 
 | Status | What |
 | --- | --- |
-| **proved** (Lean) | shifted Euler integral ∫x^{s−1}(e^{−x} − 1) = Γ(s); the Tonelli bound and Fubini interchange; the Mellin identity above; the norm identity given Plancherel |
-| **named hypothesis** (Lean) | `MellinPlancherel`: Plancherel on a vertical line. It is a classical theorem, but this Mathlib version has Plancherel only for L² classes and Schwartz functions, not as an integral identity for L¹ ∩ L² functions |
-| **open, stated with `sorry`** (Lean) | GRH(χ) ⇔ the norm is finite for every α ∈ (3/4, 1); the blow-up (α − 3/4)‖M_χ‖² → B_χ under GRH and simple zeros |
+| **proved** (Lean) | shifted Euler integral ∫x^{s−1}(e^{−x} − 1) = Γ(s); the Tonelli bound and Fubini interchange; the Mellin identity; Plancherel for L¹ ∩ L²; Mellin–Plancherel; the norm identity on 1 < α < 2; finite norms (for χ and χ⁻¹) ⇒ GRH(χ) |
+| **open, stated with `sorry`** (Lean) | GRH(χ) ⇒ the norm is finite for every α ∈ (3/4, 1) (so the full ⇔ stays open); the blow-up (α − 3/4)‖M_χ‖² → B_χ under GRH and simple zeros |
+| **definition note** | M_χ is defined in Lean as M̃_χ + 1/L(1, χ), using the classical value Σ μ(n)χ(n)/n = 1/L(1, χ) (a prime number theorem strength fact that is not in Mathlib). The series for M_χ converges only conditionally, and a Lean `tsum` of such a series is 0, so the earlier `tsum` definition made M_χ the zero function. That bug made the old open statements say the wrong thing and is fixed here |
 | **numerical** | the four-way equality of the norm, the blow-up constant, the off-line-zero controls ([docs/TESTS.md](docs/TESTS.md)) |
 
 Run it: `python -m riemann_lab lean` (needs [elan](https://lean-lang.org); the first build downloads the Mathlib cache).
@@ -45,8 +59,8 @@ theorem listed as open stops needing it.
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Unit tests | `pytest -q` | 114 tests: 113 pass, 1 skips without lake (the Lean audit, which runs in CI) |
-| Lean build + audit + numerics | `python -m riemann_lab lean` | PASS (7 proved, 1 named hypothesis, 2 open) |
+| Unit tests | `pytest -q` | 114 tests pass (the Lean audit test skips when lake is absent) |
+| Lean build + audit + numerics | `python -m riemann_lab lean` | PASS (14 proved, 2 open) |
 | Original checks | `python -m riemann_lab report` | zeros on the line in 3 windows to t = 10^6, Robin, Lagarias, Mertens, Li, Weil, GUE |
 | Extended criteria | `python -m riemann_lab extended` | 7/7 consistent |
 | Ramanujan × Masullo | `python -m riemann_lab ramanujan` | 8/8 consistent |
