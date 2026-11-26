@@ -1,8 +1,10 @@
 == riemann-lab lean: combined norm identity in Lean 4 + Mathlib ==
-(GitHub Actions run 45774968608, Lean 4.36.0, Mathlib v4.36.0; lake build by leanprover/lean-action, then
- python -m riemann_lab lean --skip-build)
+(Local run: Lean 4.36.0, Mathlib v4.36.0, full `lake build` OK with 7448 jobs, then
+ python -m riemann_lab lean --skip-build. The same build runs in GitHub Actions on every push.)
 
-[build]    lake build: OK. RiemannLab/CombinedNorm.lean: no sorry. RiemannLab/Open.lean: 2 declarations use sorry.
+[build]    lake build: OK. No sorry in CombinedNorm, Plancherel, MtBounds, CombinedNormFull,
+           GRHFromNorm. RiemannLab/Open.lean: 2 declarations use sorry.
+
 [audit]    OK
    PROVED  mellin_g                 int_0^oo x^(s-1) (e^-x - 1) dx = Gamma(s) on -1 < Re s < 0
    PROVED  integrableOn_g_norm      x^(sigma-1) |e^-x - 1| is integrable on (0, oo) for -1 < sigma < 0
@@ -11,7 +13,14 @@
    PROVED  mellin_Mt_eq_LSeries     Mellin(M~_chi)(s) = Gamma(s) L(mu chi, 1-2s) on -1 < Re s < 0 (Fubini)
    PROVED  mellin_Mt                Mellin(M~_chi)(s) = Gamma(s) / L(1-2s, chi) on -1 < Re s < 0
    PROVED  combined_norm_identity   int |M~_chi|^2 x^(1-2 alpha) dx = (1/2pi) int |Gamma/L|^2 dt, 1 < alpha < 2, given the named hypothesis MellinPlancherel
-   HYPOTH  MellinPlancherel         Mellin-Plancherel on Re s = c (classical; not in this Mathlib in L1 n L2 integral form)
+   PROVED  plancherel               int |F f|^2 = int |f|^2 for f in L1 n L2 (integral form of Plancherel)
+   PROVED  mellin_plancherel        int_0^oo |f|^2 x^(2c-1) dx = (1/2pi) int |Mellin f(c+it)|^2 dt
+   PROVED  combined_norm_identity_unconditional the combined norm identity on 1 < alpha < 2 with no hypothesis
+   PROVED  mellinOn_differentiableAt int_S t^(s-1) f(t) dt is holomorphic where t^(sigma-1)|f| is integrable (dominated differentiation)
+   PROVED  K_mul_LFunction_eq       K(s) L(1-2s, chi) = Gamma(s+1) on -1 < Re s < 0
+   PROVED  LFunction_ne_zero_of_finiteNorms finite norms for chi => L(w, chi) != 0 on 1/2 < Re w < 1
+   PROVED  grh_of_finiteNorms       finite norms for chi and chi^-1 => GRH(chi), chi primitive
+   HYPOTH  MellinPlancherel         Mellin-Plancherel on Re s = c; now proved (mellin_plancherel) and discharged for M~_chi in combined_norm_identity_unconditional
    OPEN    grh_iff_finite_norm      GRH(chi) <=> int |M_chi|^2 x^(1-2 alpha) < oo for all alpha in (3/4, 1)  [sorry]
    OPEN    blowup_limit             (alpha - 3/4) ||M_chi||^2 -> (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2, given GRH, simple zeros, absolute convergence  [sorry]
 [numerics] OK
