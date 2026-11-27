@@ -54,7 +54,8 @@ right side is Masullo's line seminorm.
 | --- | --- |
 | **proved** (Lean) | shifted Euler integral ∫x^{s−1}(e^{−x} − 1) = Γ(s); the Tonelli bound and Fubini interchange; the Mellin identity; Plancherel for L¹ ∩ L²; Mellin–Plancherel; the norm identity on 1 < α < 2; Σ μ(n)χ(n)/n = 1/L(1, χ) and the convergence of the series for M_χ; GRH(χ) ⟺ finite norms for every α ∈ (3/4, 1) |
 | **conditional** (Lean, as an equivalence) | GRH(χ) itself and the finiteness of the norms on (3/4, 1): each is equivalent to the other, neither is proved |
-| **open, stated with `sorry`** (Lean) | the blow-up (α − 3/4)‖M_χ‖² → B_χ under GRH and simple zeros |
+| **proved from a named hypothesis** (Lean) | the blow-up (α − 3/4)‖M_χ‖² → B_χ = (1/8)Σ_ρ\|Γ((1−ρ)/2)/L′(ρ)\|² under GRH, Σ_ρ\|Γ/L′\| < ∞ and `ZeroExpansion` (`blowup_limit_of_expansion`). `ZeroExpansion` is the explicit formula M_χ(x) = Σ_ρ c_ρ x^{−(1−ρ)/2} + r(x) for x > 1, with c_ρ = −Γ((1−ρ)/2)/(2L′(ρ)) and ∫₁^∞\|r\|² x^{−1/2} dx < ∞. It is assumed, not proved |
+| **open, stated with `sorry`** (Lean) | the same blow-up without `ZeroExpansion` (`blowup_limit`): proving the zero expansion needs a contour shift past all the zeros |
 | **definition note** | M_χ is defined in Lean as M̃_χ + 1/L(1, χ). That is now a theorem, not a convention: Lean proves Σ_{n≤X} μ(n)χ(n)/n → 1/L(1, χ) for χ ≠ 1 (`tendsto_sum_mu_div`, via the prime number theorem in progressions and Landau's Σ μχ = o(X)), and that the partial sums of Σ μ(n)χ(n)/n · e^{−x/n²} converge to the Lean M_χ(x) for every x > 0 (`tendsto_M_partial`). So nothing is assumed in `grh_iff_finite_norm`. A Lean `tsum` is still not usable here, because the series converges only conditionally and such a `tsum` is 0 |
 | **numerical** | the four-way equality of the norm, the blow-up constant, the off-line-zero controls ([docs/TESTS.md](docs/TESTS.md)) |
 
@@ -68,7 +69,7 @@ theorem listed as open stops needing it.
 | Suite | Command | Result |
 | --- | --- | --- |
 | Unit tests | `pytest -q` | 115 tests pass (the Lean audit test skips when lake is absent) |
-| Lean build + audit + numerics | `python -m riemann_lab lean` | PASS (28 proved, 1 open) |
+| Lean build + audit + numerics | `python -m riemann_lab lean` | PASS (30 proved, 1 open) |
 | Original checks | `python -m riemann_lab report` | zeros on the line in 3 windows to t = 10^6, Robin, Lagarias, Mertens, Li, Weil, GUE |
 | Extended criteria | `python -m riemann_lab extended` | 7/7 consistent |
 | Ramanujan × Masullo | `python -m riemann_lab ramanujan` | 8/8 consistent |

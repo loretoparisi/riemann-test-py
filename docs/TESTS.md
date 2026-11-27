@@ -48,6 +48,8 @@ checks of the same statements. A theorem counts as proved only if its axioms are
 | proved | `norm_LFunction_one_sub_Sχ_le` | \|L(1, χ) − Σ_{m≤k} χ(m)/m\| ≤ 2N/k, χ ≠ 1 |
 | proved | `tendsto_sum_mu_div` | Σ_{n≤X} μ(n)χ(n)/n → 1/L(1, χ), χ ≠ 1 |
 | proved | `tendsto_M_partial` | Σ_{n≤X} μ(n)χ(n)/n · e^{−x/n²} → M_χ(x) (the Lean M), x > 0, χ ≠ 1 |
+| proved | `tendsto_meanValue'` | (α − 3/4)∫₁^∞\|Σ c_i x^{s_i}\|² x^{1−2α} dx → ½Σ\|c_i\|², Re s_i = −1/4, distinct s_i, Σ\|c_i\| < ∞ |
+| proved, given `ZeroExpansion` | `blowup_limit_of_expansion` | (α − 3/4)\|\|M_χ\|\|² → B_χ, given GRH, the named hypothesis `ZeroExpansion` and Σ_ρ\|Γ/L′\| < ∞ |
 | open (`sorry`) | `blowup_limit` | (α − 3/4)\|\|M_χ\|\|² → B_χ, given GRH, simple zeros, absolute convergence |
 
 Numerical cross-checks of the Lean statements (all PASS): `mellin_g` to 10^−30 at four points; K(σ) = −Γ(σ) to 10^−17;
@@ -111,6 +113,22 @@ Done criteria are in [STEP5_PLAN.md](STEP5_PLAN.md). Everything is in `MuSum.lea
    needing n ≠ 0 in ℂ).
 4. Series for M: the absolutely summable M̃ partial sums plus s(X) give `tendsto_M_partial`. One pass.
 5. Full build OK (7756 jobs), audit 28 proved and 1 open (`blowup_limit`), numerics PASS, pytest 115 passed.
+
+### Convergence log (eleventh run: the blow-up, given the zero expansion)
+
+Done criteria are in [STEP4_PLAN.md](STEP4_PLAN.md). Everything is in `Blowup.lean`.
+
+1. The named hypothesis `ZeroExpansion χ`: M_χ(x) = Σ_ρ c_ρ x^{−(1−ρ)/2} + r(x) for x > 1, with
+   c_ρ = −Γ((1−ρ)/2)/(2L′(ρ, χ)) and ∫₁^∞\|r\|² x^{−1/2} dx < ∞. It is assumed, not proved.
+2. Mean-value lemma: \|P\|² x^{1−2α} becomes a double series by `tsum_mul_tsum_of_summable_norm`, it is integrated term by
+   term with `integral_tsum_of_summable_integral_norm` and ∫₁^∞ x^a = −1/(a + 1), and dominated convergence for the
+   double series keeps the diagonal. The index set of zeros need not be countable in Lean, so the lemma goes through
+   the support of c, which is countable because c is summable. Five passes: `Decidable` instances, a `whnf` timeout
+   from `fun_prop` on a cpow quotient that was fixed by naming the denominator, and casts.
+3. Assembly: normSq splits at x = 1. On (0, 1], \|M_χ\| ≤ Z(1) + \|1/L(1)\|, so (α − 3/4)·(that piece) → 0. On (1, ∞),
+   \|\|P + r\|² − \|P\|²\| ≤ t\|P\|² + (1 + 1/t)\|r\|², followed by an ε-argument in t. Two passes.
+4. Full build OK (7758 jobs), audit 30 proved and 1 open (`blowup_limit`, which does not assume `ZeroExpansion`),
+   numerics PASS.
 
 ## Results of the full run
 

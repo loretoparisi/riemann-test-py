@@ -31,4 +31,6 @@ import RiemannLab
 #print axioms RiemannLab.norm_LFunction_one_sub_Sχ_le
 #print axioms RiemannLab.tendsto_sum_mu_div
 #print axioms RiemannLab.tendsto_M_partial
+#print axioms RiemannLab.tendsto_meanValue'
+#print axioms RiemannLab.blowup_limit_of_expansion
 #print axioms RiemannLab.blowup_limit
