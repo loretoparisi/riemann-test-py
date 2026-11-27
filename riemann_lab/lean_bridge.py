@@ -47,9 +47,21 @@ PROVED = {
     "RiemannLab.K_mul_LFunction_eq": "K(s) L(1-2s, chi) = Gamma(s+1) on -1 < Re s < 0",
     "RiemannLab.LFunction_ne_zero_of_finiteNorms": "finite norms for chi => L(w, chi) != 0 on 1/2 < Re w < 1",
     "RiemannLab.grh_of_finiteNorms": "finite norms for chi and chi^-1 => GRH(chi), chi primitive",
+    "RiemannLab.norm_LFunction_le": "|L(s, chi)| <= N |s| / Re s on Re s > 0, chi != 1 (Abel summation)",
+    "RiemannLab.LFunction_inv_conj": "L(s, chi^-1) = conj L(conj s, chi)",
+    "RiemannLab.norm_inv_LFunction_le": "GRH(chi) => |1/L(w, chi)| <= C (|Im w| + 8)^K on "
+                                        "1/2 + d <= Re w <= 3 (Borel-Caratheodory)",
+    "RiemannLab.integral_vertical_eq": "contour shift between two vertical lines for "
+                                       "|Phi| <= E/(1 + Im^2)",
+    "RiemannLab.integrableOn_weighted_of_mellinInv": "f = inverse Mellin of an L1 n L2 function on "
+                                                     "Re s = c => int |f|^2 x^(2c-1) dx < oo",
+    "RiemannLab.fM_eq_mellinInv": "GRH(chi) => M~_chi - g/L(1) = inverse Mellin of H on Re s = c', "
+                                  "0 < c' < 1/4",
+    "RiemannLab.finiteNorms_of_GRH": "GRH(chi) => int |M_chi|^2 x^(1-2 alpha) < oo for all alpha in (3/4, 1)",
+    "RiemannLab.grh_of_finiteNorms'": "finite norms for chi alone => GRH(chi), chi primitive",
+    "RiemannLab.grh_iff_finite_norm": "GRH(chi) <=> int |M_chi|^2 x^(1-2 alpha) < oo for all alpha in (3/4, 1)",
 }
 OPEN = {
-    "RiemannLab.grh_iff_finite_norm": "GRH(chi) <=> int |M_chi|^2 x^(1-2 alpha) < oo for all alpha in (3/4, 1)",
     "RiemannLab.blowup_limit": "(alpha - 3/4) ||M_chi||^2 -> (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2, "
                                "given GRH, simple zeros, absolute convergence",
 }
@@ -80,13 +92,13 @@ def build(timeout: int = 4 * 3600) -> dict:
     t0 = time.time()
     r = _run([lake, "build"], timeout)
     out = r.stdout + r.stderr
-    sorry_warnings = sorted(set(re.findall(r"(RiemannLab/\S+\.lean):\d+:\d+: warning: declaration uses 'sorry'", out)))
+    sorry_warnings = sorted(set(re.findall(r"(RiemannLab/\S+\.lean):\d+:\d+: warning: declaration uses [`']sorry[`']", out)))
     return {"ok": r.returncode == 0, "skipped": False, "seconds": time.time() - t0,
             "sorry_files": sorry_warnings, "log": out[-4000:]}
 
 
-_AX = re.compile(r"'([\w.]+)' depends on axioms: \[([^\]]*)\]")
-_NOAX = re.compile(r"'([\w.]+)' does not depend on any axioms")
+_AX = re.compile(r"'([\w.']+)' depends on axioms: \[([^\]]*)\]")
+_NOAX = re.compile(r"'([\w.']+)' does not depend on any axioms")
 
 
 def parse_axioms(text: str) -> dict[str, set[str]]:
