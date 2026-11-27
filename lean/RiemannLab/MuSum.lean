@@ -663,4 +663,36 @@ theorem tendsto_sum_mu_div (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) :
   filter_upwards [eventually_ge_atTop 1] with X hX
   rw [← sμ_mul_L χ hX, mul_div_cancel_right₀ _ hL, sμ]
 
+/-! ### Step D: the defining series of `M_χ` converges to `M χ x` -/
+
+/-- **The series behind `M`.** For `χ ≠ 1` and `x > 0`, the partial sums of
+`Σ μ(n)χ(n)/n · e^{-x/n²}` converge to `M χ x`. So the Lean `M`, defined as
+`M̃_χ(x) + 1/L(1, χ)`, is exactly the sum of the Ramanujan–Hardy–Littlewood series. -/
+theorem tendsto_M_partial (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) {x : ℝ} (hx : 0 < x) :
+    Tendsto (fun X : ℕ => ∑ n ∈ Ioc 0 X,
+        χ n * (μ n : ℂ) / n * ((Real.exp (-x / (n : ℝ) ^ 2) : ℝ) : ℂ)) atTop
+      (𝓝 (M χ x)) := by
+  set f : ℕ → ℂ := fun n => coef χ n * g (b n * x) with hf
+  have hf0 : f 0 = 0 := by simp [hf, coef]
+  have hsum : HasSum f (Mt χ x) :=
+    (Summable.of_norm (summable_term χ hx one_pos le_rfl)).hasSum
+  have hrange : ∀ X : ℕ, ∑ n ∈ Ioc 0 X, f n = ∑ n ∈ range (X + 1), f n := by
+    intro X
+    have : range (X + 1) = insert 0 (Ioc 0 X) := by
+      ext n; simp only [mem_range, mem_insert, mem_Ioc]; omega
+    rw [this, sum_insert (by simp), hf0, zero_add]
+  have h1 : Tendsto (fun X : ℕ => ∑ n ∈ Ioc 0 X, f n) atTop (𝓝 (Mt χ x)) := by
+    simp_rw [hrange]
+    exact hsum.tendsto_sum_nat.comp (tendsto_add_atTop_nat 1)
+  have h2 := (h1.add (tendsto_sum_mu_div χ hχ))
+  refine h2.congr fun X => ?_
+  rw [← sum_add_distrib]
+  refine sum_congr rfl fun n hn => ?_
+  have hn0 : (n : ℝ) ≠ 0 := by exact_mod_cast (mem_Ioc.mp hn).1.ne'
+  simp only [hf, coef, g, b, Pi.mul_apply]
+  have : ((n : ℝ) ^ 2)⁻¹ * x = x / (n : ℝ) ^ 2 := by field_simp
+  rw [this, neg_div]
+  push_cast
+  ring
+
 end RiemannLab

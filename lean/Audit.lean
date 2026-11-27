@@ -26,4 +26,9 @@ import RiemannLab
 #print axioms RiemannLab.finiteNorms_of_GRH
 #print axioms RiemannLab.grh_of_finiteNorms'
 #print axioms RiemannLab.grh_iff_finite_norm
+#print axioms RiemannLab.tendsto_psiχ_div
+#print axioms RiemannLab.tendsto_Mμ_div
+#print axioms RiemannLab.norm_LFunction_one_sub_Sχ_le
+#print axioms RiemannLab.tendsto_sum_mu_div
+#print axioms RiemannLab.tendsto_M_partial
 #print axioms RiemannLab.blowup_limit
