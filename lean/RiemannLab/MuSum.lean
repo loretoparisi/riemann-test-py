@@ -4,6 +4,7 @@ import Mathlib.NumberTheory.ArithmeticFunction.Misc
 import Mathlib.NumberTheory.Harmonic.Bounds
 import Mathlib.Analysis.SpecialFunctions.Stirling
 import Mathlib.Analysis.SpecialFunctions.Log.Sum
+import Mathlib.NumberTheory.AbelSummation
 
 /-!
 # `Σ μ(n)χ(n)/n = 1/L(1, χ)` for a nontrivial Dirichlet character
@@ -243,5 +244,253 @@ theorem tendsto_Mμ_div (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) :
     push Not at hcon
     nlinarith
   nlinarith
+
+/-! ### Step C: the tail of `Σ χ(m)/m` -/
+
+/-- `S(k) = Σ_{m ≤ k} χ(m)/m`. -/
+def Sχ (χ : DirichletCharacter ℂ N) (k : ℕ) : ℂ := ∑ m ∈ Ioc 0 k, χ m / m
+
+/-- `χ` with the value at `0` set to `0`. -/
+def χ0 (χ : DirichletCharacter ℂ N) (m : ℕ) : ℂ := if m = 0 then 0 else χ m
+
+omit [NeZero N] in
+lemma A_eq_sum_χ0 (χ : DirichletCharacter ℂ N) (t : ℝ) :
+    A χ t = ∑ k ∈ Icc 0 ⌊t⌋₊, χ0 χ k := by
+  rw [A]
+  have : Icc 0 ⌊t⌋₊ = insert 0 (Icc 1 ⌊t⌋₊) := by
+    ext n; simp only [mem_Icc, mem_insert]; omega
+  rw [this, sum_insert (by simp), χ0, if_pos rfl, zero_add]
+  refine sum_congr rfl fun k hk => ?_
+  rw [χ0, if_neg (by have := (mem_Icc.mp hk).1; omega)]
+
+lemma cpow_neg_two {t : ℝ} (_ht : 0 < t) :
+    (t : ℂ) ^ ((-1 : ℂ) - 1) = (((t ^ 2)⁻¹ : ℝ) : ℂ) := by
+  rw [show (-1 : ℂ) - 1 = -((2 : ℕ) : ℂ) by push_cast; ring, cpow_neg, cpow_natCast]
+  push_cast
+  rfl
+
+lemma integrableOn_A_div_sq (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) {a : ℝ} (ha : 0 < a) :
+    MeasureTheory.IntegrableOn (fun t : ℝ => (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t) (Set.Ioi a) := by
+  have hint : MeasureTheory.IntegrableOn (fun t : ℝ => (N : ℝ) * t ^ (-2 : ℝ)) (Set.Ioi a) :=
+    (integrableOn_Ioi_rpow_of_lt (by norm_num) ha).const_mul _
+  refine hint.mono' ?_ ((MeasureTheory.ae_restrict_mem measurableSet_Ioi).mono fun t ht => ?_)
+  · refine MeasureTheory.AEStronglyMeasurable.mul ?_ (measurable_A χ).aestronglyMeasurable
+    exact (Complex.continuous_ofReal.measurable.comp
+      ((measurable_id.pow_const 2).inv)).aestronglyMeasurable
+  · have ht0 : 0 < t := ha.trans ht
+    rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (by positivity),
+      Real.rpow_neg ht0.le, Real.rpow_two, mul_comm]
+    exact mul_le_mul_of_nonneg_right (norm_A_le χ hχ t) (by positivity)
+
+lemma norm_integral_A_div_sq_le (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) {a : ℝ}
+    (ha : 0 < a) :
+    ‖∫ t in Set.Ioi a, (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t‖ ≤ N / a := by
+  have hint : MeasureTheory.IntegrableOn (fun t : ℝ => (N : ℝ) * t ^ (-2 : ℝ)) (Set.Ioi a) :=
+    (integrableOn_Ioi_rpow_of_lt (by norm_num) ha).const_mul _
+  have hval : ∫ t in Set.Ioi a, (N : ℝ) * t ^ (-2 : ℝ) = N / a := by
+    rw [MeasureTheory.integral_const_mul, integral_Ioi_rpow_of_lt (by norm_num) ha]
+    rw [show (-2 : ℝ) + 1 = -1 by norm_num, Real.rpow_neg_one]
+    field_simp
+  rw [← hval]
+  refine MeasureTheory.norm_integral_le_of_norm_le hint
+    ((MeasureTheory.ae_restrict_mem measurableSet_Ioi).mono fun t ht => ?_)
+  have ht0 : 0 < t := ha.trans ht
+  rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (by positivity),
+    Real.rpow_neg ht0.le, Real.rpow_two, mul_comm]
+  exact mul_le_mul_of_nonneg_right (norm_A_le χ hχ t) (by positivity)
+
+/-- `L(1, χ) = ∫₁^∞ A(t) t^{-2} dt`. -/
+lemma LFunction_one_eq_integral (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) :
+    LFunction χ 1 = ∫ t in Set.Ioi (1:ℝ), (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t := by
+  rw [LFunction_eq_J χ hχ (by norm_num), J, mellinOn, one_mul]
+  refine MeasureTheory.setIntegral_congr_fun measurableSet_Ioi fun t ht => ?_
+  simp only [smul_eq_mul]
+  rw [cpow_neg_two (zero_lt_one.trans ht)]
+
+omit [NeZero N] in
+/-- **Abel summation for `S(k)`.** `S(k) = A(k)/k + ∫₁^k A(t) t^{-2} dt`. -/
+lemma Sχ_eq (χ : DirichletCharacter ℂ N) (k : ℕ) :
+    Sχ χ k = A χ k / k + ∫ t in Set.Ioc (1:ℝ) k, (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t := by
+  set f : ℝ → ℂ := fun t => ((t⁻¹ : ℝ) : ℂ) with hf
+  have hderiv : ∀ t : ℝ, t ≠ 0 → HasDerivAt f (((-(t ^ 2)⁻¹ : ℝ)) : ℂ) t := fun t ht =>
+    (hasDerivAt_inv ht).ofReal_comp
+  have hd : ∀ t ∈ Set.Icc (1:ℝ) k, DifferentiableAt ℝ f t := fun t ht =>
+    (hderiv t (by linarith [ht.1])).differentiableAt
+  have hderiv_eq : ∀ t ∈ Set.Icc (1:ℝ) k, deriv f t = (((-(t ^ 2)⁻¹ : ℝ)) : ℂ) := fun t ht =>
+    (hderiv t (by linarith [ht.1])).deriv
+  have hint : MeasureTheory.IntegrableOn (deriv f) (Set.Icc (1:ℝ) k) := by
+    have hc : ContinuousOn (fun t : ℝ => (((-(t ^ 2)⁻¹ : ℝ)) : ℂ)) (Set.Icc (1:ℝ) k) :=
+      Complex.continuous_ofReal.comp_continuousOn
+        ((continuousOn_id.pow 2).inv₀ fun t ht =>
+          pow_ne_zero 2 (by have : (1:ℝ) ≤ t := ht.1; simp only [id]; linarith)).neg
+    exact (hc.integrableOn_compact isCompact_Icc).congr_fun
+      (fun t ht => (hderiv_eq t ht).symm) measurableSet_Icc
+  have h := sum_mul_eq_sub_integral_mul₀' (χ0 χ) (by simp [χ0]) k hd hint
+  have hL : ∑ m ∈ Icc 0 k, f m * χ0 χ m = Sχ χ k := by
+    rw [Sχ]
+    have : Icc 0 k = insert 0 (Ioc 0 k) := by
+      ext n; simp only [mem_Icc, mem_insert, mem_Ioc]; omega
+    rw [this, sum_insert (by simp), χ0, if_pos rfl, mul_zero, zero_add]
+    refine sum_congr rfl fun m hm => ?_
+    rw [χ0, if_neg (by have := (mem_Ioc.mp hm).1; omega), hf]
+    push_cast
+    ring
+  rw [hL] at h
+  have hAk : A χ k = ∑ m ∈ Icc 0 k, χ0 χ m := by rw [A_eq_sum_χ0, Nat.floor_natCast]
+  rw [h]
+  have hI : ∫ t in Set.Ioc (1:ℝ) k, deriv f t * ∑ m ∈ Icc 0 ⌊t⌋₊, χ0 χ m
+      = -∫ t in Set.Ioc (1:ℝ) k, (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t := by
+    rw [← MeasureTheory.integral_neg]
+    refine MeasureTheory.setIntegral_congr_fun measurableSet_Ioc fun t ht => ?_
+    rw [hderiv_eq t ⟨ht.1.le, ht.2⟩, ← A_eq_sum_χ0]
+    push_cast
+    ring
+  rw [hI, ← hAk, hf]
+  push_cast
+  ring
+
+/-- **Tail bound.** `|L(1, χ) − S(k)| ≤ 2N/k` for `k ≥ 1`. -/
+theorem norm_LFunction_one_sub_Sχ_le (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) {k : ℕ}
+    (hk : 1 ≤ k) : ‖LFunction χ 1 - Sχ χ k‖ ≤ 2 * N / k := by
+  have hk0 : (0:ℝ) < k := by exact_mod_cast hk
+  have hk1 : (1:ℝ) ≤ k := by exact_mod_cast hk
+  have hsplit : LFunction χ 1 = (∫ t in Set.Ioc (1:ℝ) k, (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t)
+      + ∫ t in Set.Ioi (k:ℝ), (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t := by
+    rw [LFunction_one_eq_integral χ hχ, ← Set.Ioc_union_Ioi_eq_Ioi hk1,
+      MeasureTheory.setIntegral_union Set.Ioc_disjoint_Ioi_same measurableSet_Ioi
+        ((integrableOn_A_div_sq χ hχ zero_lt_one).mono_set Set.Ioc_subset_Ioi_self)
+        (integrableOn_A_div_sq χ hχ hk0)]
+  rw [hsplit, Sχ_eq]
+  have h1 := norm_integral_A_div_sq_le χ hχ hk0
+  have h2 : ‖A χ k / k‖ ≤ N / k := by
+    rw [norm_div, Complex.norm_natCast]
+    exact div_le_div_of_nonneg_right (norm_A_le χ hχ k) hk0.le
+  calc ‖(∫ t in Set.Ioc (1:ℝ) k, (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t)
+        + (∫ t in Set.Ioi (k:ℝ), (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t)
+        - (A χ k / k + ∫ t in Set.Ioc (1:ℝ) k, (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t)‖
+      = ‖(∫ t in Set.Ioi (k:ℝ), (((t ^ 2)⁻¹ : ℝ) : ℂ) * A χ t) - A χ k / k‖ := by ring_nf
+    _ ≤ N / k + N / k := (norm_sub_le _ _).trans (add_le_add h1 h2)
+    _ = 2 * N / k := by ring
+
+/-! ### Step C: `Σ_{n ≤ X} μ(n)χ(n)/n → 1/L(1, χ)` -/
+
+/-- `s(X) = Σ_{n ≤ X} μ(n)χ(n)/n`. -/
+def sμ (χ : DirichletCharacter ℂ N) (X : ℕ) : ℂ := ∑ n ∈ Ioc 0 X, χ n * (μ n : ℂ) / n
+
+omit [NeZero N] in
+/-- `Σ_{n ≤ X} μχ(n)/n · S(X/n) = 1` for `X ≥ 1`. -/
+lemma sum_mu_div_mul_Sχ (χ : DirichletCharacter ℂ N) {X : ℕ} (hX : 1 ≤ X) :
+    ∑ n ∈ Ioc 0 X, χ n * (μ n : ℂ) / n * Sχ χ (X / n) = 1 := by
+  let f : ArithmeticFunction ℂ := ⟨fun n => χ n * (μ n : ℂ) / n, by simp⟩
+  let g : ArithmeticFunction ℂ := ⟨fun n => χ n / n, by simp⟩
+  have hfg : ∀ k : ℕ, (f * g) k = if k = 1 then 1 else 0 := by
+    intro k
+    rw [ArithmeticFunction.mul_apply]
+    have hmu := congrArg (fun F : ArithmeticFunction ℤ => F k)
+      ArithmeticFunction.moebius_mul_coe_zeta
+    simp only [ArithmeticFunction.mul_apply, ArithmeticFunction.one_apply] at hmu
+    have hterm : ∀ x ∈ k.divisorsAntidiagonal, f x.1 * g x.2
+        = χ k / k * ((μ x.1 * (ArithmeticFunction.zeta : ArithmeticFunction ℤ) x.2 : ℤ) : ℂ) := by
+      intro x hx
+      have hk := Nat.mem_divisorsAntidiagonal.mp hx
+      have h2 : x.2 ≠ 0 := fun h => hk.2 (by rw [← hk.1, h, mul_zero])
+      rw [ArithmeticFunction.natCoe_apply, ArithmeticFunction.zeta_apply, if_neg h2]
+      show χ x.1 * (μ x.1 : ℂ) / x.1 * (χ x.2 / x.2) = _
+      rw [← hk.1, Nat.cast_mul, map_mul]
+      push_cast
+      field_simp
+    rw [sum_congr rfl hterm, ← mul_sum, ← Int.cast_sum, hmu]
+    split_ifs with h
+    · subst h; simp
+    · simp
+  have h := ArithmeticFunction.sum_Ioc_mul_eq_sum_sum f g X
+  simp only [hfg] at h
+  rw [sum_ite_eq' (Ioc 0 X) 1, if_pos (mem_Ioc.mpr ⟨one_pos, hX⟩)] at h
+  exact h.symm
+
+omit [NeZero N] in
+/-- Discrete Abel summation for `Σ μχ(n)/n` on a block `(a, a+d+1]`. -/
+lemma sum_Ioc_mu_div_eq (χ : DirichletCharacter ℂ N) (a d : ℕ) :
+    ∑ n ∈ Ioc a (a + d + 1), χ n * (μ n : ℂ) / n
+      = Mμ χ (a + d + 1) / (a + d + 1 : ℕ) - Mμ χ a / (a + 1 : ℕ)
+        + ∑ n ∈ Ico (a + 1) (a + d + 1), Mμ χ n * (1 / n - 1 / (n + 1 : ℕ)) := by
+  induction d with
+  | zero =>
+    simp only [add_zero, Ico_self, sum_empty]
+    rw [sum_Ioc_succ_top le_rfl, Ioc_self, sum_empty, zero_add, Mμ, Mμ,
+      sum_Ioc_succ_top (Nat.zero_le a)]
+    ring
+  | succ d ih =>
+    have e : a + (d + 1) + 1 = a + d + 1 + 1 := by ring
+    have hM : Mμ χ (a + d + 1 + 1) = Mμ χ (a + d + 1)
+        + χ (a + d + 1 + 1 : ℕ) * (μ (a + d + 1 + 1) : ℂ) := by
+      simp only [Mμ]
+      rw [sum_Ioc_succ_top (by omega : 0 ≤ a + d + 1)]
+    rw [e, sum_Ioc_succ_top (by omega : a ≤ a + d + 1), ih,
+      sum_Ico_succ_top (by omega : a + 1 ≤ a + d + 1), hM]
+    have h1 : ((a + d + 1 : ℕ) : ℂ) ≠ 0 := by exact_mod_cast (by omega : a + d + 1 ≠ 0)
+    have h2 : ((a + d + 1 + 1 : ℕ) : ℂ) ≠ 0 := by exact_mod_cast (by omega : a + d + 1 + 1 ≠ 0)
+    field_simp
+    ring
+
+omit [NeZero N] in
+/-- On a block `(a, b]` with `b < 2(a+1)` and `|M_μ(Y)| ≤ δ Y` for `Y ≥ a`,
+`|Σ_{a < n ≤ b} μχ(n)/n| ≤ 4δ`. -/
+lemma norm_sum_Ioc_mu_div_le (χ : DirichletCharacter ℂ N) {δ : ℝ} (hδ : 0 ≤ δ) {a b : ℕ}
+    (hM : ∀ Y : ℕ, a ≤ Y → ‖Mμ χ Y‖ ≤ δ * Y) (hab : a ≤ b) (hb2 : b < 2 * (a + 1)) :
+    ‖∑ n ∈ Ioc a b, χ n * (μ n : ℂ) / n‖ ≤ 4 * δ := by
+  rcases Nat.eq_or_lt_of_le hab with rfl | hlt
+  · simp; positivity
+  obtain ⟨d, rfl⟩ : ∃ d, b = a + d + 1 := ⟨b - a - 1, by omega⟩
+  rw [sum_Ioc_mu_div_eq]
+  have hb0 : (0:ℝ) < ((a + d + 1 : ℕ) : ℝ) := by exact_mod_cast (by omega : 0 < a + d + 1)
+  have ha0 : (0:ℝ) < ((a + 1 : ℕ) : ℝ) := by exact_mod_cast (by omega : 0 < a + 1)
+  have t1 : ‖Mμ χ (a + d + 1) / ((a + d + 1 : ℕ) : ℂ)‖ ≤ δ := by
+    rw [norm_div, Complex.norm_natCast, div_le_iff₀ hb0]
+    exact hM _ (by omega)
+  have t2 : ‖Mμ χ a / ((a + 1 : ℕ) : ℂ)‖ ≤ δ := by
+    rw [norm_div, Complex.norm_natCast, div_le_iff₀ ha0]
+    refine (hM a le_rfl).trans ?_
+    push_cast
+    nlinarith
+  have t3 : ‖∑ n ∈ Ico (a + 1) (a + d + 1), Mμ χ n * (1 / n - 1 / (n + 1 : ℕ))‖ ≤ 2 * δ := by
+    refine (norm_sum_le _ _).trans ?_
+    calc ∑ n ∈ Ico (a + 1) (a + d + 1), ‖Mμ χ n * (1 / n - 1 / (n + 1 : ℕ))‖
+        ≤ ∑ n ∈ Ico (a + 1) (a + d + 1), δ / ((a + 1 : ℕ) : ℝ) := by
+          refine sum_le_sum fun n hn => ?_
+          have hn1 : a + 1 ≤ n := (mem_Ico.mp hn).1
+          have hn0 : (0:ℝ) < n := by exact_mod_cast (by omega : 0 < n)
+          have hn0' : (n : ℂ) ≠ 0 := by exact_mod_cast hn0.ne'
+          have hn1' : (n : ℂ) + 1 ≠ 0 := by exact_mod_cast (by omega : n + 1 ≠ 0)
+          have hdiff : (1 / (n : ℂ) - 1 / ((n + 1 : ℕ) : ℂ)) = (((n : ℝ) * (n + 1))⁻¹ : ℝ) := by
+            push_cast
+            field_simp
+            ring
+          rw [hdiff, norm_mul, Complex.norm_real, Real.norm_of_nonneg (by positivity)]
+          calc ‖Mμ χ n‖ * ((n : ℝ) * (n + 1))⁻¹ ≤ δ * n * ((n : ℝ) * (n + 1))⁻¹ :=
+                mul_le_mul_of_nonneg_right (hM n (by omega)) (by positivity)
+            _ = δ / (n + 1) := by field_simp
+            _ ≤ δ / ((a + 1 : ℕ) : ℝ) := by
+                apply div_le_div_of_nonneg_left hδ ha0
+                push_cast
+                have : ((a : ℝ) + 1) ≤ n := by exact_mod_cast hn1
+                linarith
+      _ = (d : ℝ) * (δ / ((a + 1 : ℕ) : ℝ)) := by
+          rw [sum_const, Nat.card_Ico, nsmul_eq_mul]
+          congr 1
+          push_cast
+          congr 1
+          omega
+      _ ≤ 2 * δ := by
+          have hd : (d : ℝ) ≤ 2 * ((a + 1 : ℕ) : ℝ) := by
+            have : d ≤ 2 * (a + 1) := by omega
+            exact_mod_cast this
+          rw [mul_div_assoc', div_le_iff₀ ha0]
+          nlinarith
+  calc ‖Mμ χ (a + d + 1) / ((a + d + 1 : ℕ) : ℂ) - Mμ χ a / ((a + 1 : ℕ) : ℂ)
+        + ∑ n ∈ Ico (a + 1) (a + d + 1), Mμ χ n * (1 / n - 1 / (n + 1 : ℕ))‖
+      ≤ δ + δ + 2 * δ := (norm_add_le _ _).trans
+        (add_le_add ((norm_sub_le _ _).trans (add_le_add t1 t2)) t3)
+    _ = 4 * δ := by ring
 
 end RiemannLab
