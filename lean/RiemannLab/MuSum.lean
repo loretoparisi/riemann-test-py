@@ -493,4 +493,174 @@ lemma norm_sum_Ioc_mu_div_le (χ : DirichletCharacter ℂ N) {δ : ℝ} (hδ : 0
         (add_le_add ((norm_sub_le _ _).trans (add_le_add t1 t2)) t3)
     _ = 4 * δ := by ring
 
+/-- The error term `T(X) = Σ_{n ≤ X} μχ(n)/n · (L(1,χ) − S(X/n))`. -/
+def Tμ (χ : DirichletCharacter ℂ N) (X : ℕ) : ℂ :=
+  ∑ n ∈ Ioc 0 X, χ n * (μ n : ℂ) / n * (LFunction χ 1 - Sχ χ (X / n))
+
+lemma sμ_mul_L (χ : DirichletCharacter ℂ N) {X : ℕ} (hX : 1 ≤ X) :
+    sμ χ X * LFunction χ 1 = 1 + Tμ χ X := by
+  rw [sμ, sum_mul, Tμ, ← sum_mu_div_mul_Sχ χ hX, ← sum_add_distrib]
+  exact sum_congr rfl fun n _ => by ring
+
+omit [NeZero N] in
+lemma norm_mu_div_le (χ : DirichletCharacter ℂ N) (n : ℕ) :
+    ‖χ n * (μ n : ℂ) / n‖ ≤ 1 / n := by
+  rw [norm_div, Complex.norm_natCast]
+  exact div_le_div_of_nonneg_right (norm_chi_mu_le χ n) (Nat.cast_nonneg n)
+
+/-- Terms with `X/n ≥ K` contribute at most `4N/K`. -/
+lemma norm_Tμ_head_le (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) {K X : ℕ} (hK : 1 ≤ K)
+    (hX : 1 ≤ X) :
+    ‖∑ n ∈ Ioc 0 (X / K), χ n * (μ n : ℂ) / n * (LFunction χ 1 - Sχ χ (X / n))‖
+      ≤ 4 * N / K := by
+  have hX0 : (0:ℝ) < X := by exact_mod_cast hX
+  have hK0 : (0:ℝ) < K := by exact_mod_cast hK
+  have hterm : ∀ n ∈ Ioc 0 (X / K),
+      ‖χ n * (μ n : ℂ) / n * (LFunction χ 1 - Sχ χ (X / n))‖ ≤ 4 * N / X := by
+    intro n hn
+    obtain ⟨hn0, hnK⟩ := mem_Ioc.mp hn
+    have hnX : n ≤ X := hnK.trans (Nat.div_le_self _ _)
+    have hm : 1 ≤ X / n := (Nat.le_div_iff_mul_le hn0).mpr (by omega)
+    have hlt := Nat.lt_mul_div_succ X hn0
+    have h2 : X < 2 * (n * (X / n)) := by
+      have : n ≤ n * (X / n) := Nat.le_mul_of_pos_right n hm
+      linarith [Nat.mul_succ n (X / n)]
+    have h2r : (X : ℝ) < 2 * ((n : ℝ) * ((X / n : ℕ) : ℝ)) := by exact_mod_cast h2
+    have hn0r : (0:ℝ) < n := by exact_mod_cast hn0
+    have hm0r : (0:ℝ) < ((X / n : ℕ) : ℝ) := by exact_mod_cast hm
+    rw [norm_mul]
+    calc ‖χ n * (μ n : ℂ) / n‖ * ‖LFunction χ 1 - Sχ χ (X / n)‖
+        ≤ (1 / n) * (2 * N / ((X / n : ℕ) : ℝ)) :=
+          mul_le_mul (norm_mu_div_le χ n) (norm_LFunction_one_sub_Sχ_le χ hχ hm)
+            (norm_nonneg _) (by positivity)
+      _ = 2 * N / ((n : ℝ) * ((X / n : ℕ) : ℝ)) := by field_simp
+      _ ≤ 4 * N / X := by
+          rw [div_le_div_iff₀ (by positivity) hX0]
+          have hN : (0:ℝ) ≤ N := Nat.cast_nonneg N
+          nlinarith
+  refine (norm_sum_le _ _).trans ((sum_le_sum hterm).trans ?_)
+  rw [sum_const, Nat.card_Ioc, Nat.sub_zero, nsmul_eq_mul]
+  have hc : ((X / K : ℕ) : ℝ) ≤ (X : ℝ) / K := Nat.cast_div_le
+  calc ((X / K : ℕ) : ℝ) * (4 * N / X) ≤ (X : ℝ) / K * (4 * N / X) :=
+        mul_le_mul_of_nonneg_right hc (by positivity)
+    _ = 4 * N / K := by field_simp
+
+omit [NeZero N] in
+lemma filter_div_eq (X K j : ℕ) (hj : 1 ≤ j) (hjK : j < K) :
+    {n ∈ Ioc (X / K) X | X / n = j} = Ioc (X / (j + 1)) (X / j) := by
+  ext n
+  simp only [mem_filter, mem_Ioc]
+  constructor
+  · rintro ⟨⟨hKn, hnX⟩, hj'⟩
+    have hn0 : 0 < n := lt_of_le_of_lt (Nat.zero_le _) hKn
+    refine ⟨(Nat.div_lt_iff_lt_mul (by omega)).mpr ?_, (Nat.le_div_iff_mul_le (by omega)).mpr ?_⟩
+    · have := (Nat.div_lt_iff_lt_mul hn0).mp (by omega : X / n < j + 1)
+      linarith [mul_comm n (j + 1)]
+    · have := (Nat.le_div_iff_mul_le hn0).mp (le_of_eq hj'.symm)
+      linarith [mul_comm n j]
+  · rintro ⟨h1, h2⟩
+    have hn0 : 0 < n := lt_of_le_of_lt (Nat.zero_le _) h1
+    have hjn : n * j ≤ X := (Nat.le_div_iff_mul_le (by omega)).mp h2
+    have hXn : X < n * (j + 1) := (Nat.div_lt_iff_lt_mul (by omega)).mp h1
+    refine ⟨⟨lt_of_le_of_lt (Nat.div_le_div_left (by omega) (by omega)) h1,
+      h2.trans (Nat.div_le_self _ _)⟩, le_antisymm ?_ ?_⟩
+    · have := (Nat.div_lt_iff_lt_mul hn0).mpr (by linarith [mul_comm n (j + 1)] : X < (j + 1) * n)
+      omega
+    · exact (Nat.le_div_iff_mul_le hn0).mpr (by linarith [mul_comm n j])
+
+/-- Terms with `X/n < K` contribute at most `8NKδ`, given `|M_μ(Y)| ≤ δY` for `Y ≥ A₀`
+and `X ≥ A₀ K`. -/
+lemma norm_Tμ_tail_le (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) {δ : ℝ} (hδ : 0 ≤ δ)
+    {A0 K X : ℕ} (hK1 : 1 ≤ K) (hM : ∀ Y : ℕ, A0 ≤ Y → ‖Mμ χ Y‖ ≤ δ * Y) (hX : A0 * K ≤ X) :
+    ‖∑ n ∈ Ioc (X / K) X, χ n * (μ n : ℂ) / n * (LFunction χ 1 - Sχ χ (X / n))‖
+      ≤ 8 * N * K * δ := by
+  have hmaps : ∀ n ∈ Ioc (X / K) X, X / n ∈ Ico 1 K := by
+    intro n hn
+    obtain ⟨hKn, hnX⟩ := mem_Ioc.mp hn
+    have hK : 0 < K := hK1
+    have hn0 : 0 < n := lt_of_le_of_lt (Nat.zero_le _) hKn
+    refine mem_Ico.mpr ⟨(Nat.le_div_iff_mul_le hn0).mpr (by rw [one_mul]; exact hnX), ?_⟩
+    exact (Nat.div_lt_iff_lt_mul hn0).mpr (by
+      have := (Nat.div_lt_iff_lt_mul hK).mp hKn; linarith [mul_comm n K])
+  rw [← sum_fiberwise_of_maps_to hmaps]
+  have hblock : ∀ j ∈ Ico 1 K,
+      ‖∑ n ∈ Ioc (X / K) X with X / n = j,
+          χ n * (μ n : ℂ) / n * (LFunction χ 1 - Sχ χ (X / n))‖ ≤ 8 * N * δ := by
+    intro j hj
+    obtain ⟨hj1, hjK⟩ := mem_Ico.mp hj
+    rw [sum_congr rfl (fun n hn => by rw [(mem_filter.mp hn).2]), ← sum_mul,
+      filter_div_eq X K j hj1 hjK, norm_mul]
+    set a := X / (j + 1)
+    set b := X / j
+    have haA : A0 ≤ a := (Nat.le_div_iff_mul_le (by omega)).mpr
+      ((Nat.mul_le_mul_left A0 (by omega : j + 1 ≤ K)).trans hX)
+    have hab : a ≤ b := Nat.div_le_div_left (by omega) (by omega)
+    have hb2 : b < 2 * (a + 1) := by
+      have h1 : b * j ≤ X := Nat.div_mul_le_self X j
+      have h2 : X < (j + 1) * (a + 1) := Nat.lt_mul_div_succ X (by omega)
+      have h3 : (j + 1) * (a + 1) ≤ (2 * (a + 1)) * j := by nlinarith
+      exact Nat.lt_of_mul_lt_mul_right (by omega : b * j < 2 * (a + 1) * j)
+    have hB := norm_sum_Ioc_mu_div_le χ hδ (fun Y hY => hM Y (haA.trans hY)) hab hb2
+    have hL : ‖LFunction χ 1 - Sχ χ j‖ ≤ 2 * N := by
+      refine (norm_LFunction_one_sub_Sχ_le χ hχ hj1).trans ?_
+      have hj1r : (1:ℝ) ≤ j := by exact_mod_cast hj1
+      exact div_le_self (by positivity) hj1r
+    calc _ ≤ 4 * δ * (2 * N) := mul_le_mul hB hL (norm_nonneg _) (by positivity)
+      _ = 8 * N * δ := by ring
+  refine (norm_sum_le _ _).trans ((sum_le_sum hblock).trans ?_)
+  rw [sum_const, Nat.card_Ico, nsmul_eq_mul]
+  have : ((K - 1 : ℕ) : ℝ) ≤ K := by exact_mod_cast Nat.sub_le K 1
+  have h8 : 0 ≤ 8 * (N:ℝ) * δ := by positivity
+  nlinarith
+
+/-- `T(X) → 0`. -/
+lemma tendsto_Tμ (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) :
+    Tendsto (Tμ χ) atTop (𝓝 0) := by
+  rw [Metric.tendsto_atTop]
+  intro ε hε
+  have hN : (0:ℝ) < N := by exact_mod_cast Nat.pos_of_ne_zero (NeZero.ne N)
+  obtain ⟨K, hK⟩ : ∃ K : ℕ, K = ⌈8 * N / ε⌉₊ + 1 := ⟨_, rfl⟩
+  have hK1 : 1 ≤ K := by omega
+  have hK0 : (0:ℝ) < K := by exact_mod_cast hK1
+  have hKε : 8 * N / ε < K := by
+    rw [hK]; push_cast; linarith [Nat.le_ceil (8 * (N:ℝ) / ε)]
+  obtain ⟨d, hd⟩ : ∃ d : ℝ, d = ε / (32 * N * K) := ⟨_, rfl⟩
+  have hd0 : 0 < d := by rw [hd]; positivity
+  obtain ⟨A0, hA0⟩ := (Metric.tendsto_atTop.mp (tendsto_Mμ_div χ hχ)) d hd0
+  have hM : ∀ Y : ℕ, A0 ≤ Y → ‖Mμ χ Y‖ ≤ d * Y := by
+    intro Y hY
+    rcases Nat.eq_zero_or_pos Y with rfl | hY0
+    · simp [Mμ]
+    have := hA0 Y hY
+    rw [dist_zero_right, norm_div, Complex.norm_natCast] at this
+    have hY0r : (0:ℝ) < Y := by exact_mod_cast hY0
+    rw [div_lt_iff₀ hY0r] at this
+    linarith
+  refine ⟨A0 * K + 1, fun X hX => ?_⟩
+  rw [dist_zero_right, Tμ, ← sum_Ioc_consecutive _ (Nat.zero_le (X / K)) (Nat.div_le_self X K)]
+  have h1 := norm_Tμ_head_le χ hχ hK1 (by omega : 1 ≤ X)
+  have h2 := norm_Tμ_tail_le χ hχ hd0.le hK1 hM (by omega : A0 * K ≤ X)
+  have e1 : 4 * N / K < ε / 2 := by
+    rw [div_lt_iff₀ hK0]
+    rw [div_lt_iff₀ hε] at hKε
+    linarith
+  have e2 : 8 * N * K * d = ε / 4 := by rw [hd]; field_simp; ring
+  calc _ ≤ _ := norm_add_le _ _
+    _ ≤ 4 * N / K + 8 * N * K * d := add_le_add h1 h2
+    _ < ε := by linarith
+
+/-- **Main theorem of Step C.** For a non-principal character `χ`,
+`Σ_{n ≤ X} μ(n)χ(n)/n → 1/L(1, χ)`. -/
+theorem tendsto_sum_mu_div (χ : DirichletCharacter ℂ N) (hχ : χ ≠ 1) :
+    Tendsto (fun X : ℕ => ∑ n ∈ Ioc 0 X, χ n * (μ n : ℂ) / n) atTop
+      (𝓝 (1 / LFunction χ 1)) := by
+  have hL : LFunction χ 1 ≠ 0 := LFunction_ne_zero_of_one_le_re χ (Or.inl hχ) (by simp)
+  have hlim : Tendsto (fun X => (1 + Tμ χ X) / LFunction χ 1) atTop
+      (𝓝 ((1 + 0) / LFunction χ 1)) :=
+    (tendsto_const_nhds.add (tendsto_Tμ χ hχ)).div_const _
+  rw [add_zero] at hlim
+  refine hlim.congr' ?_
+  filter_upwards [eventually_ge_atTop 1] with X hX
+  rw [← sμ_mul_L χ hX, mul_div_cancel_right₀ _ hL, sμ]
+
 end RiemannLab
