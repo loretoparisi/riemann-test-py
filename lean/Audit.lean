@@ -10,5 +10,12 @@ import RiemannLab
 #print axioms RiemannLab.mellin_Mt_eq_LSeries
 #print axioms RiemannLab.mellin_Mt
 #print axioms RiemannLab.combined_norm_identity
+#print axioms RiemannLab.plancherel
+#print axioms RiemannLab.mellin_plancherel
+#print axioms RiemannLab.combined_norm_identity_unconditional
+#print axioms RiemannLab.mellinOn_differentiableAt
+#print axioms RiemannLab.K_mul_LFunction_eq
+#print axioms RiemannLab.LFunction_ne_zero_of_finiteNorms
+#print axioms RiemannLab.grh_of_finiteNorms
 #print axioms RiemannLab.grh_iff_finite_norm
 #print axioms RiemannLab.blowup_limit

@@ -4,12 +4,12 @@ Every section below follows the same protocol (see [Methodology](../README.md#me
 before the code, one full run, fixes, and re-runs until every check converges. Floating-point checks are evidence,
 not certificates; the Lean section is the only part that is machine-checked proof.
 
-* [Lean 4 formalisation](#lean-4-formalisation-seventh-run)
+* [Lean 4 formalisation](#lean-4-formalisation-seventh-and-eighth-runs)
 * [Original checks](#results-of-the-full-run) · [Extended criteria](#results-of-the-extended-run-new-criteria)
 * [Ramanujan × Masullo](#ramanujan--masullo-third-run) · [Majorana × Masullo](#majorana--masullo-fourth-run)
 * [Hardy–Littlewood–Ramanujan](#hardylittlewoodramanujan-investigation-fifth-run) · [Combined norm](#ramanujan--majorana--masullo-one-combined-norm-sixth-run)
 
-## Lean 4 formalisation (seventh run)
+## Lean 4 formalisation (seventh and eighth runs)
 
 `python -m riemann_lab lean` (and the `Lean` GitHub Actions workflow on every PR touching `lean/`). It runs
 `lake build`, then `lake env lean Audit.lean`, which prints `#print axioms` for every theorem, and then mpmath
@@ -26,8 +26,15 @@ checks of the same statements. A theorem counts as proved only if its axioms are
 | proved | `mellin_Mt_eq_LSeries` | 𝓜M̃_χ(s) = Γ(s) L(μχ, 1 − 2s), −1 < Re s < 0 (Fubini) |
 | proved | `mellin_Mt` | 𝓜M̃_χ(s) = Γ(s)/L(1 − 2s, χ), −1 < Re s < 0 |
 | proved, given `MellinPlancherel` | `combined_norm_identity` | ∫\|M̃_χ\|² x^{1−2α} dx = (1/2π)∫\|Γ/L\|² dt, 1 < α < 2 |
-| named hypothesis | `MellinPlancherel` | Mellin–Plancherel on Re s = c |
-| open (`sorry`) | `grh_iff_finite_norm` | GRH(χ) ⇔ finite norm for all α ∈ (3/4, 1) |
+| proved | `plancherel` | ∫\|𝓕f\|² = ∫\|f\|² for f ∈ L¹ ∩ L²(ℝ) |
+| proved | `mellin_plancherel` | ∫₀^∞\|f\|² x^{2c−1} dx = (1/2π)∫\|𝓜f(c+it)\|² dt when x^{c−1}f and x^{2c−1}\|f\|² are integrable |
+| proved | `combined_norm_identity_unconditional` | the norm identity on 1 < α < 2 with no hypothesis |
+| proved | `mellinOn_differentiableAt` | ∫_S t^{s−1}f(t) dt is holomorphic where t^{σ−1}\|f\| is integrable on S ⊆ (0, ∞) |
+| proved | `K_mul_LFunction_eq` | K(s) L(1 − 2s, χ) = Γ(s + 1) on −1 < Re s < 0, K(s) = s(∫₀¹x^{s−1}M̃ + ∫₁^∞x^{s−1}M) + 1/L(1, χ) |
+| proved | `LFunction_ne_zero_of_finiteNorms` | finite norms for all α ∈ (3/4, 1) ⇒ L(w, χ) ≠ 0 for 1/2 < Re w < 1 |
+| proved | `grh_of_finiteNorms` | finite norms for χ and χ⁻¹ ⇒ GRH(χ), χ primitive, χ ≠ 1 |
+| named hypothesis (now discharged) | `MellinPlancherel` | Mellin–Plancherel on Re s = c; kept as a definition, proved by `mellin_plancherel` |
+| open (`sorry`) | `grh_iff_finite_norm` | GRH(χ) ⇔ finite norm for all α ∈ (3/4, 1); the ⇐ direction is `grh_of_finiteNorms`, the ⇒ direction is open |
 | open (`sorry`) | `blowup_limit` | (α − 3/4)\|\|M_χ\|\|² → B_χ, given GRH, simple zeros, absolute convergence |
 
 Numerical cross-checks of the Lean statements (all PASS): `mellin_g` to 10^−30 at four points; K(σ) = −Γ(σ) to 10^−17;
@@ -42,6 +49,19 @@ Numerical cross-checks of the Lean statements (all PASS): `mellin_g` to 10^−30
    `IntegrableOn` congruence, a rewrite that also hit the `0` inside `𝓝[>] 0`, and the order of two integral rewrites).
    Pass 2: one remaining rewrite in the boundary limit at 0. Pass 3: `CombinedNorm.lean` compiles with no `sorry`;
    `Open.lean` needed `[NeZero N]` for Mathlib's `LFunction`. Pass 4: build, audit and numerics PASS.
+
+### Convergence log (eighth run: Plancherel and finite norms ⇒ GRH)
+
+1. `Plancherel.lean`: five CI passes. The L² Fourier transform needed an explicit `Lp` type ascription, the
+   integrals of real casts needed `integral_complex_ofReal`, `ContDiff ℝ ⊤` had to be `ContDiff ℝ ∞`, and the
+   substitution x = e^{−u} was redone by hand because the generic Mathlib lemma timed out at E = ℂ.
+2. `MtBounds.lean` (split out of `CombinedNormFull.lean` so the GRH file could build independently): sums had to
+   be indexed by ℕ explicitly, and two rpow rewrites were restated.
+3. **Bug found and fixed in `Open.lean`.** M_χ was a `tsum` of a series that converges only conditionally; in Lean
+   such a `tsum` is 0, so M_χ was the zero function and the two open statements were about the wrong object
+   (`blowup_limit` was even false as stated). M_χ is now M̃_χ + 1/L(1, χ).
+4. `GRHFromNorm.lean`: one CI pass with name clashes (`K` already existed, `δ` is a reserved token), then the full
+   build passed locally (7448 jobs) and the audit reports 14 proved, 2 open. pytest: 114 passed.
 
 ## Results of the full run
 

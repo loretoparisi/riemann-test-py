@@ -38,6 +38,15 @@ PROVED = {
     "RiemannLab.mellin_Mt": "Mellin(M~_chi)(s) = Gamma(s) / L(1-2s, chi) on -1 < Re s < 0",
     "RiemannLab.combined_norm_identity": "int |M~_chi|^2 x^(1-2 alpha) dx = (1/2pi) int |Gamma/L|^2 dt, "
                                          "1 < alpha < 2, given the named hypothesis MellinPlancherel",
+    "RiemannLab.plancherel": "int |F f|^2 = int |f|^2 for f in L1 n L2 (integral form of Plancherel)",
+    "RiemannLab.mellin_plancherel": "int_0^oo |f|^2 x^(2c-1) dx = (1/2pi) int |Mellin f(c+it)|^2 dt",
+    "RiemannLab.combined_norm_identity_unconditional": "the combined norm identity on 1 < alpha < 2 "
+                                                       "with no hypothesis",
+    "RiemannLab.mellinOn_differentiableAt": "int_S t^(s-1) f(t) dt is holomorphic where t^(sigma-1)|f| "
+                                            "is integrable (dominated differentiation)",
+    "RiemannLab.K_mul_LFunction_eq": "K(s) L(1-2s, chi) = Gamma(s+1) on -1 < Re s < 0",
+    "RiemannLab.LFunction_ne_zero_of_finiteNorms": "finite norms for chi => L(w, chi) != 0 on 1/2 < Re w < 1",
+    "RiemannLab.grh_of_finiteNorms": "finite norms for chi and chi^-1 => GRH(chi), chi primitive",
 }
 OPEN = {
     "RiemannLab.grh_iff_finite_norm": "GRH(chi) <=> int |M_chi|^2 x^(1-2 alpha) < oo for all alpha in (3/4, 1)",
@@ -45,7 +54,8 @@ OPEN = {
                                "given GRH, simple zeros, absolute convergence",
 }
 NAMED_HYPOTHESES = {
-    "RiemannLab.MellinPlancherel": "Mellin-Plancherel on Re s = c (classical; not in this Mathlib in L1 n L2 integral form)",
+    "RiemannLab.MellinPlancherel": "Mellin-Plancherel on Re s = c; now proved (mellin_plancherel) and "
+                                   "discharged for M~_chi in combined_norm_identity_unconditional",
 }
 
 
