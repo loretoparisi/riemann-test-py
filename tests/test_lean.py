@@ -66,3 +66,8 @@ def test_lean_Mt_is_M_minus_inverse_L1():
 def test_lean_audit():
     r = B.audit()
     assert r["ok"], r["problems"]
+
+
+def test_parse_axioms_primed_name():
+    ax = B.parse_axioms("'RiemannLab.grh_of_finiteNorms'' depends on axioms: [propext, Quot.sound]\n")
+    assert ax["RiemannLab.grh_of_finiteNorms'"] == {"propext", "Quot.sound"}

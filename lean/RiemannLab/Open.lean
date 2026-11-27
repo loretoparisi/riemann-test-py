@@ -9,9 +9,9 @@ checks that the statement is well-typed and nothing else. `#print axioms` report
 each of them (see `Audit.lean`), and the Python bridge `python -m riemann_lab lean` fails if
 any of the theorems in `CombinedNorm.lean` ever starts to depend on `sorryAx`.
 
-* `grh_iff_finite_norm` is the GRH-equivalent half of the combined equation
-  (Hardy–Littlewood 1918 for `ζ`, Garg–Maji 2022 for `χ`). Proving it in Lean would include
-  proving nothing less than the equivalence, so it stays open.
+* `grh_iff_finite_norm`, the GRH-equivalent half of the combined equation (Hardy–Littlewood
+  1918 for `ζ`, Garg–Maji 2022 for `χ`), used to be stated here with `sorry`. It is now proved
+  in `GRHIff.lean`; only the equivalence is proved, GRH itself stays open.
 * `blowup_limit` is the conditional corollary `(α - 3/4) ‖F_χ‖² → B_χ`, stated with all of
   its hypotheses (GRH, simple zeros, absolute convergence of the zero expansion) as explicit
   arguments. It is checked numerically in `riemann_lab.combined_checks.critical_blowup`.
@@ -48,14 +48,6 @@ def zeros (χ : DirichletCharacter ℂ N) : Set ℂ :=
 /-- The weighted norm on the GRH-sensitive range: `∫₀^∞ |M_χ(x)|² x^{1-2α} dx`. -/
 def normSq (χ : DirichletCharacter ℂ N) (α : ℝ) : ℝ :=
   ∫ x in Ioi (0:ℝ), ‖M χ x‖ ^ 2 * x ^ (1 - 2 * α)
-
-/-- **OPEN (sorry).** GRH-equivalent half of the combined equation: for a primitive
-nontrivial `χ`, GRH holds iff the weighted norm of `M_χ` is finite for every `α ∈ (3/4, 1)`. -/
-theorem grh_iff_finite_norm (χ : DirichletCharacter ℂ N) (hprim : χ.IsPrimitive)
-    (hχ : χ ≠ 1) :
-    GRH χ ↔ ∀ α ∈ Ioo (3 / 4 : ℝ) 1,
-      IntegrableOn (fun x : ℝ => ‖M χ x‖ ^ 2 * x ^ (1 - 2 * α)) (Ioi 0) := by
-  sorry
 
 /-- **OPEN (sorry), conditional.** The blow-up at the critical exponent, with all hypotheses
 explicit: GRH, simple zeros, and absolute convergence of the zero expansion. Then
