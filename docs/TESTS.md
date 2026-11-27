@@ -9,7 +9,7 @@ not certificates; the Lean section is the only part that is machine-checked proo
 * [Ramanujan × Masullo](#ramanujan--masullo-third-run) · [Majorana × Masullo](#majorana--masullo-fourth-run)
 * [Hardy–Littlewood–Ramanujan](#hardylittlewoodramanujan-investigation-fifth-run) · [Combined norm](#ramanujan--majorana--masullo-one-combined-norm-sixth-run)
 
-## Lean 4 formalisation (seventh and eighth runs)
+## Lean 4 formalisation (seventh to ninth runs)
 
 `python -m riemann_lab lean` (and the `Lean` GitHub Actions workflow on every PR touching `lean/`). It runs
 `lake build`, then `lake env lean Audit.lean`, which prints `#print axioms` for every theorem, and then mpmath
@@ -34,7 +34,15 @@ checks of the same statements. A theorem counts as proved only if its axioms are
 | proved | `LFunction_ne_zero_of_finiteNorms` | finite norms for all α ∈ (3/4, 1) ⇒ L(w, χ) ≠ 0 for 1/2 < Re w < 1 |
 | proved | `grh_of_finiteNorms` | finite norms for χ and χ⁻¹ ⇒ GRH(χ), χ primitive, χ ≠ 1 |
 | named hypothesis (now discharged) | `MellinPlancherel` | Mellin–Plancherel on Re s = c; kept as a definition, proved by `mellin_plancherel` |
-| open (`sorry`) | `grh_iff_finite_norm` | GRH(χ) ⇔ finite norm for all α ∈ (3/4, 1); the ⇐ direction is `grh_of_finiteNorms`, the ⇒ direction is open |
+| proved | `norm_LFunction_le` | \|L(s, χ)\| ≤ N\|s\|/Re s on Re s > 0, χ ≠ 1 (Abel summation + identity theorem) |
+| proved | `LFunction_inv_conj` | L(s, χ⁻¹) = conj L(conj s, χ) |
+| proved | `norm_inv_LFunction_le` | GRH(χ) ⇒ \|1/L(w, χ)\| ≤ C(\|Im w\| + 8)^K on 1/2 + δ ≤ Re w ≤ 3 (holomorphic log + Borel–Carathéodory) |
+| proved | `integral_vertical_eq` | contour shift between two vertical lines when \|Φ\| ≤ E/(1 + Im² s) on the closed strip |
+| proved | `integrableOn_weighted_of_mellinInv` | f = inverse Mellin of an L¹ ∩ L² function on Re s = c ⇒ ∫₀^∞\|f\|² x^{2c−1} dx < ∞ |
+| proved | `fM_eq_mellinInv` | GRH(χ) ⇒ M̃_χ − (e^{−x} − 1)/L(1, χ) is the inverse Mellin transform on Re s = c′, 0 < c′ < 1/4 |
+| proved | `finiteNorms_of_GRH` | GRH(χ) ⇒ finite norms for all α ∈ (3/4, 1), χ ≠ 1 |
+| proved | `grh_of_finiteNorms'` | finite norms for χ alone ⇒ GRH(χ), χ primitive, χ ≠ 1 |
+| proved | `grh_iff_finite_norm` | GRH(χ) ⟺ finite norms for all α ∈ (3/4, 1), χ primitive, χ ≠ 1 (an equivalence; neither side is proved) |
 | open (`sorry`) | `blowup_limit` | (α − 3/4)\|\|M_χ\|\|² → B_χ, given GRH, simple zeros, absolute convergence |
 
 Numerical cross-checks of the Lean statements (all PASS): `mellin_g` to 10^−30 at four points; K(σ) = −Γ(σ) to 10^−17;
@@ -62,6 +70,26 @@ Numerical cross-checks of the Lean statements (all PASS): `mellin_g` to 10^−30
    (`blowup_limit` was even false as stated). M_χ is now M̃_χ + 1/L(1, χ).
 4. `GRHFromNorm.lean`: one CI pass with name clashes (`K` already existed, `δ` is a reserved token), then the full
    build passed locally (7448 jobs) and the audit reports 14 proved, 2 open. pytest: 114 passed.
+
+### Convergence log (ninth run: GRH ⇒ finite norms, closing `grh_iff_finite_norm`)
+
+Done criteria were written first ([STEP3_PLAN.md](STEP3_PLAN.md)): `grh_iff_finite_norm` with no `sorry` and only the
+three standard axioms, full build and CI green, bridge lists matching the audit, pytest green, docs stating exactly
+what Lean checks.
+
+1. `LGrowth.lean`: bounded partial sums of χ, Mathlib's Abel summation `LSeries_eq_mul_integral` on Re s > 1 extended to
+   Re s > 0 by the identity theorem, and the conjugation symmetry. Two passes (a lemma name, a `linear_combination`
+   sign, a `whnf` timeout from `congr` on a `tsum`, fixed with `tsum_congr`).
+2. `InvLBound.lean`: the holomorphic logarithm on a disc from Mathlib's `isExactOn_ball`, then Borel–Carathéodory on
+   the disc of radius 7/2 − δ/2 around 4 + it. Two passes (`δ` is a reserved token again; one rewrite).
+3. `GRHToNorm.lean`: Γ decay by induction on Γ(s + 1) = sΓ(s), the rectangle contour shift with horizontal edges
+   O(T⁻²), Plancherel in the reverse direction by the substitution x = e^u, the Mellin transform
+   H(s) = Γ(s + 1)·dslope(1/L(1 − 2·, χ), 0)(s), its (1 + Im² s)⁻¹ bound, and the assembly. About ten passes, mostly
+   notation clashes (`L` from `LSeries.notation`, `[[a, b]]`) and one `set` that hid a constant from `linarith`.
+4. `GRHIff.lean`: the ⇐ direction now needs finite norms for χ only, through `LFunction_inv_conj`.
+5. The bridge's axiom parser missed names with a prime (`grh_of_finiteNorms'`) and its sorry-warning pattern used the
+   wrong quote; both fixed, with a test. Full build OK (7476 jobs), audit 23 proved and 1 open (`blowup_limit`),
+   numerics PASS, pytest 115 passed.
 
 ## Results of the full run
 
