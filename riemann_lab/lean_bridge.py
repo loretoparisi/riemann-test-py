@@ -60,6 +60,11 @@ PROVED = {
     "RiemannLab.finiteNorms_of_GRH": "GRH(chi) => int |M_chi|^2 x^(1-2 alpha) < oo for all alpha in (3/4, 1)",
     "RiemannLab.grh_of_finiteNorms'": "finite norms for chi alone => GRH(chi), chi primitive",
     "RiemannLab.grh_iff_finite_norm": "GRH(chi) <=> int |M_chi|^2 x^(1-2 alpha) < oo for all alpha in (3/4, 1)",
+    "RiemannLab.tendsto_psiχ_div": "sum_{n<=X} chi(n) Lambda(n) = o(X), chi != 1 (PNT in progressions)",
+    "RiemannLab.tendsto_Mμ_div": "sum_{n<=X} mu(n) chi(n) = o(X), chi != 1 (Landau)",
+    "RiemannLab.norm_LFunction_one_sub_Sχ_le": "|L(1, chi) - sum_{m<=k} chi(m)/m| <= 2N/k, chi != 1",
+    "RiemannLab.tendsto_sum_mu_div": "sum_{n<=X} mu(n) chi(n)/n -> 1/L(1, chi), chi != 1",
+    "RiemannLab.tendsto_M_partial": "sum_{n<=X} mu(n) chi(n)/n e^(-x/n^2) -> M_chi(x) (the Lean M), x > 0, chi != 1",
 }
 OPEN = {
     "RiemannLab.blowup_limit": "(alpha - 3/4) ||M_chi||^2 -> (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2, "
