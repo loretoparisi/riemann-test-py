@@ -200,8 +200,8 @@ $0<\Re\rho<1/2$ to a zero of $L(\cdot,\chi^{-1})$ at $1-\rho$, and $L(s,\chi^{-1
 zero of $L(\cdot,\chi)$ at $\overline{1-\rho}$, with real part in $(1/2,1)$.
 \end{proof}
 
-\begin{proposition}[Blow-up at the critical exponent]\label{prop:blowup}\status{conditional, sketch; Lean statement
-open: \lean{blowup_limit}}
+\begin{proposition}[Blow-up at the critical exponent]\label{prop:blowup}\status{conditional; Lean:
+\lean{blowup_limit_of_expansion} given the named hypothesis \lean{ZeroExpansion}; without it open: \lean{blowup_limit}}
 Assume GRH for primitive nonprincipal $\chi$, that all zeros $\rho$ in the strip are simple, and that
 $\sum_\rho|\Gamma(\frac{1-\rho}2)/L'(\rho,\chi)|<\infty$. Then
 \[\lim_{\alpha\to3/4^+}\Bigl(\alpha-\frac34\Bigr)\int_0^\infty|M_\chi(x)|^2x^{1-2\alpha}dx
@@ -213,6 +213,22 @@ $f(u)=\sum_\rho c_\rho e^{-i\gamma u/2}$, $c_\rho=\Gamma(\frac{1-\rho}2)/(2L'(\r
 almost periodic series. With $h=\alpha-3/4$ the left side is $h\int e^{-2hu}|f(u)|^2du+O(h)\to\frac12\,\mathrm{mean}|f|^2
 =\frac12\sum|c_\rho|^2$ by Parseval for almost periodic functions (distinct ordinates by simplicity).
 \end{proof}
+
+\begin{remark}[What Lean checks]\label{rem:blowup-lean}
+Lean proves the second half of this sketch. The first half, the expansion over the zeros, is a named hypothesis
+\lean{ZeroExpansion}: for $x>1$,
+\[M_\chi(x)=\sum_\rho c_\rho\,x^{-(1-\rho)/2}+r(x),\qquad c_\rho=-\frac{\Gamma(\frac{1-\rho}2)}{2L'(\rho,\chi)},\qquad
+\int_1^\infty|r(x)|^2x^{-1/2}\,dx<\infty .\]
+Under GRH, this hypothesis and $\sum_\rho|\Gamma(\frac{1-\rho}2)/L'(\rho,\chi)|<\infty$, \lean{blowup_limit_of_expansion}
+proves the limit of Proposition~\ref{prop:blowup} with only the standard axioms. It needs neither primitivity nor
+simplicity: simplicity enters only through the form of $c_\rho$ in the hypothesis. The proof goes through a
+mean-value lemma, \lean{tendsto_meanValue'}: if $\sum|c_i|<\infty$, $\Re s_i=-1/4$ and the $s_i$ are distinct, then
+$(\alpha-\frac34)\int_1^\infty|\sum c_ix^{s_i}|^2x^{1-2\alpha}dx\to\frac12\sum|c_i|^2$. Expanding the square gives
+$\sum_{i,j}c_i\bar c_j(\alpha-\frac34)/(2\alpha-\frac32-i(\Im s_i-\Im s_j))$, and dominated convergence for the double
+series keeps the diagonal only. The remainder and the range $(0,1]$ contribute $o(1)$ after multiplication by
+$\alpha-\frac34$. Proving \lean{ZeroExpansion} itself needs a contour shift to the right past all the zeros, with
+bounds for $1/L$ on horizontal lines that avoid them. That part is not formalised, and so \lean{blowup_limit} stays open.
+\end{remark}
 
 \begin{remark}[Coarse and fine spaces]
 A zero $\rho=\beta+i\gamma$ with $\beta>1/2$ moves the divergence to $\alpha=(1+\beta)/2>3/4$: the norm stays finite for
@@ -256,7 +272,8 @@ Plancherel theorems, \path{RiemannLab/MtBounds.lean} the bounds on $\Mt$,
 \path{RiemannLab/GRHFromNorm.lean} the direction ``finite norms $\Rightarrow$ GRH'';
 \path{RiemannLab/LGrowth.lean}, \path{RiemannLab/InvLBound.lean} and \path{RiemannLab/GRHToNorm.lean} the
 direction ``GRH $\Rightarrow$ finite norms'', \path{RiemannLab/GRHIff.lean} the equivalence, and
-\path{RiemannLab/MuSum.lean} Theorem~\ref{thm:musum}.
+\path{RiemannLab/MuSum.lean} Theorem~\ref{thm:musum}, and \path{RiemannLab/Blowup.lean} the blow-up given
+\lean{ZeroExpansion} (Remark~\ref{rem:blowup-lean}).
 \path{RiemannLab/Open.lean} contains the one open statement, ending in \texttt{sorry}.
 The main statements, verbatim:
 
@@ -339,6 +356,8 @@ Declaration & Status & \#print axioms \\
 \lean{grh_iff_finite_norm} & proved (an equivalence) & standard three \\
 twisted PNT, Landau and the $L(1)$ tail bound (\path{MuSum.lean}) & proved & standard three \\
 \lean{tendsto_sum_mu_div}, \lean{tendsto_M_partial} & proved & standard three \\
+\lean{tendsto_meanValue'} & proved & standard three \\
+\lean{blowup_limit_of_expansion} & proved from \lean{ZeroExpansion} & standard three \\
 \lean{blowup_limit} & open & includes \texttt{sorryAx} \\
 \bottomrule
 \end{tabular}
