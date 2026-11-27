@@ -51,7 +51,9 @@ def normSq (χ : DirichletCharacter ℂ N) (α : ℝ) : ℝ :=
 
 /-- **OPEN (sorry), conditional.** The blow-up at the critical exponent, with all hypotheses
 explicit: GRH, simple zeros, and absolute convergence of the zero expansion. Then
-`(α - 3/4) · ‖F_χ‖²_{D⁺_α} → B_χ = (1/8) Σ_ρ |Γ((1-ρ)/2) / L'(ρ, χ)|²` as `α ↓ 3/4`. -/
+`(α - 3/4) · ‖F_χ‖²_{D⁺_α} → B_χ = (1/8) Σ_ρ |Γ((1-ρ)/2) / L'(ρ, χ)|²` as `α ↓ 3/4`.
+The same limit is proved in `Blowup.lean` (`blowup_limit_of_expansion`) from the named hypothesis
+`ZeroExpansion χ`; what remains open here is that expansion. -/
 theorem blowup_limit (χ : DirichletCharacter ℂ N) (hprim : χ.IsPrimitive) (hχ : χ ≠ 1)
     (hGRH : GRH χ)
     (hsimple : ∀ ρ ∈ zeros χ, deriv (DirichletCharacter.LFunction χ) ρ ≠ 0)
