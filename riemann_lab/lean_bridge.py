@@ -65,12 +65,18 @@ PROVED = {
     "RiemannLab.norm_LFunction_one_sub_Sχ_le": "|L(1, chi) - sum_{m<=k} chi(m)/m| <= 2N/k, chi != 1",
     "RiemannLab.tendsto_sum_mu_div": "sum_{n<=X} mu(n) chi(n)/n -> 1/L(1, chi), chi != 1",
     "RiemannLab.tendsto_M_partial": "sum_{n<=X} mu(n) chi(n)/n e^(-x/n^2) -> M_chi(x) (the Lean M), x > 0, chi != 1",
+    "RiemannLab.tendsto_meanValue'": "(alpha - 3/4) int_1^oo |sum c_i x^(s_i)|^2 x^(1-2 alpha) -> (1/2) sum |c_i|^2, "
+                                     "Re s_i = -1/4, s_i distinct, sum |c_i| < oo",
+    "RiemannLab.blowup_limit_of_expansion": "(alpha - 3/4) ||M_chi||^2 -> (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2, "
+                                            "given GRH, the named hypothesis ZeroExpansion, absolute convergence",
 }
 OPEN = {
     "RiemannLab.blowup_limit": "(alpha - 3/4) ||M_chi||^2 -> (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2, "
                                "given GRH, simple zeros, absolute convergence",
 }
 NAMED_HYPOTHESES = {
+    "RiemannLab.ZeroExpansion": "M_chi(x) = sum_rho c_rho x^(-(1-rho)/2) + r(x) for x > 1, c_rho = -Gamma((1-rho)/2)/(2 L'(rho)), "
+                                "int_1^oo |r|^2 x^(-1/2) < oo; assumed in blowup_limit_of_expansion, not proved",
     "RiemannLab.MellinPlancherel": "Mellin-Plancherel on Re s = c; now proved (mellin_plancherel) and "
                                    "discharged for M~_chi in combined_norm_identity_unconditional",
 }
