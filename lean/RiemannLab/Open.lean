@@ -31,9 +31,9 @@ variable {N : ℕ} [NeZero N]
 The series converges only conditionally: `Σ |μ(n) χ(n)| / n` diverges. A Lean `tsum` of a series
 that is not absolutely summable is `0` by definition, so writing `M` as a `tsum` would silently
 make it the zero function. We therefore write it through the absolutely convergent `M̃_χ`:
-`M_χ(x) = M̃_χ(x) + Σ μ(n) χ(n)/n`, and use the classical value `Σ μ(n) χ(n)/n = 1/L(1, χ)` for
-`χ ≠ 1` (de la Vallée Poussin–Landau, a prime number theorem strength fact not in Mathlib) as the
-definition of the constant. -/
+`M_χ(x) = M̃_χ(x) + Σ μ(n) χ(n)/n`, with the value `Σ μ(n) χ(n)/n = 1/L(1, χ)` for `χ ≠ 1`.
+That value is proved in `MuSum.lean` (`tendsto_sum_mu_div`), and `tendsto_M_partial` there proves
+that the partial sums of the series converge to this `M χ x` for `x > 0`. -/
 def M (χ : DirichletCharacter ℂ N) (x : ℝ) : ℂ :=
   Mt χ x + 1 / DirichletCharacter.LFunction χ 1
 

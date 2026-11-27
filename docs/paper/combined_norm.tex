@@ -113,8 +113,9 @@ $L(s,\chi)=\sum\chi(n)n^{-s}$ for $\Re s>1$. Put
  \Mel f(s)=\int_0^\infty x^{s-1}f(x)\,dx .
 \]
 The series for $\Mt$ converges absolutely since $|g(t)|\le\min(t,1)$. For nonprincipal $\chi$ one has
-$\sum\mu(n)\chi(n)/n=1/L(1,\chi)$, so $\Mt=M_\chi-1/L(1,\chi)$; we use $\Mt$ as the definition, which is what Lean
-formalises, and check the identification numerically (Section~\ref{sec:numerics}).
+$\sum\mu(n)\chi(n)/n=1/L(1,\chi)$, so $\Mt=M_\chi-1/L(1,\chi)$. Lean defines $M_\chi=\Mt+1/L(1,\chi)$ and proves
+both that $\sum_{n\le X}\mu\chi(n)/n\to1/L(1,\chi)$ (\lean{tendsto_sum_mu_div}) and that the partial sums of the
+series for $M_\chi(x)$ converge to this $M_\chi(x)$ for $x>0$ (\lean{tendsto_M_partial}); see Section~\ref{sec:musum}.
 
 \begin{lemma}[Shifted Euler integral]\label{lem:euler}\status{Lean: \lean{mellin_g}}
 For $-1<\Re s<0$, $\int_0^\infty x^{s-1}(e^{-x}-1)\,dx=\Gamma(s)$.
@@ -222,6 +223,30 @@ the same gap as in Connes' trace-formula approach \cite{Connes}: the positivity 
 proved.
 \end{remark}
 
+\section{The value $\sum\mu(n)\chi(n)/n=1/L(1,\chi)$}\label{sec:musum}
+
+\begin{theorem}\label{thm:musum}\status{Lean: \lean{tendsto_sum_mu_div}, \lean{tendsto_M_partial}}
+Let $\chi\ne1$ be a Dirichlet character modulo $N$. Then $\sum_{n\le X}\mu(n)\chi(n)/n\to1/L(1,\chi)$ as $X\to\infty$,
+and for every $x>0$ the partial sums of $\sum_n\mu(n)\chi(n)n^{-1}e^{-x/n^2}$ converge to $\Mt(x)+1/L(1,\chi)$.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+(i) Orthogonality of characters and the prime number theorem in residue classes (in Mathlib) give
+$\psi_\chi(X)=\sum_{n\le X}\chi(n)\Lambda(n)=o(X)$. (ii) From $\mu\log=-\mu*\Lambda$ twisted by $\chi$,
+$\sum_{n\le X}\mu\chi(n)\log n=-\sum_{d\le X}\mu\chi(d)\psi_\chi(X/d)$, which is $o(X\log X)$; with Stirling this gives
+Landau's $M_\mu(X)=\sum_{n\le X}\mu\chi(n)=o(X)$. (iii) Abel summation gives $|L(1,\chi)-S(k)|\le2N/k$ for
+$S(k)=\sum_{m\le k}\chi(m)/m$, and the Dirichlet convolution $(\mu\chi/n)*(\chi/n)=\delta$ gives
+$\sum_{n\le X}\frac{\mu\chi(n)}{n}S(\lfloor X/n\rfloor)=1$. Hence $s(X)L(1,\chi)=1+T(X)$ with
+$T(X)=\sum_{n\le X}\frac{\mu\chi(n)}{n}\bigl(L(1,\chi)-S(\lfloor X/n\rfloor)\bigr)$. Split $T$ at $\lfloor X/n\rfloor=K$:
+the terms with $\lfloor X/n\rfloor\ge K$ add up to at most $4N/K$; the others are grouped into the blocks
+$X/(j+1)<n\le X/j$, $1\le j<K$, on each of which discrete Abel summation and (ii) bound
+$|\sum\mu\chi(n)/n|$ by $4\delta$ once $X$ is large. So $T(X)\to0$, and $L(1,\chi)\ne0$ (Mathlib) gives the first claim.
+(iv) The second follows by adding the absolutely convergent series for $\Mt(x)$.
+\end{proof}
+
+So the Lean definition $M_\chi=\Mt+1/L(1,\chi)$ is the sum of the Ramanujan--Hardy--Littlewood series, proved, not
+assumed, and every statement about $M_\chi$ in this paper is about that series.
+
 \section{Formal verification in Lean 4}\label{sec:lean}
 
 The project \texttt{lean/} builds against Lean~4.36.0 and Mathlib~v4.36.0 \cite{Mathlib}. The file
@@ -230,7 +255,8 @@ Plancherel theorems, \path{RiemannLab/MtBounds.lean} the bounds on $\Mt$,
 \path{RiemannLab/CombinedNormFull.lean} the hypothesis-free norm identity and
 \path{RiemannLab/GRHFromNorm.lean} the direction ``finite norms $\Rightarrow$ GRH'';
 \path{RiemannLab/LGrowth.lean}, \path{RiemannLab/InvLBound.lean} and \path{RiemannLab/GRHToNorm.lean} the
-direction ``GRH $\Rightarrow$ finite norms'', and \path{RiemannLab/GRHIff.lean} the equivalence.
+direction ``GRH $\Rightarrow$ finite norms'', \path{RiemannLab/GRHIff.lean} the equivalence, and
+\path{RiemannLab/MuSum.lean} Theorem~\ref{thm:musum}.
 \path{RiemannLab/Open.lean} contains the one open statement, ending in \texttt{sorry}.
 The main statements, verbatim:
 
@@ -311,6 +337,8 @@ Declaration & Status & \#print axioms \\
 \lean{integral_vertical_eq}, \lean{integrableOn_weighted_of_mellinInv} & proved & standard three \\
 \lean{fM_eq_mellinInv}, \lean{finiteNorms_of_GRH}, \lean{grh_of_finiteNorms'} & proved & standard three \\
 \lean{grh_iff_finite_norm} & proved (an equivalence) & standard three \\
+twisted PNT, Landau and the $L(1)$ tail bound (\path{MuSum.lean}) & proved & standard three \\
+\lean{tendsto_sum_mu_div}, \lean{tendsto_M_partial} & proved & standard three \\
 \lean{blowup_limit} & open & includes \texttt{sorryAx} \\
 \bottomrule
 \end{tabular}
@@ -324,10 +352,10 @@ theorem listed as open no longer depends on \texttt{sorryAx}. The same check run
 Caveats. First, Lean's Bochner integral is $0$ for non-integrable functions, so
 \lean{combined_norm_identity} states an equality of integrals and does not by itself assert that they are finite;
 in \lean{combined_norm_identity_unconditional} both sides are in fact finite, since the proof goes through
-Plancherel for an $L^1\cap L^2$ function. Second, $M_\chi$ is defined in Lean as $\Mt+1/L(1,\chi)$, i.e.\ we use
-$\sum\mu\chi(n)/n=1/L(1,\chi)$, a prime number theorem in progressions that is not formalised; it is checked
-numerically. A Lean \texttt{tsum} of the conditionally convergent series $\sum\mu\chi(n)n^{-1}e^{-x/n^2}$ would be $0$,
-which is why $M_\chi$ is not defined that way. Third, \lean{grh_iff_finite_norm} is an equivalence between two open
+Plancherel for an $L^1\cap L^2$ function. Second, $M_\chi$ is defined in Lean as $\Mt+1/L(1,\chi)$ rather than as a
+\texttt{tsum}, because a Lean \texttt{tsum} of the conditionally convergent series $\sum\mu\chi(n)n^{-1}e^{-x/n^2}$
+would be $0$; \lean{tendsto_M_partial} proves that this $M_\chi$ is the limit of the partial sums, so nothing is
+assumed. Third, \lean{grh_iff_finite_norm} is an equivalence between two open
 statements: it proves neither GRH nor the finiteness of any norm on $(3/4,1)$.
 
 \section{Numerical evidence}\label{sec:numerics}
