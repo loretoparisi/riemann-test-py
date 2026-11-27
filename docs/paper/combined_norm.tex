@@ -57,9 +57,10 @@ On the range $c\in(-1,0)$ the identity is unconditional, and we verify it in Lea
 transform of $\Mt=M_\chi-1/L(1,\chi)$ equals $\Gamma(s)/L(1-2s,\chi)$ on $-1<\Re s<0$ with no \texttt{sorry} and no
 axioms beyond Lean's standard three, and so does the norm identity, for which we also formalise Plancherel's
 theorem in integral form for $L^1\cap L^2$ functions and its Mellin version on a vertical line. On $c\in(0,1/4)$
-finiteness of the norm for all $c$ is equivalent to GRH. We prove in Lean the direction ``finite norms for $\chi$ and
-$\chi^{-1}$ imply GRH for $\chi$'', by holomorphic continuation and the identity theorem; the converse is equivalent to
-GRH and stays open. Under GRH and simplicity of zeros the norm blows up at $c=1/4$ with an explicit constant
+finiteness of the norm for all $c$ is equivalent to GRH, and we verify this equivalence in Lean as well: ``finite
+norms imply GRH'' by holomorphic continuation and the identity theorem, and ``GRH implies finite norms'' by a
+polynomial bound for $1/L$ from Borel--Carath\'eodory, Mellin inversion, a contour shift and Plancherel. Neither side
+of the equivalence is proved. Under GRH and simplicity of zeros the norm blows up at $c=1/4$ with an explicit constant
 $B_\chi=\frac18\sum_\rho|\Gamma(\frac{1-\rho}2)/L'(\rho,\chi)|^2$; this is stated in Lean and left open. We report numerical evidence for every part and a visibility
 estimate showing why such evidence says nothing about high zeros. Nothing in this paper proves GRH.
 \end{abstract}
@@ -167,8 +168,7 @@ Let $c=1-\alpha$ and $F_\chi(w)=\sum_n\mu(n)\chi(n)\,n/(1-in^2w)$, the Laplace t
 Laplace transform $\Phi$ of $\Mt$ in the weighted Bergman realisation of the discrete series $D^+_\alpha$ of
 $SL(2,\R)$ (the internal space of Majorana's infinite-component equation in $2+1$ dimensions), up to the constant
 $2\pi\,\Gamma(2\alpha-1)2^{1-2\alpha}$ coming from the Paley--Wiener isometry.
-\item \status{classical \cite{HL,GM}; $\Leftarrow$ in Lean (\lean{grh_of_finiteNorms}, assuming the norms
-finite for $\chi$ and $\chi^{-1}$); $\Rightarrow$ open (\lean{grh_iff_finite_norm})} For primitive
+\item \status{classical \cite{HL,GM}; the equivalence in Lean (\lean{grh_iff_finite_norm}); both sides open} For primitive
 nonprincipal $\chi$: GRH for $\chi$ holds if and only if $\int_0^\infty|M_\chi(x)|^2x^{1-2\alpha}dx<\infty$ for every
 $\alpha\in(3/4,1)$; then the same identity holds with $M_\chi$ in place of $\Mt$, i.e.\ $\|F_\chi\|^2_{D^+_\alpha}$
 equals the line integral.
@@ -181,14 +181,22 @@ $Z(\theta)=\sum n^{-1-2\theta}$, $0<\theta\le1$, used with $\theta=1$ near $0$ a
 both integrability conditions, and Proposition~\ref{prop:mellin} identifies $\Mel\Mt$ on the line.
 (ii) For $\Phi(w)=\int_0^\infty M(t)e^{iwt}dt$ on the upper half-plane, $\int_\R|\Phi(u+iv)|^2du=2\pi\int_0^\infty|M(t)|^2e^{-2vt}dt$;
 integrating against $v^{2\alpha-2}dv$ gives $\Gamma(2\alpha-1)2^{1-2\alpha}\cdot2\pi\int|M|^2t^{1-2\alpha}dt$.
-(iii) $\Rightarrow$: under GRH, $M_\chi=O(x^{-1/4+\varepsilon})$ \cite{GM} and $M_\chi\to1/L(1,\chi)$ at $0$, so the norm is
-finite for $c<1/4$. $\Leftarrow$ (the Lean proof): on $(1,\infty)$,
+(iii) $\Rightarrow$ (the Lean proof, \lean{finiteNorms_of_GRH}): for $\chi\ne1$ the partial sums $A(t)$ of $\chi$ are
+bounded by $N$, so $L(s,\chi)=s\int_1^\infty A(t)t^{-s-1}dt$ on $\Re s>0$ and $|L(s,\chi)|\le N|s|/\Re s$. Under GRH,
+$L(\cdot,\chi)$ has no zeros on $\Re w>1/2$, hence a holomorphic logarithm on each disc there; Borel--Carath\'eodory on
+the disc of radius $7/2-\delta/2$ around $4+it$ gives $|1/L(w,\chi)|\le C(|\Im w|+8)^K$ on $1/2+\delta\le\Re w\le3$.
+With $|\Gamma(s)||\Im s|^k\le\Gamma(\Re s+k)$, the Mellin transform
+$H(s)=\Gamma(s)\bigl(1/L(1-2s,\chi)-1/L(1,\chi)\bigr)$ of $f=\Mt-(e^{-x}-1)/L(1,\chi)$ is holomorphic and
+$O\bigl((1+\Im^2s)^{-1}\bigr)$ on $-1/2\le\Re s\le c$. Mellin inversion on $\Re s=-1/2$ and a rectangle contour shift write
+$f$ as the inverse Mellin transform of $H$ on $\Re s=c$, and Plancherel gives $\int_0^\infty|f|^2x^{2c-1}dx<\infty$;
+since $M_\chi=f+e^{-x}/L(1,\chi)$, the norm is finite. $\Leftarrow$ (the Lean proof): on $(1,\infty)$,
 $x^{\sigma-1}|M_\chi|\le|M_\chi|^2x^{1-2\alpha}+x^{2\sigma-3+2\alpha}$, so $x^{\sigma-1}M_\chi$ is integrable there for
 every $\sigma<1/4$; on $(0,1]$, $x^{\sigma-1}\Mt$ is integrable for $\sigma>-1$. Dominated differentiation makes
 $K(s)=s\bigl(\int_0^1x^{s-1}\Mt+\int_1^\infty x^{s-1}M_\chi\bigr)+1/L(1,\chi)$ holomorphic on $-1<\Re s<1/4$. For
 $-1<\Re s<0$, $K(s)=s\,\Mel\Mt(s)$, so $K(s)L(1-2s,\chi)=\Gamma(s+1)$; the identity theorem extends this to the whole
 strip, and $\Gamma(s+1)\ne0$ gives $L(w,\chi)\ne0$ for $1/2<\Re w<1$. The functional equation sends a zero with
-$0<\Re\rho<1/2$ to a zero of $L(\cdot,\chi^{-1})$ at $1-\rho$, which the same argument for $\chi^{-1}$ excludes.
+$0<\Re\rho<1/2$ to a zero of $L(\cdot,\chi^{-1})$ at $1-\rho$, and $L(s,\chi^{-1})=\overline{L(\bar s,\chi)}$ turns it into a
+zero of $L(\cdot,\chi)$ at $\overline{1-\rho}$, with real part in $(1/2,1)$.
 \end{proof}
 
 \begin{proposition}[Blow-up at the critical exponent]\label{prop:blowup}\status{conditional, sketch; Lean statement
@@ -220,8 +228,10 @@ The project \texttt{lean/} builds against Lean~4.36.0 and Mathlib~v4.36.0 \cite{
 \path{RiemannLab/CombinedNorm.lean} contains the Mellin identity, \path{RiemannLab/Plancherel.lean} the two
 Plancherel theorems, \path{RiemannLab/MtBounds.lean} the bounds on $\Mt$,
 \path{RiemannLab/CombinedNormFull.lean} the hypothesis-free norm identity and
-\path{RiemannLab/GRHFromNorm.lean} the direction ``finite norms $\Rightarrow$ GRH''. \path{RiemannLab/Open.lean}
-contains the open statements, each ending in \texttt{sorry}.
+\path{RiemannLab/GRHFromNorm.lean} the direction ``finite norms $\Rightarrow$ GRH'';
+\path{RiemannLab/LGrowth.lean}, \path{RiemannLab/InvLBound.lean} and \path{RiemannLab/GRHToNorm.lean} the
+direction ``GRH $\Rightarrow$ finite norms'', and \path{RiemannLab/GRHIff.lean} the equivalence.
+\path{RiemannLab/Open.lean} contains the one open statement, ending in \texttt{sorry}.
 The main statements, verbatim:
 
 \begin{Verbatim}
@@ -230,26 +240,26 @@ The main statements, verbatim:
 \kw{def} coef ($\chi$ : DirichletCharacter $\mathbb{C}$ N) (n : $\mathbb{N}$) : $\mathbb{C}$ := ($\nearrow$$\chi$ * $\nearrow$$\mu$) n / n
 \kw{def} Mt ($\chi$ : DirichletCharacter $\mathbb{C}$ N) (x : $\mathbb{R}$) : $\mathbb{C}$ := $\sum$' n : $\mathbb{N}$, coef $\chi$ n * g (b n * x)
 
-\kw{theorem} mellin_g {s : $\mathbb{C}$} (h1 : -1 < s.re) (h0 : s.re < 0) : mellin g s = Gamma s
+\kw{theorem} mellin_g \textbraceleft{}s : $\mathbb{C}$\textbraceright{} (h1 : -1 < s.re) (h0 : s.re < 0) : mellin g s = Gamma s
 
-\kw{theorem} mellin_Mt ($\chi$ : DirichletCharacter $\mathbb{C}$ N) {s : $\mathbb{C}$} (h1 : -1 < s.re) (h0 : s.re < 0) :
+\kw{theorem} mellin_Mt ($\chi$ : DirichletCharacter $\mathbb{C}$ N) \textbraceleft{}s : $\mathbb{C}$\textbraceright{} (h1 : -1 < s.re) (h0 : s.re < 0) :
     mellin (Mt $\chi$) s = Gamma s / LSeries $\nearrow$$\chi$ (1 - 2 * s)
 
 \kw{def} MellinPlancherel (f : $\mathbb{R}$ $\to$ $\mathbb{C}$) (c : $\mathbb{R}$) : \kw{Prop} :=
   $\int$ x in Ioi (0:$\mathbb{R}$), $\Vert$f x$\Vert$ ^ 2 * x ^ (2 * c - 1)
     = (1 / (2 * Real.pi)) * $\int$ t : $\mathbb{R}$, $\Vert$mellin f (c + t * I)$\Vert$ ^ 2
 
-\kw{theorem} combined_norm_identity ($\chi$ : DirichletCharacter $\mathbb{C}$ N) {$\alpha$ : $\mathbb{R}$} (h1 : 1 < $\alpha$) (h2 : $\alpha$ < 2)
+\kw{theorem} combined_norm_identity ($\chi$ : DirichletCharacter $\mathbb{C}$ N) \textbraceleft{}$\alpha$ : $\mathbb{R}$\textbraceright{} (h1 : 1 < $\alpha$) (h2 : $\alpha$ < 2)
     (hP : MellinPlancherel (Mt $\chi$) (1 - $\alpha$)) :
     $\int$ x in Ioi (0:$\mathbb{R}$), $\Vert$Mt $\chi$ x$\Vert$ ^ 2 * x ^ (1 - 2 * $\alpha$)
       = (1 / (2 * Real.pi)) * $\int$ t : $\mathbb{R}$,
           $\Vert$Gamma ((1 - $\alpha$ : $\mathbb{R}$) + t * I) / LSeries $\nearrow$$\chi$ (1 - 2 * ((1 - $\alpha$ : $\mathbb{R}$) + t * I))$\Vert$ ^ 2
 
-\kw{theorem} mellin_plancherel {f : $\mathbb{R}$ $\to$ $\mathbb{C}$} {c : $\mathbb{R}$} (hf1 : MellinConvergent f c)
+\kw{theorem} mellin_plancherel \textbraceleft{}f : $\mathbb{R}$ $\to$ $\mathbb{C}$\textbraceright{} \textbraceleft{}c : $\mathbb{R}$\textbraceright{} (hf1 : MellinConvergent f c)
     (hf2 : MellinConvergent (\kw{fun} x => (($\Vert$f x$\Vert$ ^ 2 : $\mathbb{R}$) : $\mathbb{C}$)) ((2 * c : $\mathbb{R}$) : $\mathbb{C}$)) :
     MellinPlancherel f c       -- stated in full in the source
 
-\kw{theorem} combined_norm_identity_unconditional ($\chi$ : DirichletCharacter $\mathbb{C}$ N) {$\alpha$ : $\mathbb{R}$}
+\kw{theorem} combined_norm_identity_unconditional ($\chi$ : DirichletCharacter $\mathbb{C}$ N) \textbraceleft{}$\alpha$ : $\mathbb{R}$\textbraceright{}
     (h1 : 1 < $\alpha$) (h2 : $\alpha$ < 2) : -- the conclusion of combined_norm_identity, no hP
 
 \kw{def} M ($\chi$ : DirichletCharacter $\mathbb{C}$ N) (x : $\mathbb{R}$) : $\mathbb{C}$ := Mt $\chi$ x + 1 / LFunction $\chi$ 1
@@ -259,6 +269,18 @@ The main statements, verbatim:
 
 \kw{theorem} grh_of_finiteNorms ($\chi$ : DirichletCharacter $\mathbb{C}$ N) (hprim : $\chi$.IsPrimitive) (h$\chi$ : $\chi$ $\ne$ 1)
     (hfin : FiniteNorms $\chi$) (hfin' : FiniteNorms $\chi\sp{-1}$) : GRH $\chi$
+
+\kw{theorem} norm_inv_LFunction_le ($\chi$ : DirichletCharacter $\mathbb{C}$ N) (h$\chi$ : $\chi$ $\ne$ 1) (hGRH : GRH $\chi$)
+    \textbraceleft{}d : $\mathbb{R}$\textbraceright{} (hd : 0 < d) (hd1 : d $\le$ 1) :
+    $\exists$ C K : $\mathbb{R}$, 0 $\le$ C $\wedge$ 0 $\le$ K $\wedge$ $\forall$ w : $\mathbb{C}$, 1 / 2 + d $\le$ w.re $\to$ w.re $\le$ 3 $\to$
+      $\Vert$(LFunction $\chi$ w)$\sp{-1}\Vert$ $\le$ C * (|w.im| + 8) ^ K
+
+\kw{theorem} finiteNorms_of_GRH ($\chi$ : DirichletCharacter $\mathbb{C}$ N) (h$\chi$ : $\chi$ $\ne$ 1) (hGRH : GRH $\chi$) :
+    FiniteNorms $\chi$
+
+\kw{theorem} grh_iff_finite_norm ($\chi$ : DirichletCharacter $\mathbb{C}$ N) (hprim : $\chi$.IsPrimitive) (h$\chi$ : $\chi$ $\ne$ 1) :
+    GRH $\chi$ $\leftrightarrow$ $\forall$ $\alpha$ $\in$ Ioo (3 / 4 : $\mathbb{R}$) 1,
+      IntegrableOn (\kw{fun} x : $\mathbb{R}$ => $\Vert$M $\chi$ x$\Vert$ ^ 2 * x ^ (1 - 2 * $\alpha$)) (Ioi 0)
 \end{Verbatim}
 
 The proof of \lean{mellin_g} uses Mathlib's integration by parts on $(0,\infty)$
@@ -267,7 +289,10 @@ The proof of \lean{mellin_g} uses Mathlib's integration by parts on $(0,\infty)$
 \lean{DirichletCharacter.LSeries.mul_mu_eq_one}. \lean{plancherel} uses \lean{Lp.fourier_toTemperedDistribution_eq}
 and \lean{ae_eq_of_integral_contDiff_smul_eq}; \lean{grh_of_finiteNorms} uses
 \lean{hasDerivAt_integral_of_dominated_loc_of_deriv_le}, \lean{AnalyticOnNhd.eqOn_of_preconnected_of_eventuallyEq}
-and \lean{IsPrimitive.completedLFunction_one_sub}. In total about 1000 lines.
+and \lean{IsPrimitive.completedLFunction_one_sub}. \lean{finiteNorms_of_GRH} uses Mathlib's Abel summation
+\lean{LSeries_eq_mul_integral}, primitives on discs (\lean{DifferentiableOn.isExactOn_ball}),
+\lean{Complex.borelCaratheodory}, \lean{integral_boundary_rect_eq_zero_of_differentiableOn},
+\lean{mellinInv_mellin_eq} and \lean{differentiableOn_dslope}. In total about 2200 lines.
 
 \subsection*{What Lean checks and what it does not}
 \begin{center}
@@ -282,7 +307,10 @@ Declaration & Status & \#print axioms \\
 \lean{combined_norm_identity_unconditional} & proved & standard three \\
 \lean{mellinOn_differentiableAt}, \lean{K_mul_LFunction_eq} & proved & standard three \\
 \lean{LFunction_ne_zero_of_finiteNorms}, \lean{grh_of_finiteNorms} & proved & standard three \\
-\lean{grh_iff_finite_norm} & open & includes \texttt{sorryAx} \\
+\lean{norm_LFunction_le}, \lean{LFunction_inv_conj}, \lean{norm_inv_LFunction_le} & proved & standard three \\
+\lean{integral_vertical_eq}, \lean{integrableOn_weighted_of_mellinInv} & proved & standard three \\
+\lean{fM_eq_mellinInv}, \lean{finiteNorms_of_GRH}, \lean{grh_of_finiteNorms'} & proved & standard three \\
+\lean{grh_iff_finite_norm} & proved (an equivalence) & standard three \\
 \lean{blowup_limit} & open & includes \texttt{sorryAx} \\
 \bottomrule
 \end{tabular}
@@ -293,14 +321,14 @@ The Python launcher
 \texttt{Audit.lean}, and fails if a theorem listed as proved depends on \texttt{sorryAx} or on any other axiom, or if a
 theorem listed as open no longer depends on \texttt{sorryAx}. The same check runs in continuous integration.
 
-Two caveats. First, Lean's Bochner integral is $0$ for non-integrable functions, so
+Caveats. First, Lean's Bochner integral is $0$ for non-integrable functions, so
 \lean{combined_norm_identity} states an equality of integrals and does not by itself assert that they are finite;
 in \lean{combined_norm_identity_unconditional} both sides are in fact finite, since the proof goes through
 Plancherel for an $L^1\cap L^2$ function. Second, $M_\chi$ is defined in Lean as $\Mt+1/L(1,\chi)$, i.e.\ we use
 $\sum\mu\chi(n)/n=1/L(1,\chi)$, a prime number theorem in progressions that is not formalised; it is checked
 numerically. A Lean \texttt{tsum} of the conditionally convergent series $\sum\mu\chi(n)n^{-1}e^{-x/n^2}$ would be $0$,
-which is why $M_\chi$ is not defined that way. Third, \lean{grh_of_finiteNorms} asks for finite norms for $\chi^{-1}$
-as well; they equal those for $\chi$ because $M_{\bar\chi}=\overline{M_\chi}$, which is not formalised.
+which is why $M_\chi$ is not defined that way. Third, \lean{grh_iff_finite_norm} is an equivalence between two open
+statements: it proves neither GRH nor the finiteness of any norm on $(3/4,1)$.
 
 \section{Numerical evidence}\label{sec:numerics}
 
@@ -334,8 +362,8 @@ about high zeros, and none of the numbers above bear on GRH beyond the zeros alr
 \section{Conclusion}
 The Hardy--Littlewood--Ramanujan criterion has a natural Hilbert-scale form in which Ramanujan's Master Theorem,
 Majorana's discrete-series norm and Masullo's line seminorms compute the same number. Its unconditional half is now a
-Lean theorem with no hypothesis, and so is the implication from finite norms to GRH. The converse implication is
-equivalent to GRH and remains open. The blow-up constant $B_\chi$ gives a quantitative form of the criterion, and the coarse/fine analysis shows
+Lean theorem with no hypothesis, and so is the equivalence between GRH and finiteness of the norms on $(3/4,1)$.
+Both sides of that equivalence remain open. The blow-up constant $B_\chi$ gives a quantitative form of the criterion, and the coarse/fine analysis shows
 that no coarse member of the scale can exclude off-line zeros.
 
 \begin{thebibliography}{9}

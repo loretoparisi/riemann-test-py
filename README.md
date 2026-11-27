@@ -29,15 +29,22 @@ integral form for L¹ ∩ L² functions (`plancherel`, derived from Mathlib's L�
 distributions), its Mellin form on a vertical line (`mellin_plancherel`), and the two integrability conditions for
 M̃_χ (`MtBounds.lean`).
 
-Lean also checks one direction of the GRH-sensitive half (Hardy–Littlewood 1918 for ζ, Garg–Maji 2022 for χ):
+Lean also checks the GRH-sensitive half as an equivalence (Hardy–Littlewood 1918 for ζ, Garg–Maji 2022 for χ):
 
-    if ∫₀^∞ |M_χ(x)|² x^{1−2α} dx < ∞ for every α ∈ (3/4, 1), for χ and for χ⁻¹,
-    then every zero of L(s, χ) with 0 < Re s < 1 has Re s = 1/2          (grh_of_finiteNorms, χ primitive)
+    for χ primitive, χ ≠ 1:
+    GRH(χ)  ⟺  ∫₀^∞ |M_χ(x)|² x^{1−2α} dx < ∞ for every α ∈ (3/4, 1)          (grh_iff_finite_norm)
 
-The proof continues K(s) = s(∫₀¹ x^{s−1}M̃_χ + ∫₁^∞ x^{s−1}M_χ) + 1/L(1, χ) holomorphically to −1 < Re s < 1/4,
-shows K(s) L(1 − 2s, χ) = Γ(s + 1) there by the identity theorem, and uses the functional equation for the zeros
-left of 1/2. This is a conditional statement: it does not say the norms are finite. Proving they are finite is
-equivalent to GRH and is not attempted.
+⇐ (`grh_of_finiteNorms'`): K(s) = s(∫₀¹ x^{s−1}M̃_χ + ∫₁^∞ x^{s−1}M_χ) + 1/L(1, χ) continues holomorphically to
+−1 < Re s < 1/4, K(s) L(1 − 2s, χ) = Γ(s + 1) there by the identity theorem, and the functional equation plus
+L(s, χ⁻¹) = conj L(conj s, χ) handle the zeros left of 1/2.
+
+⇒ (`finiteNorms_of_GRH`): Abel summation gives |L(s, χ)| ≤ N|s|/Re s on Re s > 0; under GRH, a holomorphic
+logarithm of L on discs in Re w > 1/2 and Borel–Carathéodory turn that into |1/L(w, χ)| ≤ C(|Im w| + 8)^K on
+1/2 + δ ≤ Re w ≤ 3; with |Γ(s)| |Im s|^k ≤ Γ(Re s + k) this makes the Mellin transform of M̃_χ − (e^{−x} − 1)/L(1, χ)
+decay like (1 + Im² s)⁻¹ on −1/2 ≤ Re s ≤ 1 − α. Mellin inversion, a rectangle contour shift and Plancherel then give
+the finite norm.
+
+This is an equivalence, not a proof of GRH: neither side is proved, and nothing here says the norms are finite.
 
 This is the unconditional half of the combined Ramanujan + Majorana + Masullo equation: the left side is the
 Ramanujan/Laplace side, which equals Majorana's discrete-series norm ‖F_χ‖²_{D⁺_α} (checked numerically), and the
@@ -45,8 +52,9 @@ right side is Masullo's line seminorm.
 
 | Status | What |
 | --- | --- |
-| **proved** (Lean) | shifted Euler integral ∫x^{s−1}(e^{−x} − 1) = Γ(s); the Tonelli bound and Fubini interchange; the Mellin identity; Plancherel for L¹ ∩ L²; Mellin–Plancherel; the norm identity on 1 < α < 2; finite norms (for χ and χ⁻¹) ⇒ GRH(χ) |
-| **open, stated with `sorry`** (Lean) | GRH(χ) ⇒ the norm is finite for every α ∈ (3/4, 1) (so the full ⇔ stays open); the blow-up (α − 3/4)‖M_χ‖² → B_χ under GRH and simple zeros |
+| **proved** (Lean) | shifted Euler integral ∫x^{s−1}(e^{−x} − 1) = Γ(s); the Tonelli bound and Fubini interchange; the Mellin identity; Plancherel for L¹ ∩ L²; Mellin–Plancherel; the norm identity on 1 < α < 2; GRH(χ) ⟺ finite norms for every α ∈ (3/4, 1) |
+| **conditional** (Lean, as an equivalence) | GRH(χ) itself and the finiteness of the norms on (3/4, 1): each is equivalent to the other, neither is proved |
+| **open, stated with `sorry`** (Lean) | the blow-up (α − 3/4)‖M_χ‖² → B_χ under GRH and simple zeros |
 | **definition note** | M_χ is defined in Lean as M̃_χ + 1/L(1, χ), using the classical value Σ μ(n)χ(n)/n = 1/L(1, χ) (a prime number theorem strength fact that is not in Mathlib). The series for M_χ converges only conditionally, and a Lean `tsum` of such a series is 0, so the earlier `tsum` definition made M_χ the zero function. That bug made the old open statements say the wrong thing and is fixed here |
 | **numerical** | the four-way equality of the norm, the blow-up constant, the off-line-zero controls ([docs/TESTS.md](docs/TESTS.md)) |
 
@@ -59,8 +67,8 @@ theorem listed as open stops needing it.
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Unit tests | `pytest -q` | 114 tests pass (the Lean audit test skips when lake is absent) |
-| Lean build + audit + numerics | `python -m riemann_lab lean` | PASS (14 proved, 2 open) |
+| Unit tests | `pytest -q` | 115 tests pass (the Lean audit test skips when lake is absent) |
+| Lean build + audit + numerics | `python -m riemann_lab lean` | PASS (23 proved, 1 open) |
 | Original checks | `python -m riemann_lab report` | zeros on the line in 3 windows to t = 10^6, Robin, Lagarias, Mertens, Li, Weil, GUE |
 | Extended criteria | `python -m riemann_lab extended` | 7/7 consistent |
 | Ramanujan × Masullo | `python -m riemann_lab ramanujan` | 8/8 consistent |
