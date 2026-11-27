@@ -1,4 +1,4 @@
-"""Command line: python -m riemann_lab {report,extended,ramanujan,majorana,hlr,combined,lean,plots,verify,turing} ..."""
+"""Command line: python -m riemann_lab {report,extended,ramanujan,majorana,hlr,combined,majorana-hp,lean,plots,verify,turing} ..."""
 from __future__ import annotations
 
 import argparse
@@ -66,6 +66,12 @@ def main(argv=None):
     cb.add_argument("--quick", action="store_true")
     cb.add_argument("--only", nargs="*", help="subset, e.g. line_norm majorana_holomorphic critical_blowup "
                     "off_line_control visibility")
+    mh = sub.add_parser("majorana-hp", help="Majorana's infinite-component tower as a Hilbert-Polya frame: oscillator "
+                        "singleton, boost spectral measure, combined norm as a tower sum, zeros as point spectrum, "
+                        "off-line-zero control")
+    mh.add_argument("--quick", action="store_true")
+    mh.add_argument("--only", nargs="*", help="subset, e.g. oscillator_singleton boost_spectral_measure tower_norm "
+                    "boost_point_spectrum off_line_control")
     ln = sub.add_parser("lean", help="Lean 4 + Mathlib: build lean/, audit axioms (proved vs sorry), numeric cross-check")
     ln.add_argument("--skip-build", action="store_true")
     ln.add_argument("--skip-numerics", action="store_true")
@@ -93,6 +99,9 @@ def main(argv=None):
     elif a.cmd == "combined":
         from . import combined_checks
         combined_checks.run(a.quick, a.only)
+    elif a.cmd == "majorana-hp":
+        from . import majorana_hp_checks
+        majorana_hp_checks.run(a.quick, a.only)
     elif a.cmd == "lean":
         import sys
         from . import lean_bridge

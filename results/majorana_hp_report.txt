@@ -1,0 +1,92 @@
+== riemann-lab: Majorana's infinite-component tower as a Hilbert-Polya frame (criteria in docs/majorana_hp_done_criteria.md) ==
+   (the operator is built from L itself: it locates zeros on a line, it cannot exclude zeros off it;
+    numerical evidence, not proof; 'CONSISTENT' = every criterion met)
+
+[oscillator-singleton] CONSISTENT  (2.5s)
+    N = 400: su(1,1) relations 5.5e-16, Casimir even sector (k = 1/4) 3.6e-16, odd (k = 3/4) 3.6e-16 (relative); even sector vs Plyushchay D+_1/4 2.8e-14; (xp + px)/2 + 2 K2 5.7e-14
+    N = 800: su(1,1) relations 5.5e-16, Casimir even sector (k = 1/4) 3.6e-16, odd (k = 3/4) 3.6e-16 (relative); even sector vs Plyushchay D+_1/4 5.7e-14; (xp + px)/2 + 2 K2 1.1e-13
+    Hermite coefficients of e^(-x^2/2n^2), n = 2, 3, 7 (levels <= 80): quadrature vs squeezed-vacuum closed form, max diff 1.7e-15
+    <phi0, e^(-i 0.5 D) phi0>: tower 0.941710615831681, Fourier of |Gamma(1/4 + iE/2)|^2 0.941710615831676, (cosh)^(-1/2) 0.941710615831676
+    <phi0, e^(-i 1.0 D) phi0>: tower 0.805018182194602, Fourier of |Gamma(1/4 + iE/2)|^2 0.805018182194592, (cosh)^(-1/2) 0.805018182194592
+    <phi0, e^(-i 2.0 D) phi0>: tower 0.515560111756226, Fourier of |Gamma(1/4 + iE/2)|^2 0.515560111756214, (cosh)^(-1/2) 0.515560111756214
+    So at Bargmann index 1/4 the Majorana representation is the even oscillator sector, its boost is
+    Berry-Keating's xp (D = -2 K2), and the spectral measure of D on the ground state is |Gamma(1/4 + iE/2)|^2,
+    the weight of Masullo's critical line. M_chi(x^2) = sum mu chi(n)/n e^(-x^2/n^2) is a Moebius sum of
+    squeezed vacua U(log n) phi0. 
+
+[boost-spectral-measure] CONSISTENT  (5.9s)
+    k = 0.05: K1 = (J+ + J-)/2 0e+00; mass tower 55.772170035410952, closed 55.772170035410923, quad 55.772170035410916; moments E^(2m), m <= 10: 6.7e-16; char. function n = 200: 5.2e-16, n = 400: 6.4e-16
+    k = 0.1: K1 = (J+ + J-)/2 0e+00; mass tower 25.111136995458779, closed 25.111136995458768, quad 25.111136995458764; moments E^(2m), m <= 10: 4.4e-16; char. function n = 200: 1.0e-15, n = 400: 2.9e-16
+    k = 0.15: K1 = (J+ + J-)/2 0e+00; mass tower 15.267569023672898, closed 15.267569023672893, quad 15.267569023672893; moments E^(2m), m <= 10: 4.4e-16; char. function n = 200: 2.3e-16, n = 400: 4.8e-16
+    k = 0.2: K1 = (J+ + J-)/2 0e+00; mass tower 10.562352328873052, closed 10.562352328873040, quad 10.562352328873041; moments E^(2m), m <= 10: 4.4e-16; char. function n = 200: 5.3e-16, n = 400: 1.2e-15
+    k = 0.25: K1 = (J+ + J-)/2 0e+00; mass tower 7.874804972861206, closed 7.874804972861208, quad 7.874804972861210; moments E^(2m), m <= 10: 4.4e-16; char. function n = 200: 9.6e-16, n = 400: 4.8e-16
+    The n-level Majorana tower in D+_k is the Gauss rule of |Gamma(k + iE)|^2 dE: its eigenvalues are the
+    boost's 'discrete spectrum' at truncation n, and they fill the line as n grows. 
+
+[tower-norm] CONSISTENT  (380.8s)
+    zeta    tower sum, n = 200, 400, 800, vs adaptive quadrature: k=0.05: 0.8488880592 (err 7.9e-07, 1.1e-07, 1.4e-08; p = 2.89; node spacing at -gamma1/2 0.58 vs peak width 0.20); k=0.1: 0.9229653599 (err 1.3e-06, 1.9e-07, 2.7e-08; p = 2.79; node spacing at -gamma1/2 0.58 vs peak width 0.15); k=0.15: 1.012496335 (err 2.1e-06, 3.2e-07, 5.1e-08; p = 2.68; node spacing at -gamma1/2 0.58 vs peak width 0.10); k=0.2: 1.120531655 (err 3.4e-06, 5.6e-07, 9.5e-08; p = 2.58; node spacing at -gamma1/2 0.58 vs peak width 0.05)
+    chi3_1  tower sum, n = 200, 400, 800, vs adaptive quadrature: k=0.05: 25.59743587 (err 1.6e-06, 4.7e-07, 1.7e-07; p = 1.60; node spacing at -gamma1/2 0.53 vs peak width 0.20); k=0.1: 12.19636474 (err 6.1e-06, 2.0e-06, 7.9e-07; p = 1.48; node spacing at -gamma1/2 0.53 vs peak width 0.15); k=0.15: 7.881514939 (err 1.8e-05, 6.5e-06, 2.8e-06; p = 1.35; node spacing at -gamma1/2 0.53 vs peak width 0.10); k=0.2: 5.823716826 (err 4.8e-05, 1.9e-05, 9.6e-06; p = 1.17; node spacing at -gamma1/2 0.53 vs peak width 0.05)
+    chi4    tower sum, n = 200, 400, 800, vs adaptive quadrature: k=0.05: 14.84148492 (err 1.8e-06, 2.7e-06, 2.2e-06; p = -0.12; node spacing at -gamma1/2 0.50 vs peak width 0.20); k=0.1: 6.911507563 (err 9.0e-06, 1.6e-05, 1.1e-05; p = -0.16; node spacing at -gamma1/2 0.50 vs peak width 0.15); k=0.15: 4.360451172 (err 3.7e-05, 7.8e-05, 4.5e-05; p = -0.15; node spacing at -gamma1/2 0.51 vs peak width 0.10); k=0.2: 3.141959428 (err 1.7e-04, 4.6e-04, 1.9e-04; p = -0.08; node spacing at -gamma1/2 0.51 vs peak width 0.05)
+    chi5_1  tower sum, n = 200, 400, 800, vs adaptive quadrature: k=0.05: 11.45019798 (err 3.1e-05, 2.5e-05, 3.5e-05; p = -0.10; node spacing at -gamma1/2 0.50 vs peak width 0.20); k=0.1: 5.260645174 (err 1.7e-04, 9.5e-05, 1.9e-04; p = -0.10; node spacing at -gamma1/2 0.50 vs peak width 0.15); k=0.15: 3.270843691 (err 8.0e-04, 1.8e-04, 8.6e-04; p = -0.05; node spacing at -gamma1/2 0.51 vs peak width 0.10); k=0.2: 2.319574662 (err 4.1e-03, 9.2e-04, 4.1e-03; p = -0.00; node spacing at -gamma1/2 0.51 vs peak width 0.05)
+    chi5_2  tower sum, n = 200, 400, 800, vs adaptive quadrature: k=0.05: 53.51140028 (err 8.4e-04, 4.5e-04, 2.4e-04; p = 0.90; node spacing at -gamma1/2 0.50 vs peak width 0.20); k=0.1: 27.2866821 (err 3.2e-03, 1.9e-03, 1.1e-03; p = 0.80; node spacing at -gamma1/2 0.50 vs peak width 0.15); k=0.15: 19.10695456 (err 9.2e-03, 5.7e-03, 3.5e-03; p = 0.70; node spacing at -gamma1/2 0.51 vs peak width 0.10); k=0.2: 15.52547807 (err 2.3e-02, 1.5e-02, 1.0e-02; p = 0.60; node spacing at -gamma1/2 0.51 vs peak width 0.05)
+    chi5_3  tower sum, n = 200, 400, 800, vs adaptive quadrature: k=0.05: 11.45019798 (err 3.1e-05, 2.5e-05, 3.5e-05; p = -0.10; node spacing at -gamma1/2 0.48 vs peak width 0.20); k=0.1: 5.260645174 (err 1.7e-04, 9.5e-05, 1.9e-04; p = -0.10; node spacing at -gamma1/2 0.48 vs peak width 0.15); k=0.15: 3.270843691 (err 8.0e-04, 1.8e-04, 8.6e-04; p = -0.05; node spacing at -gamma1/2 0.48 vs peak width 0.10); k=0.2: 2.319574662 (err 4.1e-03, 9.2e-04, 4.1e-03; p = -0.00; node spacing at -gamma1/2 0.48 vs peak width 0.05)
+    No zeros are used: (1/2pi) sum_j w_j / |L(1 - 2k - 2i E_j)|^2 over the eigenvalues of the truncated boost.
+    Resolution limit: near height E the tower's eigenvalues are spaced ~ pi/log(n/E) (0.5 at n = 800, E = 3), so a
+    peak of width 1/4 - k at a low zero is sampled with an aliasing error ~ exp(-2 pi (1/4 - k)/spacing) =
+    (n/E)^(-2(1/4 - k)): negligible for zeta (first zero at E = 7, weight e^(-7 pi)), slow and non-monotone for
+    characters with zeros near E = 3 (errors up to 1e-2 at n = 800).
+    A finite Majorana tower cannot resolve the critical line (k -> 1/4) at any n. 
+
+[boost-point-spectrum] CONSISTENT  (119.0s)
+    zeta: window |E| < 19.5, 12 peaks in it, Jacobi matrix of size n = 44 (and 28)
+      gamma = +14.134725: |node - E0| at h = 1e-3, 1e-4, 1e-5: 1.4e-03, 1.5e-04, 1.5e-05 (x9.9, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999856; n = 28: 5.7e-06, 0.999939; 24 vs 32 panel nodes 5e-15
+      gamma = +21.022040: |node - E0| at h = 1e-3, 1e-4, 1e-5: 1.3e-03, 1.3e-04, 1.3e-05 (x9.9, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999898; n = 28: 4.1e-06, 0.999958; 24 vs 32 panel nodes 1e-14
+      gamma = +25.010858: |node - E0| at h = 1e-3, 1e-4, 1e-5: 3.1e-03, 3.2e-04, 3.2e-05 (x9.9, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999719; n = 28: 5.3e-06, 0.999993; 24 vs 32 panel nodes 4e-15
+      gamma = +30.424876: |node - E0| at h = 1e-3, 1e-4, 1e-5: 2.1e-03, 2.1e-04, 2.1e-05 (x9.9, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999867; n = 28: 1.1e-05, 1.000003; 24 vs 32 panel nodes 1e-14
+      gamma = -14.134725: |node - E0| at h = 1e-3, 1e-4, 1e-5: 1.4e-03, 1.5e-04, 1.5e-05 (x9.9, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999856; n = 28: 5.7e-06, 0.999939; 24 vs 32 panel nodes 4e-15
+      gamma = -21.022040: |node - E0| at h = 1e-3, 1e-4, 1e-5: 1.3e-03, 1.3e-04, 1.3e-05 (x9.9, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999898; n = 28: 4.1e-06, 0.999958; 24 vs 32 panel nodes 2e-15
+      gamma = -25.010858: |node - E0| at h = 1e-3, 1e-4, 1e-5: 3.1e-03, 3.2e-04, 3.2e-05 (x9.9, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999719; n = 28: 5.3e-06, 0.999993; 24 vs 32 panel nodes 0e+00
+      gamma = -30.424876: |node - E0| at h = 1e-3, 1e-4, 1e-5: 2.1e-03, 2.1e-04, 2.1e-05 (x9.9, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999867; n = 28: 1.1e-05, 1.000003; 24 vs 32 panel nodes 2e-14
+      sum of h w over the tracked zeros 2.139459e-10 vs their share of B_chi 2.139767e-10 (rel. 1.4e-04)
+    chi4: window |E| < 10.5, 10 peaks in it, Jacobi matrix of size n = 42 (and 26)
+      gamma = +6.020949: |node - E0| at h = 1e-3, 1e-4, 1e-5: 4.4e-03, 4.8e-04, 4.8e-05 (x9.3, x9.9 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999289; n = 26: 1.5e-06, 0.999977; 24 vs 32 panel nodes 2e-15
+      gamma = +10.243770: |node - E0| at h = 1e-3, 1e-4, 1e-5: 2.0e-03, 2.0e-04, 2.0e-05 (x9.8, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999791; n = 26: 1.6e-06, 0.999997; 24 vs 32 panel nodes 4e-15
+      gamma = +12.988098: |node - E0| at h = 1e-3, 1e-4, 1e-5: 3.3e-04, 3.4e-05, 3.4e-06 (x10.0, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999961; n = 26: 1.8e-03, 0.775978; 24 vs 32 panel nodes 3e-15
+      gamma = -6.020949: |node - E0| at h = 1e-3, 1e-4, 1e-5: 4.4e-03, 4.8e-04, 4.8e-05 (x9.3, x9.9 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999289; n = 26: 1.5e-06, 0.999977; 24 vs 32 panel nodes 4e-16
+      gamma = -10.243770: |node - E0| at h = 1e-3, 1e-4, 1e-5: 2.0e-03, 2.0e-04, 2.0e-05 (x9.8, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999791; n = 26: 1.6e-06, 0.999997; 24 vs 32 panel nodes 4e-15
+      gamma = -12.988098: |node - E0| at h = 1e-3, 1e-4, 1e-5: 3.3e-04, 3.4e-05, 3.4e-06 (x10.0, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999961; n = 26: 1.8e-03, 0.775978; 24 vs 32 panel nodes 9e-15
+      sum of h w over the tracked zeros 4.130242e-05 vs their share of B_chi 4.133182e-05 (rel. 7.1e-04)
+    chi3_1: window |E| < 12.0, 10 peaks in it, Jacobi matrix of size n = 42 (and 26)
+      gamma = +8.039737: |node - E0| at h = 1e-3, 1e-4, 1e-5: 3.1e-03, 3.2e-04, 3.2e-05 (x9.7, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999750; n = 26: 1.7e-05, 0.999880; 24 vs 32 panel nodes 4e-13
+      gamma = +11.249206: |node - E0| at h = 1e-3, 1e-4, 1e-5: 5.6e-04, 5.6e-05, 5.6e-06 (x10.0, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999942; n = 26: 2.1e-05, 1.000028; 24 vs 32 panel nodes 7e-14
+      gamma = +15.704619: |node - E0| at h = 1e-3, 1e-4, 1e-5: 7.8e-03, 8.9e-04, 9.1e-05 (x8.7, x9.8 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.997847; n = 26: 2.8e-06, 0.999986; 24 vs 32 panel nodes 7e-12
+      gamma = -8.039737: |node - E0| at h = 1e-3, 1e-4, 1e-5: 3.1e-03, 3.2e-04, 3.2e-05 (x9.7, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999750; n = 26: 1.7e-05, 0.999880; 24 vs 32 panel nodes 4e-13
+      gamma = -11.249206: |node - E0| at h = 1e-3, 1e-4, 1e-5: 5.6e-04, 5.6e-05, 5.6e-06 (x10.0, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999942; n = 26: 2.1e-05, 1.000028; 24 vs 32 panel nodes 6e-14
+      gamma = -15.704619: |node - E0| at h = 1e-3, 1e-4, 1e-5: 7.8e-03, 8.9e-04, 9.1e-05 (x8.7, x9.8 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.997847; n = 26: 2.8e-06, 0.999986; 24 vs 32 panel nodes 7e-12
+      sum of h w over the tracked zeros 1.890852e-06 vs their share of B_chi 1.891325e-06 (rel. 2.5e-04)
+    chi5_1: window |E| < 10.5, 12 peaks in it, Jacobi matrix of size n = 44 (and 28)
+      gamma = +6.183578: |node - E0| at h = 1e-3, 1e-4, 1e-5: 2.2e-03, 2.2e-04, 2.2e-05 (x9.8, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999732; n = 28: 3.8e-06, 0.999996; 24 vs 32 panel nodes 4e-15
+      gamma = +8.457229: |node - E0| at h = 1e-3, 1e-4, 1e-5: 4.4e-04, 4.4e-05, 4.4e-06 (x10.0, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999950; n = 28: 9.4e-06, 0.999935; 24 vs 32 panel nodes 4e-15
+      gamma = +12.674946: |node - E0| at h = 1e-3, 1e-4, 1e-5: 5.1e-04, 5.1e-05, 5.1e-06 (x9.9, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999962; n = 28: 6.1e-05, 0.999514; 24 vs 32 panel nodes 6e-15
+      gamma = -4.132904: |node - E0| at h = 1e-3, 1e-4, 1e-5: 1.5e-04, 1.5e-05, 1.5e-06 (x10.0, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999971; n = 28: 1.1e-06, 0.999985; 24 vs 32 panel nodes 0e+00
+      gamma = -9.442931: |node - E0| at h = 1e-3, 1e-4, 1e-5: 2.2e-04, 2.2e-05, 2.2e-06 (x10.0, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999982; n = 28: 1.5e-05, 0.999943; 24 vs 32 panel nodes 0e+00
+      gamma = -11.282896: |node - E0| at h = 1e-3, 1e-4, 1e-5: 2.4e-04, 2.4e-05, 2.4e-06 (x10.0, x10.0 per decade); h w / (|Gamma|^2/8|L'|^2) = 0.999969; n = 28: 1.1e-06, 1.000004; 24 vs 32 panel nodes 6e-15
+      sum of h w over the tracked zeros 6.870947e-04 vs their share of B_chi 6.871192e-04 (rel. 3.6e-05)
+    The Jacobi matrix of |Gamma(k + iE)/L(1 - 2k - 2iE)|^2 dE (the Majorana boost in the Masullo norm) has
+    eigenvalues within O(1/4 - k) of -gamma/2 for each tracked zero, carrying the zero's share of B_chi/(1/4 - k).
+    Order of limits: h -> 0 at fixed n gives the point spectrum; n -> oo at fixed h resolves the peaks into a
+    continuum again. n must exceed the number of peaks by enough nodes for the smooth part: with n = peaks + 16
+    the third chi4 zero kept only 78% of its mass at h = 1e-5 (second full run). 
+
+[off-line-control] CONSISTENT  (12.2s)
+    model zeta, first pair moved to 3/5 +- i gamma1: at k = 1/4 - h the node nearest -gamma1/2 has h w = 9.19e-12, 8.90e-13, 8.91e-14 (x10.3, x10.0 per decade -> 0: no point mass; the on-line zero would carry 1.07e-10)
+      on-line zero gamma = 21.022040 of the model still locks: |node - E0| 1.2e-03, 9.9e-05, 9.7e-06, h w / pred = 0.99974
+      on-line zero gamma = 25.010858 of the model still locks: |node - E0| 1.6e-02, 1.6e-03, 1.6e-04, h w / pred = 1.00025
+    at k = 1/5 - h (the line through the moved zero) it locks: |node - E0| 1.3e-03, 2.1e-04, 2.3e-05 (x6.3, x9.5), h w / (|Gamma((1-rho')/2)|^2/8|L~'(rho')|^2) = 1.00416
+    visibility: in D+_0.05 zeros above |gamma| = 19.5 carry weight below 1e-16 of the total and are invisible to every check here
+    visibility: in D+_0.25 zeros above |gamma| = 22.2 carry weight below 1e-16 of the total and are invisible to every check here
+    So the Majorana boost sees a zero beta + i gamma as point spectrum only in D+_k with k = (1 - beta)/2. The
+    critical space k = 1/4 sees exactly the zeros on the line; an off-line zero is simply absent there. Proving
+    that no D+_k with k < 1/4 carries point spectrum is the statement L != 0 on 1/2 < Re s < 1: GRH itself. 
+
+5/5 checks consistent; done in 520.4s
