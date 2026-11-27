@@ -43,6 +43,11 @@ checks of the same statements. A theorem counts as proved only if its axioms are
 | proved | `finiteNorms_of_GRH` | GRH(χ) ⇒ finite norms for all α ∈ (3/4, 1), χ ≠ 1 |
 | proved | `grh_of_finiteNorms'` | finite norms for χ alone ⇒ GRH(χ), χ primitive, χ ≠ 1 |
 | proved | `grh_iff_finite_norm` | GRH(χ) ⟺ finite norms for all α ∈ (3/4, 1), χ primitive, χ ≠ 1 (an equivalence; neither side is proved) |
+| proved | `tendsto_psiχ_div` | Σ_{n≤X} χ(n)Λ(n) = o(X), χ ≠ 1 (from Mathlib's prime number theorem in progressions) |
+| proved | `tendsto_Mμ_div` | Σ_{n≤X} μ(n)χ(n) = o(X), χ ≠ 1 (Landau, via Σ μχ log = −Σ μχ(d) ψ_χ(X/d)) |
+| proved | `norm_LFunction_one_sub_Sχ_le` | \|L(1, χ) − Σ_{m≤k} χ(m)/m\| ≤ 2N/k, χ ≠ 1 |
+| proved | `tendsto_sum_mu_div` | Σ_{n≤X} μ(n)χ(n)/n → 1/L(1, χ), χ ≠ 1 |
+| proved | `tendsto_M_partial` | Σ_{n≤X} μ(n)χ(n)/n · e^{−x/n²} → M_χ(x) (the Lean M), x > 0, χ ≠ 1 |
 | open (`sorry`) | `blowup_limit` | (α − 3/4)\|\|M_χ\|\|² → B_χ, given GRH, simple zeros, absolute convergence |
 
 Numerical cross-checks of the Lean statements (all PASS): `mellin_g` to 10^−30 at four points; K(σ) = −Γ(σ) to 10^−17;
@@ -90,6 +95,22 @@ what Lean checks.
 5. The bridge's axiom parser missed names with a prime (`grh_of_finiteNorms'`) and its sorry-warning pattern used the
    wrong quote; both fixed, with a test. Full build OK (7476 jobs), audit 23 proved and 1 open (`blowup_limit`),
    numerics PASS, pytest 115 passed.
+
+### Convergence log (tenth run: Σ μ(n)χ(n)/n = 1/L(1, χ))
+
+Done criteria are in [STEP5_PLAN.md](STEP5_PLAN.md). Everything is in `MuSum.lean`.
+
+1. Twisted PNT: orthogonality of characters turns Mathlib's `tendsto_sum_residueClass_div_atTop` into
+   ψ_χ(X) = o(X). One pass (a cast normal form).
+2. Landau: μ log = −μ * Λ twisted by χ, so Σ μχ log n = −Σ_d μχ(d) ψ_χ(X/d); with Stirling for Σ log n and
+   Σ 1/d ≤ 1 + log X this gives Σ μχ = o(X). Three passes (explicit intermediate inequalities for `linarith`).
+3. Tail and convolution: |L(1) − S(k)| ≤ 2N/k by Abel summation; Σ_{n≤X} μχ(n)/n · S(X/n) = 1 from
+   (μχ/n) * (χ/n) = δ; then s(X)L(1) = 1 + T(X), with T split at X/n = K. The head is ≤ 4N/K; the tail is grouped
+   by j = X/n, and each block (X/(j+1), X/j] is bounded by 4δ through discrete Abel summation and Landau. About six
+   passes (`omega` does not know that X/K ≥ 0 when K is a variable, a missing K ≥ 1 hypothesis, `field_simp`
+   needing n ≠ 0 in ℂ).
+4. Series for M: the absolutely summable M̃ partial sums plus s(X) give `tendsto_M_partial`. One pass.
+5. Full build OK (7756 jobs), audit 28 proved and 1 open (`blowup_limit`), numerics PASS, pytest 115 passed.
 
 ## Results of the full run
 
