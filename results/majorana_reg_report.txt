@@ -43,6 +43,6 @@
     Tikhonov on the boost     | yes, every L (check 4)    | no                               | diverges ~ S/sqrt(eps) from on-line zeros only
     Speed: the cut-off converges like n^(-2(1-alpha)) and n^(-(2alpha-3/2)) (check 2), slower than direct quadrature;
     Tikhonov trades the divergence for an eps^(-1/2) law. Neither stabilises the criterion; the term is rejected as a
-    regularisation of the GRH criterion, as agreed. What remains useful is the tower itself (Lean: tower_casimir etc.). 
+    regularisation of the GRH criterion. What remains useful is the tower itself (Lean: tower_casimir etc.). 
 
 5/5 checks consistent; done in 362.1s

@@ -119,7 +119,7 @@ cut-off: `truncNorm_integrable` (∫₀^T |M_χ|² x^{1−2α} < ∞ for every �
 - With an off-line zero, the fixed cut-off gives the same value as for the true L to 10⁻⁴.
 - The Tikhonov version diverges exactly like S/√ε, where S sums over the zeros on the line only.
 
-So the term was rejected, as agreed. Lean also checks the tower itself: the D⁺_k commutators, the Casimir k(k − 1)
+So the term is rejected. Lean also checks the tower itself: the D⁺_k commutators, the Casimir k(k − 1)
 and Majorana's decreasing mass spectrum (`MajoranaTower.lean`).
 
 ## Methodology

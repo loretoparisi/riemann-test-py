@@ -2,9 +2,9 @@
 
 ## The question
 
-Loreto asked whether the Majorana tower / Hilbert-Polya operator can be added to the combined norm
+Can the Majorana tower / Hilbert-Polya operator be added to the combined norm
 N(alpha) = int_0^oo |M_chi(x)|^2 x^(1-2alpha) dx as a regularisation term that stabilises its convergence for
-alpha in (3/4, 1), and asked that such a term be rejected if it breaks the GRH equivalence (Lean:
+alpha in (3/4, 1)? A term that breaks the GRH equivalence is rejected (Lean:
 GRH(chi) <=> N(alpha) < oo for all alpha in (3/4, 1), `grh_iff_finite_norm`).
 
 The analysis, stated before testing. Any regularisation R_eps with R_eps(alpha) < oo for every chi at a fixed
