@@ -68,8 +68,8 @@ theorem listed as open stops needing it.
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Unit tests | `pytest -q` | 120 tests pass (the Lean audit test skips when lake is absent) |
-| Lean build + audit + numerics | `python -m riemann_lab lean` | PASS (30 proved, 1 open) |
+| Unit tests | `pytest -q` | 123 tests pass (the Lean audit test skips when lake is absent) |
+| Lean build + audit + numerics | `python -m riemann_lab lean` | PASS (37 proved, 1 open) |
 | Original checks | `python -m riemann_lab report` | zeros on the line in 3 windows to t = 10^6, Robin, Lagarias, Mertens, Li, Weil, GUE |
 | Extended criteria | `python -m riemann_lab extended` | 7/7 consistent |
 | Ramanujan × Masullo | `python -m riemann_lab ramanujan` | 8/8 consistent |
@@ -77,6 +77,7 @@ theorem listed as open stops needing it.
 | Hardy–Littlewood–Ramanujan | `python -m riemann_lab hlr` | 6/6 consistent |
 | Combined norm | `python -m riemann_lab combined` | 5/5 consistent |
 | Majorana tower as Hilbert–Pólya frame | `python -m riemann_lab majorana-hp` | 5/5 consistent |
+| Majorana regularisation of the norm | `python -m riemann_lab majorana-reg` | 5/5 consistent |
 
 Raw output is in [`results/`](results/); what each check measures, and the convergence log of every run, is in
 [docs/TESTS.md](docs/TESTS.md).
@@ -103,6 +104,23 @@ Meixner–Pollaczek weight, xp is Berry–Keating's (1999) Hamiltonian, and that
 lines of an operator built from ζ is the picture of Connes (1999) and Berry–Keating; what is checked here is the specific
 form in Majorana's representations and its link to the Lean blow-up constant. Criteria and convergence log:
 [docs/majorana_hp_done_criteria.md](docs/majorana_hp_done_criteria.md), [docs/TESTS.md](docs/TESTS.md).
+
+### 4. Can the Majorana tower regularise the norm? No, and Lean says why
+
+Adding the Majorana tower to the combined norm as a regularisation, either as a cut-off at n tower levels or as a
+Tikhonov term ⟨v₀|(|L(1/2 − 2iK₁)|² + ε)⁻¹|v₀⟩, gives a quantity that is finite for every character at a fixed n or
+ε. A quantity that is finite with or without off-line zeros cannot detect them, so at a fixed parameter it is not a
+GRH criterion. In the limit it gives back the original criterion and nothing more. Lean proves both halves for the
+cut-off: `truncNorm_integrable` (∫₀^T |M_χ|² x^{1−2α} < ∞ for every χ, unconditionally) and
+`grh_iff_truncNorm_bounded` (GRH ⟺ these are bounded in T for every α ∈ (3/4, 1)). Numerically
+(`python -m riemann_lab majorana-reg`):
+
+- The tower cut-off converges slowly, like n^{−2(1−α)}, because M_χ(0) = 1/L(1, χ) ≠ 0.
+- With an off-line zero, the fixed cut-off gives the same value as for the true L to 10⁻⁴.
+- The Tikhonov version diverges exactly like S/√ε, where S sums over the zeros on the line only.
+
+So the term was rejected, as agreed. Lean also checks the tower itself: the D⁺_k commutators, the Casimir k(k − 1)
+and Majorana's decreasing mass spectrum (`MajoranaTower.lean`).
 
 ## Methodology
 
@@ -190,6 +208,7 @@ python -m riemann_lab majorana           # full run, ~7 min on 4 cores (results/
 python -m riemann_lab hlr                # Hardy-Littlewood-Ramanujan investigation, ~28 min (results/hlr_report.txt)
 python -m riemann_lab combined           # Ramanujan + Majorana + Masullo combined norm, ~60 min (results/combined_report.txt)
 python -m riemann_lab majorana-hp        # Majorana tower as a Hilbert-Polya frame, ~10 min (results/majorana_hp_report.txt)
+python -m riemann_lab majorana-reg       # Majorana regularisation of the norm, ~6 min (results/majorana_reg_report.txt)
 python -m riemann_lab lean             # Lean 4: lake build + axiom audit + numerics (needs elan)
 python -m riemann_lab turing 1e6 1.0005e6 # Turing's method on one window
 python -m riemann_lab verify 100000 102000  # Turing-style check of one window
@@ -225,6 +244,8 @@ python -m riemann_lab plots --out docs/plots
 | `combined_checks` | Runs the five combined checks ([docs/combined_done_criteria.md](docs/combined_done_criteria.md)) | `run` |
 | `majorana_hp` | Majorana's tower as a Hilbert–Pólya frame: oscillator realisation of D⁺_{1/4} ⊕ D⁺_{3/4} and xp, the boost K₁ of D⁺_k as the Gauss rule of \|Γ(k + iE)\|², the combined norm as a tower sum, the Jacobi matrix of \|Γ/L\|² dE and its eigenvalues locking onto the zeros | `oscillator_check`, `tower_rule`, `tower_norm`, `arithmetic_measure`, `lanczos_rule`, `point_mass_pred` |
 | `majorana_hp_checks` | Runs the five checks ([docs/majorana_hp_done_criteria.md](docs/majorana_hp_done_criteria.md)) | `run` |
+| `majorana_reg` | Regularisations of the combined norm by the Majorana tower: coefficients of M_χ in the D⁺ basis by FFT of a generating function, cut-off norms, an off-line-zero model with exact binomial coefficients, Tikhonov on the boost | `tower_coeffs_true`, `tower_coeffs_model`, `partial_norms`, `tikhonov_critical` |
+| `majorana_reg_checks` | Runs the five checks ([docs/majorana_reg_done_criteria.md](docs/majorana_reg_done_criteria.md)) | `run` |
 | `lean_bridge` | Launcher for the Lean 4 project in `lean/`: `lake build`, `#print axioms` audit (proved vs `sorry`), mpmath checks of the Lean statements | `build`, `audit`, `classify`, `numerics`, `run` |
 | `plots` | The figures below | `make_all` |
 
