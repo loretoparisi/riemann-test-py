@@ -1,4 +1,4 @@
-"""Command line: python -m riemann_lab {report,extended,ramanujan,majorana,hlr,combined,majorana-hp,lean,plots,verify,turing} ..."""
+"""Command line: python -m riemann_lab {report,extended,ramanujan,majorana,hlr,combined,majorana-hp,majorana-reg,lean,plots,verify,turing} ..."""
 from __future__ import annotations
 
 import argparse
@@ -72,6 +72,11 @@ def main(argv=None):
     mh.add_argument("--quick", action="store_true")
     mh.add_argument("--only", nargs="*", help="subset, e.g. oscillator_singleton boost_spectral_measure tower_norm "
                     "boost_point_spectrum off_line_control")
+    mr = sub.add_parser("majorana-reg", help="Majorana regularisation of the combined norm: tower cut-off and Tikhonov "
+                        "on the boost, with an off-line-zero model; is the regularised criterion still GRH?")
+    mr.add_argument("--quick", action="store_true")
+    mr.add_argument("--only", nargs="*", help="subset, e.g. tower_coefficients tower_cutoff_true tower_cutoff_offline "
+                    "tikhonov_critical verdict")
     ln = sub.add_parser("lean", help="Lean 4 + Mathlib: build lean/, audit axioms (proved vs sorry), numeric cross-check")
     ln.add_argument("--skip-build", action="store_true")
     ln.add_argument("--skip-numerics", action="store_true")
@@ -102,6 +107,9 @@ def main(argv=None):
     elif a.cmd == "majorana-hp":
         from . import majorana_hp_checks
         majorana_hp_checks.run(a.quick, a.only)
+    elif a.cmd == "majorana-reg":
+        from . import majorana_reg_checks
+        majorana_reg_checks.run(a.quick, a.only)
     elif a.cmd == "lean":
         import sys
         from . import lean_bridge

@@ -162,7 +162,7 @@ theorem grh_iff_truncNorm_bounded (χ : DirichletCharacter ℂ N) (hprim : χ.Is
   · intro h α hα
     refine ⟨∫ x in Ioi (0 : ℝ), ‖M χ x‖ ^ 2 * x ^ (1 - 2 * α), fun T hT => ?_⟩
     rw [intervalIntegral.integral_of_le hT]
-    refine setIntegral_mono_set (h α hα) ?_ (HasSubset.Subset.eventuallyLE Ioc_subset_Ioi_self)
+    refine setIntegral_mono_set (h α hα) ?_ (show Ioc (0 : ℝ) T ≤ Ioi 0 from Ioc_subset_Ioi_self).eventuallyLE
     exact (ae_restrict_iff' measurableSet_Ioi).mpr
       (Eventually.of_forall fun x hx => integrand_nonneg χ α (le_of_lt hx))
   · intro h α hα
