@@ -423,7 +423,7 @@ With F_χ(w) = Σ μ(n)χ(n) n/(1 − i n² w) (the Laplace transform of M_χ) a
 1. Trials before the first full pass: the critical-blowup h range (10^−2…10^−5) was replaced by h = (10…0.01)·B/||M||²_{0.2},
    since the smooth part dominates until h ≈ B; the coarse-space criterion "agree to 10^−8" became "finite and within
    10^−3", since the model multiplies L by a rational factor that shifts the norm by ~2·10^−4 everywhere.
-2. A first attempt was stopped during `line-norm` to add the unconditional range c < 0 (Loreto asked for the equality); its [0, 1]
+2. A first attempt was stopped during `line-norm` to add the unconditional range c < 0 (to state the equality); its [0, 1]
    quadrature was 1% off for c < 0 until rewritten as ∫|G|² dy with M − c0 = x G(x).
 3. Pass 1, 3/5: `critical-blowup` missed for ζ by 3.4·10^−6: c = 1/4 − h was formed in 15 digits, which shifts
    h = 2·10^−12 by 5·10^−5 relative. Fixed (c at working precision, exact β = 3/5). `off-line-control` needed the
