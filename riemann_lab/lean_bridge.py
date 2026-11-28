@@ -69,6 +69,14 @@ PROVED = {
                                      "Re s_i = -1/4, s_i distinct, sum |c_i| < oo",
     "RiemannLab.blowup_limit_of_expansion": "(alpha - 3/4) ||M_chi||^2 -> (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2, "
                                             "given GRH, the named hypothesis ZeroExpansion, absolute convergence",
+    "RiemannLab.tower_comm_J0_Jp": "Majorana tower D+_k on all sequences: [J0, J+] = J+",
+    "RiemannLab.tower_comm_J0_Jm": "Majorana tower D+_k: [J0, J-] = -J-",
+    "RiemannLab.tower_comm_Jp_Jm": "Majorana tower D+_k: [J+, J-] = -2 J0, k >= 0",
+    "RiemannLab.tower_casimir": "Majorana tower D+_k: J0^2 - J0 - J+J- = k(k-1), k >= 0",
+    "RiemannLab.restMass_strictAnti": "Majorana rest masses m k/(k + n) strictly decreasing, m, k > 0",
+    "RiemannLab.truncNorm_integrable": "int_0^T |M_chi|^2 x^(1-2 alpha) < oo for every chi, alpha < 1, T (unconditional: "
+                                       "a fixed cut-off cannot decide GRH)",
+    "RiemannLab.grh_iff_truncNorm_bounded": "GRH(chi) <=> for all alpha in (3/4, 1) the cut-off norms are bounded in T",
 }
 OPEN = {
     "RiemannLab.blowup_limit": "(alpha - 3/4) ||M_chi||^2 -> (1/8) sum |Gamma((1-rho)/2)/L'(rho)|^2, "
