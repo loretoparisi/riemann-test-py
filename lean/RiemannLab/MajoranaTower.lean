@@ -132,7 +132,6 @@ theorem truncNorm_integrable (χ : DirichletCharacter ℂ N) {α : ℝ} (hα : �
       exact integrableOn_empty
     · have := (intervalIntegral.intervalIntegrable_rpow' (a := 0) (b := T) (r := 1 - 2 * α)
         (by linarith)).1
-      rw [uIoc_of_le hT.le] at this
       exact this.const_mul _
   have hc : ContinuousOn (fun x : ℝ => ‖M χ x‖ ^ 2 * x ^ (1 - 2 * α)) (Ioi 0) :=
     ((continuousOn_M χ).norm.pow 2).mul
@@ -163,7 +162,7 @@ theorem grh_iff_truncNorm_bounded (χ : DirichletCharacter ℂ N) (hprim : χ.Is
   · intro h α hα
     refine ⟨∫ x in Ioi (0 : ℝ), ‖M χ x‖ ^ 2 * x ^ (1 - 2 * α), fun T hT => ?_⟩
     rw [intervalIntegral.integral_of_le hT]
-    refine setIntegral_mono_set (h α hα) ?_ Ioc_subset_Ioi_self.eventuallyLE
+    refine setIntegral_mono_set (h α hα) ?_ (HasSubset.Subset.eventuallyLE Ioc_subset_Ioi_self)
     exact (ae_restrict_iff' measurableSet_Ioi).mpr
       (Eventually.of_forall fun x hx => integrand_nonneg χ α (le_of_lt hx))
   · intro h α hα
