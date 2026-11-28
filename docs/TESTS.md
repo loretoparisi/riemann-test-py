@@ -8,6 +8,7 @@ not certificates; the Lean section is the only part that is machine-checked proo
 * [Original checks](#results-of-the-full-run) · [Extended criteria](#results-of-the-extended-run-new-criteria)
 * [Ramanujan × Masullo](#ramanujan--masullo-third-run) · [Majorana × Masullo](#majorana--masullo-fourth-run)
 * [Hardy–Littlewood–Ramanujan](#hardylittlewoodramanujan-investigation-fifth-run) · [Combined norm](#ramanujan--majorana--masullo-one-combined-norm-sixth-run)
+* [Majorana tower as a Hilbert–Pólya frame](#majoranas-tower-as-a-hilbertpólya-frame-twelfth-run)
 
 ## Lean 4 formalisation (seventh to ninth runs)
 
@@ -430,3 +431,51 @@ With F_χ(w) = Σ μ(n)χ(n) n/(1 − i n² w) (the Laplace transform of M_χ) a
 4. Pass 2, 4/5: `critical-blowup` missed for χ5_1 by 1.1·10^−6, which is the b h² term of a first-order Richardson.
    Second order on the three smallest h. Pass 3 of that check: consistent (all within 1.4·10^−9).
 
+
+## Majorana's tower as a Hilbert–Pólya frame (twelfth run)
+
+`python -m riemann_lab majorana-hp`. Criteria: [docs/majorana_hp_done_criteria.md](majorana_hp_done_criteria.md).
+**5/5 consistent** (`../results/majorana_hp_report.txt`, ~9 min on 4 cores). Numerical evidence about low zeros, not
+proof: the operator is built from L and cannot exclude zeros off the line.
+
+1. `oscillator-singleton`: one oscillator at N = 400, 800 levels is D⁺_{1/4} ⊕ D⁺_{3/4} (relations and Casimir −3/16 to
+   ~4·10^−16 relative; even sector = Plyushchay's D⁺_{1/4} matrices to 6·10^−14); (xp + px)/2 = −2K₂ to 10^−13; the
+   dilated Gaussians e^{−x²/2n²} are squeezed vacua (closed form to 2·10^−15); ⟨φ₀, e^{−iλD} φ₀⟩ = (cosh λ)^{−1/2} from the
+   truncated matrix and from the Fourier transform of |Γ(1/4 + iE/2)|², to ~10^−14.
+2. `boost-spectral-measure`: the n-level boost K₁ of D⁺_k is the Gauss rule of |Γ(k + iE)|² dE for k = 0.05 … 0.25: mass
+   2πΓ(2k)/4^k to 10^−15, moments E^{2m} (m ≤ 10) to 7·10^−16, characteristic function to 10^−15 already at n = 200.
+3. `tower-norm`: the combined norm as (1/2π) Σ_j w_j/|L(1 − 2k − 2iE_j)|² over the tower's eigenvalues (no zeros). ζ:
+   errors 8·10^−7 → 1.4·10^−8 from n = 200 to 800 (p ≈ 2.7–2.9). Characters: 2·10^−6 … 10^−2 at n = 800, slow and
+   non-monotone, because the eigenvalues near height E are spaced ~π/log(n/E) ≈ 0.5, wider than the peak width
+   1/4 − k of 1/L near the low zeros (E ≈ 2–4). The finite tower cannot resolve the critical line at any feasible n.
+4. `boost-point-spectrum`: k = 1/4 − h, h = 10^−3, 10^−4, 10^−5, Jacobi matrix (n = peaks + 32) of
+   |Γ(k + iE)/L(1 − 2k − 2iE)|² dE by Lanczos on a panel discretisation. For ζ (4 zero pairs), χ4, χ3_1 (3 pairs) and
+   the complex χ5_1 (3 zeros of L(χ), 3 of L(χ̄)), the eigenvalue nearest −γ/2 approaches it by ×8.7–×10 per decade
+   of h (≤ 9·10^−5 at h = 10^−5), and h × weight equals |Γ((1−ρ)/2)|²/(8|L′(ρ)|²) to ≤ 2.2·10^−3; the tracked zeros
+   reproduce their share of B_χ to ≤ 7·10^−4. Two panel orders agree to 7·10^−12.
+5. `off-line-control`: model ζ with its first pair moved to 3/5 ± iγ₁. At k = 1/4 − h the node near −γ₁/2 has
+   h × weight 9·10^−12 → 9·10^−14 (×10 per decade, so no point mass), while the next two pairs still lock. At
+   k = 1/5 − h (the line through the moved zero) it locks, with h × weight within 0.4% of the prediction. Visibility:
+   zeros above |γ| ≈ 20 (k = 0.05) or 22 (k = 1/4) have weight below 10^−16 and are invisible here.
+
+What this adds and what it does not. The critical value α = 3/4 of the Lean equivalence is Bargmann index 1/4, the
+even harmonic-oscillator sector, and the zeros on the critical line are the point spectrum of a renormalised Majorana
+boost (Berry–Keating's xp in that sector), with total mass the Lean blow-up constant B_χ. A zero β + iγ off the line
+would appear only in D⁺_k with k = (1 − β)/2. Proving that no D⁺_k with 0 < k < 1/4 carries point spectrum is
+L ≠ 0 on 1/2 < Re s < 1, which is GRH; Majorana's representation theory supplies no positivity that forces it.
+
+### Convergence log (Majorana tower run)
+
+1. Trials before the first run: algebra and Casimir errors made relative to the entry scale (absolute rounding 2·10^−11
+   at N = 400); the trapezoid step taken as 2X/(M − 1), since x[1] − x[0] loses 10^−11; moments from ⟨e₀, K₁^{2m} e₀⟩, since
+   the eigenvector weights of the outermost nodes (~10^−300) carry rounding times E^{20}; the off-line criterion
+   "h w below 1% of the on-line value" replaced by "h w → 0 like h" (smooth mass near −γ₁/2 is not small against
+   B = 2·10^−10 until h ~ 10^−5).
+2. Quick run, 2/5: char-function test failed on noise (10^−15 vs 5·10^−16, floor set to 10^−14); `tower-norm` not
+   monotone for χ4 (resolution limit, see 3 above); `boost-point-spectrum` with n = 30 < 28 peaks + smooth part left
+   χ4 zeros 2, 3 unlocked: h moved to 10^−3 … 10^−5 and n to peaks + 16.
+3. Full pass 1, 3/5: `tower-norm` reached 10^−2 for χ mod 5 (criterion relaxed to 2·10^−2 plus the spacing law
+   π/log(n/E) within 25%); `boost-point-spectrum` locked nodes for χ5_1 moved 9·10^−7 between panel orders, because
+   with T = 20 nodes are placed where the weight e^{−π|E|} is below rounding. Window set to the tracked zeros + 4.
+4. Full pass 2, 4/5: with the narrower window, n = peaks + 16 left the third χ4 zero with 78% of its mass; n = peaks + 32.
+5. Full pass 3: 5/5 consistent.

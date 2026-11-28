@@ -68,7 +68,7 @@ theorem listed as open stops needing it.
 
 | Suite | Command | Result |
 | --- | --- | --- |
-| Unit tests | `pytest -q` | 115 tests pass (the Lean audit test skips when lake is absent) |
+| Unit tests | `pytest -q` | 120 tests pass (the Lean audit test skips when lake is absent) |
 | Lean build + audit + numerics | `python -m riemann_lab lean` | PASS (30 proved, 1 open) |
 | Original checks | `python -m riemann_lab report` | zeros on the line in 3 windows to t = 10^6, Robin, Lagarias, Mertens, Li, Weil, GUE |
 | Extended criteria | `python -m riemann_lab extended` | 7/7 consistent |
@@ -76,9 +76,33 @@ theorem listed as open stops needing it.
 | Majorana × Masullo | `python -m riemann_lab majorana` | 8/8 consistent |
 | Hardy–Littlewood–Ramanujan | `python -m riemann_lab hlr` | 6/6 consistent |
 | Combined norm | `python -m riemann_lab combined` | 5/5 consistent |
+| Majorana tower as Hilbert–Pólya frame | `python -m riemann_lab majorana-hp` | 5/5 consistent |
 
 Raw output is in [`results/`](results/); what each check measures, and the convergence log of every run, is in
 [docs/TESTS.md](docs/TESTS.md).
+
+### 3. Majorana's infinite-component tower as a Hilbert–Pólya frame (numerical)
+
+Majorana's infinite-component equations live in lowest-weight representations D⁺_k of SL(2, ℝ). Their compact
+generator gives his discrete mass spectrum; the noncompact one, the boost K₁, has spectral measure |Γ(k + iE)|² dE on
+the lowest state. That is the weight of Masullo's line Re z = k, so the combined norm is
+⟨v₀| |L(1 − 2k − 2iK₁, χ)|⁻² |v₀⟩ in D⁺_k. At k = 1/4 (α = 3/4, the critical line) D⁺_k is the even sector of one
+harmonic oscillator, the boost is −(xp + px)/4 (Berry–Keating's xp), and M_χ(x²) is a Möbius sum of squeezed vacua.
+
+As k → 1/4 the Jacobi matrix of |Γ(k + iE)/L(1 − 2k − 2iE)|² dE (a finite symmetric matrix computed from values of L on
+a line, with no zeros as input) has eigenvalues that converge to −γ/2 for each zero 1/2 + iγ, with error ∝ 1/4 − k,
+and (1/4 − k) × weight → |Γ((1−ρ)/2)|²/(8|L′(ρ)|²), each zero's share of the blow-up constant B_χ. Checked for ζ and
+χ mod 3, 4, 5 (weights to 0.2% or better, positions to 10⁻⁴ at 1/4 − k = 10⁻⁵). So the zeros on the critical line are the point spectrum of a
+renormalised Majorana boost: a Hilbert–Pólya-type construction.
+
+It is not a proof route on its own. The operator is built from L, so a zero β + iγ off the line would show up only in
+D⁺_k with k = (1 − β)/2, not at k = 1/4 (checked with a model L). Showing that no D⁺_k with k < 1/4 has such point
+spectrum is the statement L ≠ 0 on 1/2 < Re s < 1, which is GRH. A finite tower is also a poor quadrature near the
+line: its eigenvalues near height E are spaced ~π/log(n/E). Prior art: the boost spectral measure is the classical
+Meixner–Pollaczek weight, xp is Berry–Keating's (1999) Hamiltonian, and that zeros appear as resonances or absorption
+lines of an operator built from ζ is the picture of Connes (1999) and Berry–Keating; what is checked here is the specific
+form in Majorana's representations and its link to the Lean blow-up constant. Criteria and convergence log:
+[docs/majorana_hp_done_criteria.md](docs/majorana_hp_done_criteria.md), [docs/TESTS.md](docs/TESTS.md).
 
 ## Methodology
 
@@ -165,6 +189,7 @@ python -m riemann_lab majorana --quick    # Majorana x Masullo checks, ~5 min
 python -m riemann_lab majorana           # full run, ~7 min on 4 cores (results/majorana_report.txt)
 python -m riemann_lab hlr                # Hardy-Littlewood-Ramanujan investigation, ~28 min (results/hlr_report.txt)
 python -m riemann_lab combined           # Ramanujan + Majorana + Masullo combined norm, ~60 min (results/combined_report.txt)
+python -m riemann_lab majorana-hp        # Majorana tower as a Hilbert-Polya frame, ~10 min (results/majorana_hp_report.txt)
 python -m riemann_lab lean             # Lean 4: lake build + axiom audit + numerics (needs elan)
 python -m riemann_lab turing 1e6 1.0005e6 # Turing's method on one window
 python -m riemann_lab verify 100000 102000  # Turing-style check of one window
@@ -198,6 +223,8 @@ python -m riemann_lab plots --out docs/plots
 | `hlr_checks` | Runs the six HLR checks ([docs/hlr_done_criteria.md](docs/hlr_done_criteria.md)) | `run` |
 | `combined` | One norm, four computations: Majorana's D⁺_α (holomorphic F_χ(w) = Σμχ(n) n/(1 − i n² w), Paley–Wiener), the Laplace side, Masullo's line seminorm on Re z = 1 − α, and RMT + Plancherel (|Γ/L|² on the line); blow-up at the critical line; an off-line-zero model | `line_norm_x`, `line_norm_mellin`, `Holo`, `hline_integral`, `laplace_weighted`, `B_from_zeros`, `moved_zero_L` |
 | `combined_checks` | Runs the five combined checks ([docs/combined_done_criteria.md](docs/combined_done_criteria.md)) | `run` |
+| `majorana_hp` | Majorana's tower as a Hilbert–Pólya frame: oscillator realisation of D⁺_{1/4} ⊕ D⁺_{3/4} and xp, the boost K₁ of D⁺_k as the Gauss rule of \|Γ(k + iE)\|², the combined norm as a tower sum, the Jacobi matrix of \|Γ/L\|² dE and its eigenvalues locking onto the zeros | `oscillator_check`, `tower_rule`, `tower_norm`, `arithmetic_measure`, `lanczos_rule`, `point_mass_pred` |
+| `majorana_hp_checks` | Runs the five checks ([docs/majorana_hp_done_criteria.md](docs/majorana_hp_done_criteria.md)) | `run` |
 | `lean_bridge` | Launcher for the Lean 4 project in `lean/`: `lake build`, `#print axioms` audit (proved vs `sorry`), mpmath checks of the Lean statements | `build`, `audit`, `classify`, `numerics`, `run` |
 | `plots` | The figures below | `make_all` |
 
