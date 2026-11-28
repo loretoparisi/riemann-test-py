@@ -34,3 +34,10 @@ import RiemannLab
 #print axioms RiemannLab.tendsto_meanValue'
 #print axioms RiemannLab.blowup_limit_of_expansion
 #print axioms RiemannLab.blowup_limit
+#print axioms RiemannLab.tower_comm_J0_Jp
+#print axioms RiemannLab.tower_comm_J0_Jm
+#print axioms RiemannLab.tower_comm_Jp_Jm
+#print axioms RiemannLab.tower_casimir
+#print axioms RiemannLab.restMass_strictAnti
+#print axioms RiemannLab.truncNorm_integrable
+#print axioms RiemannLab.grh_iff_truncNorm_bounded
