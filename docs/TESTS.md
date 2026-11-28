@@ -8,7 +8,7 @@ not certificates; the Lean section is the only part that is machine-checked proo
 * [Original checks](#results-of-the-full-run) · [Extended criteria](#results-of-the-extended-run-new-criteria)
 * [Ramanujan × Masullo](#ramanujan--masullo-third-run) · [Majorana × Masullo](#majorana--masullo-fourth-run)
 * [Hardy–Littlewood–Ramanujan](#hardylittlewoodramanujan-investigation-fifth-run) · [Combined norm](#ramanujan--majorana--masullo-one-combined-norm-sixth-run)
-* [Majorana tower as a Hilbert–Pólya frame](#majoranas-tower-as-a-hilbertpólya-frame-twelfth-run)
+* [Majorana tower as a Hilbert–Pólya frame](#majoranas-tower-as-a-hilbertpólya-frame-twelfth-run) · [Majorana regularisation](#majorana-regularisation-of-the-combined-norm-thirteenth-run)
 
 ## Lean 4 formalisation (seventh to ninth runs)
 
@@ -479,3 +479,32 @@ L ≠ 0 on 1/2 < Re s < 1, which is GRH; Majorana's representation theory suppli
    with T = 20 nodes are placed where the weight e^{−π|E|} is below rounding. Window set to the tracked zeros + 4.
 4. Full pass 2, 4/5: with the narrower window, n = peaks + 16 left the third χ4 zero with 78% of its mass; n = peaks + 32.
 5. Full pass 3: 5/5 consistent.
+
+## Majorana regularisation of the combined norm (thirteenth run)
+
+`python -m riemann_lab majorana-reg`. Criteria: [docs/majorana_reg_done_criteria.md](majorana_reg_done_criteria.md).
+**5/5 consistent in the first full pass** (`../results/majorana_reg_report.txt`, 6 min). Lean companion:
+`lean/RiemannLab/MajoranaTower.lean`.
+
+1. `tower-coefficients`: the coefficients c_m of M_χ in Majorana's D⁺ basis come from the FFT of
+   (1 − r)^{−2α} 𝓛M((1+r)/(1−r)). Two FFT sizes agree to 2·10^−14. For ζ, Σ|c_m|² over m < 4096 equals the line norm
+   to 7·10^−9. The model terms agree with an exact binomial convolution to 10^−11.
+2. `tower-cutoff-true`: for ζ the relative gap is 6.6·10^−9 at n = 4096. For χ4 and χ3_1 the gap decays like
+   n^{−2(1−α)}: fitted 0.398–0.400 against 0.4 at α = 0.8, and 0.200 against 0.2 at α = 0.9. It is still 1.6% and 14%
+   at n = 4096. The cause is M_χ(0) = 1/L(1, χ) ≠ 0.
+3. `tower-cutoff-offline`: χ4 with its first pair moved to β = 0.8 (norm infinite for α < 0.9). At n ≤ 4096 the model
+   and the true N_n differ by ≤ 8·10^−5 relative. The off-line part grows log-periodically up to n = 2^17. The
+   difference of its window-averaged exponents between α = 0.8 and α = 0.95 is 0.30, 0.30, 0.30, against the predicted 0.3.
+4. `tikhonov-critical`: N_ε is finite for every ε. √ε N_ε (Richardson) equals S = Σ|Γ((1−ρ)/2)|²/(4|L′(ρ)|) to
+   2·10^−15 (ζ) and 3·10^−12 (χ4). For the model, the moved pair gives no ε^{−1/2} term: S drops from 3.4·10^−10 to
+   3.9·10^−15, the sum over the remaining on-line zeros.
+5. `verdict`: neither regularisation is a GRH criterion at a fixed parameter, and in the limit each is the old
+   criterion. The term is rejected.
+
+### Convergence log (regularisation run)
+
+1. Trials before the first run: for ζ the model's off-line terms have |d|² ~ 10^−10 and are invisible, so the model uses χ4.
+   The true χ4 converges like n^{−2(1−α)}, not like the zero-driven rate first predicted. The off-line growth law is
+   not reached by n = 2^17, so its test compares two α. The Tikhonov ε range is scaled to (S/N_bg)², as in the
+   blow-up check of the combined run.
+2. Full pass 1: 5/5 consistent.

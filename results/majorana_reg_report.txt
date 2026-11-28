@@ -1,0 +1,48 @@
+== riemann-lab: Majorana regularisation of the combined norm (criteria in docs/majorana_reg_done_criteria.md) ==
+   (numerical evidence, not proof; 'CONSISTENT' = every criterion met)
+
+[tower-coefficients] CONSISTENT  (45.7s)
+    zeta   alpha = 0.8: FFT 2^15 vs 2^16 1.7e-16; sum_(m<4096) |c_m|^2 = 1.1205315408, line norm 1.1205315482 (rel. 6.6e-09)
+    zeta   alpha = 0.9: FFT 2^15 vs 2^16 1.6e-16; sum_(m<4096) |c_m|^2 = 0.9229653339, line norm 0.9229653349 (rel. 1.1e-09)
+    chi4   alpha = 0.8: FFT 2^15 vs 2^16 3.7e-15; sum_(m<4096) |c_m|^2 = 3.0925178135, line norm 3.1425707293 (rel. 1.6e-02)
+    chi4   alpha = 0.9: FFT 2^15 vs 2^16 1.9e-14; sum_(m<4096) |c_m|^2 = 5.9252205694, line norm 6.9115850186 (rel. 1.4e-01)
+    model terms (chi4, beta = 0.8), alpha = 0.8: FFT vs exact binomial convolution 3.7e-12
+    model terms (chi4, beta = 0.8), alpha = 0.95: FFT vs exact binomial convolution 1.2e-11
+    c_m = <M_chi, psi_m> in Majorana's basis of D+ (Laguerre functions of L^2(t^(1-2alpha) dt)). 
+
+[tower-cutoff-true] CONSISTENT  (53.9s)
+    zeta   alpha = 0.8: relative gap N - N_n at n = 256, 1024, 4096: 6.4e-06, 1.8e-07, 6.6e-09 (M(0) = 1/zeta(1) = 0: fast)
+    zeta   alpha = 0.9: relative gap N - N_n at n = 256, 1024, 4096: 2.1e-06, 4.4e-08, 1.1e-09 (M(0) = 1/zeta(1) = 0: fast)
+    chi4   alpha = 0.8: relative gap at n = 256, 1024, 4096: 4.81e-02, 2.77e-02, 1.59e-02; fitted exponent 0.398 vs 2(1 - alpha) = 0.400
+    chi4   alpha = 0.9: relative gap at n = 256, 1024, 4096: 2.48e-01, 1.88e-01, 1.43e-01; fitted exponent 0.200 vs 2(1 - alpha) = 0.200
+    chi3_1 alpha = 0.8: relative gap at n = 256, 1024, 4096: 4.37e-02, 2.51e-02, 1.44e-02; fitted exponent 0.400 vs 2(1 - alpha) = 0.400
+    chi3_1 alpha = 0.9: relative gap at n = 256, 1024, 4096: 2.38e-01, 1.80e-01, 1.36e-01; fitted exponent 0.200 vs 2(1 - alpha) = 0.200
+    For chi != 1 the cut-off converges like n^(-2(1-alpha)): M_chi(0) = 1/L(1, chi) != 0 is a constant near x = 0,
+    expanded in a basis that vanishes there like x^(2alpha-1). With the zeros' n^(-(2alpha-3/2)) this is slowest at both
+    ends of (3/4, 1): the tower cut-off does not stabilise the norm, it converges more slowly than direct quadrature. 
+
+[tower-cutoff-offline] CONSISTENT  (3.1s)
+    chi4, first pair moved to beta = 0.8 (norm infinite for alpha < 0.9), alpha = 0.8: N_n true 2.879616, 2.991378, 3.055624, 3.092518, model 2.879662, 2.991430, 3.055765, 3.092775 at n = 64 ... 4096; rel. diff max 8.3e-05
+    off-line part sum_(m<n) |c_D,m|^2 at n = 2^6 ... 2^17: alpha = 0.8: 7.06e-06 -> 4.02e-04; alpha = 0.95: 2.55e-06 -> 2.35e-05
+    growth exponents averaged over 3 doublings: alpha = 0.8: 0.60, 0.44, 0.36 (-> 0.2); alpha = 0.95: 0.29, 0.14, 0.06 (-> -0.1)
+    differences 0.30, 0.30, 0.30 vs predicted 0.3
+    A fixed cut-off gives the model and the true L the same number to 1e-4: it cannot see the off-line zero.
+    The divergence shows only as n -> oo, slowly and log-periodically, and still unresolved at n = 1.3e5. 
+
+[tikhonov-critical] CONSISTENT  (259.5s)
+    zeta: N_eps at eps = 7.4e-18, 7.4e-20, 7.4e-22, 7.4e-24: 1.37597, 2.50097, 13.751, 126.251 (all finite); sqrt(eps) N_eps Richardson 3.394369e-10, 3.394369e-10, 3.394369e-10 vs S = sum |Gamma((1-rho)/2)|^2/(4|L'(rho)|) = 3.394369e-10 (rel. 1.7e-15)
+    chi4: N_eps at eps = 1.9e-07, 1.9e-09, 1.9e-11, 1.9e-13: 2.70019, 4.9502, 27.4502, 252.45 (all finite); sqrt(eps) N_eps Richardson 1.082552e-04, 1.082552e-04, 1.082552e-04 vs S = sum |Gamma((1-rho)/2)|^2/(4|L'(rho)|) = 1.082552e-04 (rel. 2.9e-12)
+    model zeta (pair 1 moved to 3/5): N_eps at eps = 9.7e-28, 9.7e-30, 9.7e-32, 9.7e-34: 1.37572, 2.50072, 13.7507, 126.251 (all finite); sqrt(eps) N_eps Richardson 3.892556e-15, 3.892556e-15, 3.892556e-15 vs S = sum |Gamma((1-rho)/2)|^2/(4|L'(rho)|) = 3.892556e-15 (rel. 2.4e-14)
+    For the model, S is summed over the on-line zeros only: the moved pair contributes no eps^(-1/2) term.
+    So at fixed eps the regularised critical norm is finite for every L, with or without off-line zeros; as
+    eps -> 0 it diverges like S/sqrt(eps) from the zeros on the line, which says nothing about zeros off it. 
+
+[verdict] CONSISTENT  (0.0s)
+    regularisation            | finite at fixed parameter | GRH criterion at fixed parameter | in the limit
+    tower cut-off N_n (x side)| yes, every chi (Lean: truncNorm_integrable) | no | GRH <=> bounded in n (Lean: grh_iff_truncNorm_bounded)
+    Tikhonov on the boost     | yes, every L (check 4)    | no                               | diverges ~ S/sqrt(eps) from on-line zeros only
+    Speed: the cut-off converges like n^(-2(1-alpha)) and n^(-(2alpha-3/2)) (check 2), slower than direct quadrature;
+    Tikhonov trades the divergence for an eps^(-1/2) law. Neither stabilises the criterion; the term is rejected as a
+    regularisation of the GRH criterion, as agreed. What remains useful is the tower itself (Lean: tower_casimir etc.). 
+
+5/5 checks consistent; done in 362.1s
